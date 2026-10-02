@@ -135,3 +135,25 @@
         }
     });
 </script>
+<!-- 漢堡選單按鈕 (左上角) -->
+<div id="menu-btn" style="position: fixed; top: 20px; left: 20px; font-size: 30px; color: #00ffcc; cursor: pointer; z-index: 10005; background: #0b0f19; padding: 5px 15px; border-radius: 5px; border: 1px solid #00ffcc;">☰</div>
+
+<!-- 側邊選單 (一開始隱藏) -->
+<div id="side-menu" style="position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: #0b0f19; border-right: 2px solid #00ffcc; z-index: 10004; transition: left 0.3s; padding-top: 80px; padding-left: 20px;">
+    <h2 style="color: #00ffcc; margin-bottom: 20px;">📋 功能選單</h2>
+    <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">🏠 首頁</div>
+    <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">📚 問答卡片</div>
+    <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">ℹ️ 關於我們</div>
+</div>
+
+<script>
+    // 點擊漢堡按鈕打開/關閉選單
+    document.getElementById('menu-btn').addEventListener('click', () => {
+        const menu = document.getElementById('side-menu');
+        if (menu.style.left === '0px') {
+            menu.style.left = '-300px';
+        } else {
+            menu.style.left = '0px';
+        }
+    });
+</script>
