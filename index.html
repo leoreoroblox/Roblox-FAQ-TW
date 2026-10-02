@@ -53,3 +53,35 @@
 
 </body>
 </html>
+<div id="user-info" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: #00ffcc; padding: 15px; border-radius: 10px; border: 1px solid #00ffcc; font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5;">
+    <span id="close-btn" style="position: absolute; top: 5px; right: 10px; cursor: pointer; color: #ff5555; font-weight: bold;">✖</span>
+    <div style="margin-bottom: 5px;">📱 設備：<span id="device-type">偵測中...</span></div>
+    <div style="margin-bottom: 5px;">🌍 地區：<span id="user-region">偵測中...</span></div>
+    <div>🌐 IP：<span id="user-ip">偵測中...</span></div>
+</div>
+
+<script>
+    // 1. 判斷是手機還是電腦
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
+
+    // 2. 抓取使用者的 IP 和地區 (使用免費的 ipapi 服務)
+    fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('user-ip').innerText = data.ip || '無法取得';
+            document.getElementById('user-region').innerText = (data.city || '未知') + ', ' + (data.country_name || '未知');
+            // 資料抓到後，把卡片顯示出來
+            document.getElementById('user-info').style.display = 'block';
+        })
+        .catch(() => {
+            document.getElementById('user-ip').innerText = '讀取失敗';
+            document.getElementById('user-region').innerText = '讀取失敗';
+            document.getElementById('user-info').style.display = 'block';
+        });
+
+    // 3. 點擊叉叉可以關閉卡片
+    document.getElementById('close-btn').addEventListener('click', () => {
+        document.getElementById('user-info').style.display = 'none';
+    });
+</script>
