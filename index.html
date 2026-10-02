@@ -85,3 +85,44 @@
         document.getElementById('user-info').style.display = 'none';
     });
 </script>
+<!-- 隱藏的管理員按鈕 (右下角小齒輪) -->
+<div id="admin-btn" style="position: fixed; bottom: 20px; right: 20px; font-size: 30px; cursor: pointer; z-index: 10001; display: none;">⚙️</div>
+
+<!-- 管理員數據面板 (一開始先隱藏) -->
+<div id="admin-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0b0f19; border: 2px solid #00ffcc; padding: 30px; border-radius: 15px; color: #fff; z-index: 10002; display: none; text-align: center; width: 80%; max-width: 400px;">
+    <h2 style="color: #00ffcc; margin-top: 0;">👑 管理員專屬面板</h2>
+    <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+        <div>📝 帖子數<br><span style="font-size: 24px; color: #00ffcc;">1250</span></div>
+        <div>🟢 在線人數<br><span style="font-size: 24px; color: #00ffcc;">32</span></div>
+        <div>👥 會員數<br><span style="font-size: 24px; color: #00ffcc;">8520</span></div>
+    </div>
+    <button id="close-admin" style="background: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">關閉面板</button>
+</div>
+
+<script>
+    // 點擊右下角小齒輪，跳出密碼輸入框
+    document.getElementById('admin-btn').addEventListener('click', () => {
+        const password = prompt('請輸入管理員密碼：');
+        if (password === 'admin123') {
+            document.getElementById('admin-panel').style.display = 'block';
+        } else {
+            alert('密碼錯誤！你以為你是管理員嗎？😎');
+        }
+    });
+
+    // 點擊關閉按鈕
+    document.getElementById('close-admin').addEventListener('click', () => {
+        document.getElementById('admin-panel').style.display = 'none';
+    });
+
+    // 秘密開關：點擊 IP 卡片 5 次，就會出現管理員按鈕
+    let clickCount = 0;
+    document.getElementById('user-info').addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 5) {
+            document.getElementById('admin-btn').style.display = 'block';
+            clickCount = 0;
+            alert('管理員權限已解鎖！點擊右下角齒輪進入。');
+        }
+    });
+</script>
