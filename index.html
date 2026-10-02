@@ -5,29 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox 問答網</title>
     <style>
-        /* 給手機的專屬魔法 */
-@media (max-width: 768px) {
-    h1 { font-size: 28px; padding: 0 10px; }
-    #admin-panel { width: 90%; padding: 20px; }
-    #admin-panel h2 { font-size: 22px; }
-    #admin-panel div { font-size: 14px; }
-    #admin-panel span { font-size: 20px !important; }
-    #loader div:first-child { font-size: 24px !important; }
-}
         body { margin: 0; font-family: sans-serif; }
-        /* 載入畫面的箱子 */
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; color: #00ffcc; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        /* 三個點的閃爍魔法 */
         .dot { animation: blink 1.4s infinite both; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
-        /* 進度條的外觀 */
         .progress-container { width: 80%; background: #1a2332; border: 1px solid #00ffcc; border-radius: 5px; height: 30px; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #00ffcc, #0055ff); transition: width 0.1s; }
         #percent-text { margin-top: 15px; font-size: 24px; font-family: monospace; }
-        /* 最後出現的標題 */
-        h1 { color: #0055ff; text-align: center; margin-top: 50px; }
+        
+        /* 手機排版優化 */
+        @media (max-width: 768px) {
+            h1 { font-size: 28px; padding: 0 10px; }
+            #admin-panel { width: 90%; padding: 20px; }
+            #admin-panel h2 { font-size: 22px; }
+            #admin-panel div { font-size: 14px; }
+            #admin-panel span { font-size: 20px !important; }
+            #loader div:first-child { font-size: 24px !important; }
+        }
+
+        /* 卡片樣式 */
+        .card { background: #0b0f19; border: 1px solid #00ffcc; border-radius: 10px; padding: 20px; margin-bottom: 20px; color: #fff; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
+        .card h3 { color: #00ffcc; margin-top: 0; }
+        .card p { line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -35,26 +36,59 @@
     <!-- 加載畫面 -->
     <div id="loader">
         <div style="font-size: 20px; margin-bottom: 20px; font-family: monospace;">Loading<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
-        <div class="progress-container">
-            <div id="progress-bar"></div>
-        </div>
+        <div class="progress-container"><div id="progress-bar"></div></div>
         <div id="percent-text">0%</div>
     </div>
 
-    <!-- 網站主要內容 -->
-    <h1>歡迎使用roblox問答網</h1>
-<!-- 卡片區塊 -->
-<div style="padding: 20px; max-width: 600px; margin: 0 auto;">
-    
-    <!-- 第一張卡片 -->
-    <div style="background: #0b0f19; border: 1px solid #00ffcc; border-radius: 10px; padding: 20px; margin-bottom: 20px; color: #fff; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);">
-        <h3 style="color: #00ffcc; margin-top: 0;">❓ 什麼是 Robux？</h3>
-        <p style="line-height: 1.6;">Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。</p>
+    <!-- 漢堡選單按鈕 -->
+    <div id="menu-btn" style="position: fixed; top: 20px; left: 20px; font-size: 30px; color: #00ffcc; cursor: pointer; z-index: 10005; background: #0b0f19; padding: 5px 15px; border-radius: 5px; border: 1px solid #00ffcc;">☰</div>
+
+    <!-- 側邊選單 -->
+    <div id="side-menu" style="position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: #0b0f19; border-right: 2px solid #00ffcc; z-index: 10004; transition: left 0.3s; padding-top: 80px; padding-left: 20px;">
+        <h2 style="color: #00ffcc; margin-bottom: 20px;">📋 功能選單</h2>
+        <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="showPage('home')">🏠 首頁</div>
+        <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="showPage('qa')">📚 問答卡片</div>
+        <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">ℹ️ 關於我們</div>
     </div>
 
-</div>
-    <!-- 讓進度條跑起來的魔法 -->
+    <!-- 箱子 1：首頁 -->
+    <div id="home-page">
+        <h1>歡迎使用roblox問答網</h1>
+    </div>
+
+    <!-- 箱子 2：問答卡片區 (一開始先隱藏) -->
+    <div id="qa-page" style="display: none; padding: 20px; max-width: 600px; margin: 0 auto; padding-top: 80px;">
+        <!-- 第一張卡片 -->
+        <div class="card">
+            <h3>❓ 什麼是 Robux？</h3>
+            <p>Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。</p>
+        </div>
+        <!-- 你可以在這裡繼續加第二張、第三張卡片 -->
+    </div>
+
+    <!-- 管理員面板與小齒輪 (原本的內容) -->
+    <div id="admin-btn" style="position: fixed; bottom: 20px; right: 20px; font-size: 30px; cursor: pointer; z-index: 10001; display: none;">⚙️</div>
+    <div id="admin-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0b0f19; border: 2px solid #00ffcc; padding: 30px; border-radius: 15px; color: #fff; z-index: 10002; display: none; text-align: center; width: 80%; max-width: 400px;">
+        <h2 style="color: #00ffcc; margin-top: 0;">👑 管理員專屬面板</h2>
+        <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+            <div>📝 帖子數<br><span style="font-size: 24px; color: #00ffcc;">1250</span></div>
+            <div>🟢 在線人數<br><span style="font-size: 24px; color: #00ffcc;">32</span></div>
+            <div>👥 會員數<br><span style="font-size: 24px; color: #00ffcc;">8520</span></div>
+        </div>
+        <button id="close-admin" style="background: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">關閉面板</button>
+    </div>
+
+    <!-- 右下角使用者資訊卡片 -->
+    <div id="user-info" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: #00ffcc; padding: 15px; border-radius: 10px; border: 1px solid #00ffcc; font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5;">
+        <span id="close-btn" style="position: absolute; top: 5px; right: 10px; cursor: pointer; color: #ff5555; font-weight: bold;">✖</span>
+        <div style="margin-bottom: 5px;">📱 設備：<span id="device-type">偵測中...</span></div>
+        <div style="margin-bottom: 5px;">🌍 地區：<span id="user-region">偵測中...</span></div>
+        <div>🌐 IP：<span id="user-ip">偵測中...</span></div>
+    </div>
+
+    <!-- 所有魔法 -->
     <script>
+        // 1. 進度條魔法
         let progress = 0;
         const interval = setInterval(() => {
             progress += 1;
@@ -62,107 +96,71 @@
             document.getElementById('percent-text').innerText = progress + '%';
             if (progress >= 100) {
                 clearInterval(interval);
-                setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
-                }, 500);
+                setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
             }
         }, 30);
-    </script>
 
-</body>
-</html>
-<div id="user-info" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: #00ffcc; padding: 15px; border-radius: 10px; border: 1px solid #00ffcc; font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5;">
-    <span id="close-btn" style="position: absolute; top: 5px; right: 10px; cursor: pointer; color: #ff5555; font-weight: bold;">✖</span>
-    <div style="margin-bottom: 5px;">📱 設備：<span id="device-type">偵測中...</span></div>
-    <div style="margin-bottom: 5px;">🌍 地區：<span id="user-region">偵測中...</span></div>
-    <div>🌐 IP：<span id="user-ip">偵測中...</span></div>
-</div>
-
-<script>
-    // 1. 判斷是手機還是電腦
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
-
-    // 2. 抓取使用者的 IP 和地區 (使用免費的 ipapi 服務)
-    fetch('https://ipapi.co/json/')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('user-ip').innerText = data.ip || '無法取得';
-            document.getElementById('user-region').innerText = (data.city || '未知') + ', ' + (data.country_name || '未知');
-            // 資料抓到後，把卡片顯示出來
-            document.getElementById('user-info').style.display = 'block';
-        })
-        .catch(() => {
-            document.getElementById('user-ip').innerText = '讀取失敗';
-            document.getElementById('user-region').innerText = '讀取失敗';
-            document.getElementById('user-info').style.display = 'block';
+        // 2. 漢堡選單開關
+        document.getElementById('menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('side-menu');
+            menu.style.left = menu.style.left === '0px' ? '-300px' : '0px';
         });
 
-    // 3. 點擊叉叉可以關閉卡片
-    document.getElementById('close-btn').addEventListener('click', () => {
-        document.getElementById('user-info').style.display = 'none';
-    });
-</script>
-<!-- 隱藏的管理員按鈕 (右下角小齒輪) -->
-<div id="admin-btn" style="position: fixed; bottom: 20px; right: 20px; font-size: 30px; cursor: pointer; z-index: 10001; display: none;">⚙️</div>
-
-<!-- 管理員數據面板 (一開始先隱藏) -->
-<div id="admin-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0b0f19; border: 2px solid #00ffcc; padding: 30px; border-radius: 15px; color: #fff; z-index: 10002; display: none; text-align: center; width: 80%; max-width: 400px;">
-    <h2 style="color: #00ffcc; margin-top: 0;">👑 管理員專屬面板</h2>
-    <div style="display: flex; justify-content: space-around; margin: 20px 0;">
-        <div>📝 帖子數<br><span style="font-size: 24px; color: #00ffcc;">1250</span></div>
-        <div>🟢 在線人數<br><span style="font-size: 24px; color: #00ffcc;">32</span></div>
-        <div>👥 會員數<br><span style="font-size: 24px; color: #00ffcc;">8520</span></div>
-    </div>
-    <button id="close-admin" style="background: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">關閉面板</button>
-</div>
-
-<script>
-    // 點擊右下角小齒輪，跳出密碼輸入框
-    document.getElementById('admin-btn').addEventListener('click', () => {
-        const password = prompt('請輸入管理員密碼：');
-        if (password === 'admin123') {
-            document.getElementById('admin-panel').style.display = 'block';
-        } else {
-            alert('密碼錯誤！你以為你是管理員嗎？😎');
+        // 3. 頁面切換魔法
+        function showPage(pageName) {
+            document.getElementById('side-menu').style.left = '-300px'; // 關閉選單
+            if (pageName === 'home') {
+                document.getElementById('home-page').style.display = 'block';
+                document.getElementById('qa-page').style.display = 'none';
+            } else if (pageName === 'qa') {
+                document.getElementById('home-page').style.display = 'none';
+                document.getElementById('qa-page').style.display = 'block';
+            }
         }
-    });
 
-    // 點擊關閉按鈕
-    document.getElementById('close-admin').addEventListener('click', () => {
-        document.getElementById('admin-panel').style.display = 'none';
-    });
+        // 4. 使用者資訊與管理員魔法
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
 
-    // 秘密開關：點擊 IP 卡片 5 次，就會出現管理員按鈕
-    let clickCount = 0;
-    document.getElementById('user-info').addEventListener('click', () => {
-        clickCount++;
-        if (clickCount === 5) {
-            document.getElementById('admin-btn').style.display = 'block';
-            clickCount = 0;
-            alert('管理員權限已解鎖！點擊右下角齒輪進入。');
-        }
-    });
-</script>
-<!-- 漢堡選單按鈕 (左上角) -->
-<div id="menu-btn" style="position: fixed; top: 20px; left: 20px; font-size: 30px; color: #00ffcc; cursor: pointer; z-index: 10005; background: #0b0f19; padding: 5px 15px; border-radius: 5px; border: 1px solid #00ffcc;">☰</div>
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('user-ip').innerText = data.ip || '無法取得';
+                document.getElementById('user-region').innerText = (data.city || '未知') + ', ' + (data.country_name || '未知');
+                document.getElementById('user-info').style.display = 'block';
+            })
+            .catch(() => {
+                document.getElementById('user-ip').innerText = '讀取失敗';
+                document.getElementById('user-region').innerText = '讀取失敗';
+                document.getElementById('user-info').style.display = 'block';
+            });
 
-<!-- 側邊選單 (一開始隱藏) -->
-<div id="side-menu" style="position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: #0b0f19; border-right: 2px solid #00ffcc; z-index: 10004; transition: left 0.3s; padding-top: 80px; padding-left: 20px;">
-    <h2 style="color: #00ffcc; margin-bottom: 20px;">📋 功能選單</h2>
-    <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">🏠 首頁</div>
-    <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">📚 問答卡片</div>
-    <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">ℹ️ 關於我們</div>
-</div>
+        document.getElementById('close-btn').addEventListener('click', () => {
+            document.getElementById('user-info').style.display = 'none';
+        });
 
-<script>
-    // 點擊漢堡按鈕打開/關閉選單
-    document.getElementById('menu-btn').addEventListener('click', () => {
-        const menu = document.getElementById('side-menu');
-        if (menu.style.left === '0px') {
-            menu.style.left = '-300px';
-        } else {
-            menu.style.left = '0px';
-        }
-    });
-</script>
+        document.getElementById('admin-btn').addEventListener('click', () => {
+            const password = prompt('請輸入管理員密碼：');
+            if (password === 'admin123') {
+                document.getElementById('admin-panel').style.display = 'block';
+            } else {
+                alert('密碼錯誤！你以為你是管理員嗎？😎');
+            }
+        });
+
+        document.getElementById('close-admin').addEventListener('click', () => {
+            document.getElementById('admin-panel').style.display = 'none';
+        });
+
+        let clickCount = 0;
+        document.getElementById('user-info').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 5) {
+                document.getElementById('admin-btn').style.display = 'block';
+                clickCount = 0;
+                alert('管理員權限已解鎖！點擊右下角齒輪進入。');
+            }
+        });
+    </script>
+</body>
+</html>
