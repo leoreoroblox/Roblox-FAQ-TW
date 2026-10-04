@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox 問答網 v0.0.2</title>
+    <title>Roblox 問答網 v0.0.3</title>
     <style>
-        body { margin: 0; font-family: sans-serif; background: #0b0f19; color: #fff; }
+        body { margin: 0; font-family: sans-serif; background: #0b0f19; color: #fff; transition: background 0.3s ease; }
         
         /* 互動與動畫魔法 */
         .page-section { display: none; opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
@@ -23,7 +23,10 @@
         .progress-container { width: 80%; background: #1a2332; border: 1px solid #00ffcc; border-radius: 5px; height: 30px; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #00ffcc, #0055ff); transition: width 0.1s; }
         #percent-text { margin-top: 15px; font-size: 24px; font-family: monospace; }
-        
+        .skip-btn { margin-top: 20px; background: transparent; color: #9ca3af; border: 1px solid #9ca3af; padding: 8px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .skip-btn:hover { color: #00ffcc; border-color: #00ffcc; }
+        #loader-success { margin-top: 15px; font-size: 18px; color: #00ffcc; display: none; }
+
         /* 全局排版 */
         h1, h2, h3 { margin-top: 0; }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; padding-top: 80px; }
@@ -36,28 +39,20 @@
         .submenu div { font-size: 15px !important; color: #9ca3af !important; margin-bottom: 10px !important; }
         .submenu div:hover { color: #00ffcc !important; }
 
-        /* ================= 首頁專屬魔法 ================= */
+        /* 首頁專屬魔法 */
         #home-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
-        /* 背景科技感光暈 */
         #home-page::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0, 255, 204, 0.05) 0%, transparent 70%); z-index: 0; }
-        
         .hero-content { position: relative; z-index: 1; text-align: center; padding: 20px; width: 100%; max-width: 800px; }
         .hero-title { font-size: 48px; font-weight: bold; margin-bottom: 15px; background: linear-gradient(90deg, #00ffcc, #0055ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 255, 204, 0.3); }
         .hero-subtitle { font-size: 18px; color: #9ca3af; margin-bottom: 40px; line-height: 1.6; }
-        
-        /* 首頁大按鈕 */
         .hero-btn { background: linear-gradient(90deg, #00ffcc, #0055ff); color: #0b0f19; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 50px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4); margin-bottom: 60px; }
         .hero-btn:hover { box-shadow: 0 0 30px rgba(0, 255, 204, 0.8); transform: scale(1.05); }
-        
-        /* 快速導航格子 */
         .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
         .quick-card { background: rgba(11, 15, 25, 0.8); border: 1px solid #1f2937; border-radius: 12px; padding: 20px; text-align: left; transition: 0.3s; }
         .quick-card:hover { border-color: #00ffcc; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); transform: translateY(-5px); }
         .quick-card .emoji { font-size: 28px; margin-bottom: 10px; display: block; }
         .quick-card .title { font-size: 16px; font-weight: bold; color: #00ffcc; margin-bottom: 5px; }
         .quick-card .desc { font-size: 12px; color: #9ca3af; line-height: 1.4; }
-        
-        /* 首頁底部版本號 */
         .hero-version { position: absolute; bottom: 30px; font-size: 14px; color: #4b5563; }
 
         /* 問答卡片區 */
@@ -66,7 +61,6 @@
         .qa-sidebar { width: 140px; position: sticky; top: 100px; height: fit-content; display: flex; flex-direction: column; gap: 8px; }
         .qa-sidebar button { background: #0b0f19; border: 1px solid #557788; color: #9ca3af; padding: 10px; border-radius: 8px; text-align: left; font-size: 14px; }
         .qa-sidebar button:hover, .qa-sidebar button.active { border-color: #00ffcc; color: #00ffcc; background: #1a2332; }
-        
         #search-input { flex: 1; padding: 12px; background: #0b0f19; border: 1px solid #00ffcc; color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
         #search-input::placeholder { color: #557788; }
         .adv-input, #adv-topic { width: 100%; padding: 8px; background: #1a2332; border: 1px solid #557788; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
@@ -105,6 +99,25 @@
         .log-content li { margin-bottom: 5px; }
         .log-tag { display: inline-block; font-size: 11px; background: rgba(0, 255, 204, 0.2); color: #00ffcc; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
         .log-btn { background: #00ffcc; color: #0b0f19; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; margin-top: 10px; display: inline-block; }
+
+        /* 設定頁面 */
+        .settings-card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .settings-card h3 { color: #00ffcc; margin-bottom: 15px; }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1f2937; }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-row label { color: #d1d5db; font-size: 16px; }
+        /* 開關按鈕 */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4b5563; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00ffcc; }
+        input:checked + .slider:before { transform: translateX(24px); }
+        /* 顏色選擇 */
+        .color-options { display: flex; gap: 15px; flex-wrap: wrap; }
+        .color-box { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-box:hover { transform: scale(1.1); }
+        .color-box.active { border-color: #00ffcc; box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
 
         /* 管理員後台 */
         #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 20000; flex-direction: column; }
@@ -146,13 +159,15 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
     <!-- 加載畫面 -->
     <div id="loader">
         <div style="font-size: 20px; margin-bottom: 20px; font-family: monospace;">Loading<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
         <div class="progress-container"><div id="progress-bar"></div></div>
         <div id="percent-text">0%</div>
+        <div id="loader-success">✅ 載入成功！</div>
+        <button id="skip-loader" class="skip-btn clickable" onclick="skipLoader()">跳過 ⏩</button>
     </div>
 
     <!-- 漢堡選單按鈕 -->
@@ -174,6 +189,7 @@
         </div>
 
         <div class="menu-item clickable" onclick="showPage('changelog')">📜 更新日誌</div>
+        <div class="menu-item clickable" onclick="showPage('settings')">⚙️ 設定</div>
         <div class="menu-item clickable" onclick="alert('這頁面還在施工中 🚧')">ℹ️ 關於我們</div>
     </div>
 
@@ -208,7 +224,7 @@
                 </div>
             </div>
         </div>
-        <div class="hero-version">v0.0.2 版本</div>
+        <div class="hero-version">v0.0.3 版本</div>
     </div>
 
     <!-- 箱子 2：問答卡片區 -->
@@ -266,16 +282,28 @@
         <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">記錄著這個網站一路以來的成長</p>
 
         <div class="log-item">
-            <div class="log-version">v0.0.2 - 首頁大改造 <span class="log-tag">當前版本</span></div>
+            <div class="log-version">v0.0.3 - 設定與載入優化 <span class="log-tag">當前版本</span></div>
+            <div class="log-date">📅 2026-10-04</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 載入畫面新增「跳過」按鈕與「載入成功」提示</li>
+                    <li>✅ 三橫選單新增「⚙️ 設定」頁面</li>
+                    <li>✅ 設定頁面可開關載入動畫（關閉後重新整理將直接進入網頁）</li>
+                    <li>✅ 設定頁面可更換背景顏色，並自動儲存偏好</li>
+                </ul>
+                <button class="log-btn clickable" onclick="showPage('home')">🚀 回首頁看看</button>
+            </div>
+        </div>
+
+        <div class="log-item">
+            <div class="log-version">v0.0.2 - 首頁大改造 <span class="log-tag">重要更新</span></div>
             <div class="log-date">📅 2026-10-04</div>
             <div class="log-content">
                 <ul>
                     <li>✅ 首頁全新改版，加入科技感標題與副標題</li>
                     <li>✅ 新增超大「開始探索」按鈕，引導使用者進入知識庫</li>
-                    <li>✅ 首頁加入四大主題快速導航卡片（基礎、安全、Robux、社群）</li>
-                    <li>✅ 頁面整體排版優化，手機版閱讀更舒適</li>
+                    <li>✅ 首頁加入四大主題快速導航卡片</li>
                 </ul>
-                <button class="log-btn clickable" onclick="showPage('home')">🚀 回首頁看看</button>
             </div>
         </div>
 
@@ -286,27 +314,39 @@
                 <ul>
                     <li>✅ 問答卡片大幅擴充至 38 張，涵蓋六大主題</li>
                     <li>✅ 卡片新增顏色標籤，用顏色區分不同主題</li>
-                    <li>✅ 管理員後台升級，利用瀏覽器內建資料庫儲存</li>
-                    <li>✅ 新增「右側快速主題導航欄」與側邊選單子分類</li>
-                    <li>✅ 修復跳轉過濾功能，點擊後自動平滑滾動至頂部</li>
-                    <li>✅ 新增「更新日誌」頁面</li>
+                    <li>✅ 新增管理員後台與右側快速主題導航欄</li>
                     <li>✅ 加入頁面進出動畫與點按回饋</li>
-                    <li>✅ 密碼進行簡易加密偽裝，提升基礎安全性</li>
                 </ul>
             </div>
         </div>
+    </div>
 
-        <div class="log-item">
-            <div class="log-version">v0.0.0 Alpha - 網站誕生 <span class="log-tag">最初版本</span></div>
-            <div class="log-date">📅 2026-10-02 ~ 2026-10-03</div>
-            <div class="log-content">
-                <ul>
-                    <li>✅ 建立 GitHub 倉庫與網站基礎架構</li>
-                    <li>✅ 加入科技感載入畫面</li>
-                    <li>✅ 新增漢堡選單與問答卡片系統</li>
-                    <li>✅ 新增管理員後台與 IP 顯示功能</li>
-                </ul>
+    <!-- 箱子 4：設定頁面 -->
+    <div id="settings-page" class="page-section container">
+        <h2 style="color: #00ffcc; text-align: center;">⚙️ 網站設定</h2>
+        <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">調整你的個人化偏好</p>
+
+        <div class="settings-card">
+            <h3>🎬 載入動畫</h3>
+            <div class="settings-row">
+                <label>開啟載入動畫</label>
+                <label class="switch">
+                    <input type="checkbox" id="setting-loader" onchange="toggleLoaderSetting(this.checked)">
+                    <span class="slider"></span>
+                </label>
             </div>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">關閉後，重新整理網頁將直接進入網站，不再顯示載入畫面。</p>
+        </div>
+
+        <div class="settings-card">
+            <h3>🎨 背景顏色</h3>
+            <div class="color-options">
+                <div class="color-box clickable active" style="background: #0b0f19;" onclick="changeBgTheme('#0b0f19', this)"></div>
+                <div class="color-box clickable" style="background: #1a0b19;" onclick="changeBgTheme('#1a0b19', this)"></div>
+                <div class="color-box clickable" style="background: #0b191a;" onclick="changeBgTheme('#0b191a', this)"></div>
+                <div class="color-box clickable" style="background: #191a0b;" onclick="changeBgTheme('#191a0b', this)"></div>
+            </div>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">選擇一個你喜歡的背景顏色，設定會自動儲存。</p>
         </div>
     </div>
 
@@ -388,7 +428,7 @@
     <!-- 所有魔法 -->
     <script>
         // ================= 資料庫 =================
-        const currentVersion = 'v0.0.2';
+        const currentVersion = 'v0.0.3';
         const defaultCards = [
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
@@ -437,6 +477,80 @@
             localStorage.setItem('robloxCards', JSON.stringify(cardsData));
             localStorage.setItem('robloxCardsVersion', currentVersion);
         }
+
+        // ================= 載入動畫與跳過功能 =================
+        let loaderEnabled = localStorage.getItem('loaderEnabled') !== 'false';
+        let skipRequested = false;
+
+        function skipLoader() {
+            skipRequested = true;
+        }
+
+        function initLoader() {
+            if (!loaderEnabled) {
+                document.getElementById('loader').style.display = 'none';
+                return;
+            }
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (skipRequested) {
+                    progress = 100;
+                } else {
+                    progress += 1;
+                }
+                document.getElementById('progress-bar').style.width = progress + '%';
+                document.getElementById('percent-text').innerText = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('loader-success').style.display = 'block';
+                    document.getElementById('skip-loader').style.display = 'none';
+                    setTimeout(() => { 
+                        const loader = document.getElementById('loader');
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.style.display = 'none', 500);
+                    }, 800);
+                }
+            }, 30);
+        }
+        initLoader();
+
+        // ================= 設定頁面功能 =================
+        function toggleLoaderSetting(checked) {
+            localStorage.setItem('loaderEnabled', checked);
+            alert(checked ? '已開啟載入動畫，下次重新整理會顯示。' : '已關閉載入動畫，下次重新整理將直接進入網站。');
+        }
+
+        function changeBgTheme(color, element) {
+            document.body.style.backgroundColor = color;
+            localStorage.setItem('bgTheme', color);
+            document.querySelectorAll('.color-box').forEach(box => box.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // 載入使用者偏好
+        function loadUserPreferences() {
+            // 載入背景顏色
+            const savedBg = localStorage.getItem('bgTheme');
+            if (savedBg) {
+                document.body.style.backgroundColor = savedBg;
+                document.querySelectorAll('.color-box').forEach(box => {
+                    if (box.style.backgroundColor === savedBg || box.style.background === savedBg) {
+                        box.classList.add('active');
+                    } else {
+                        box.classList.remove('active');
+                    }
+                });
+            }
+            // 載入動畫開關狀態
+            const savedLoader = localStorage.getItem('loaderEnabled');
+            if (savedLoader !== null) {
+                document.getElementById('setting-loader').checked = savedLoader === 'true';
+            } else {
+                document.getElementById('setting-loader').checked = true; // 預設開啟
+            }
+        }
+        loadUserPreferences();
 
         // ================= 頁面切換動畫與資料渲染 =================
         function renderTopicNav() {
@@ -589,21 +703,6 @@
         }
 
         // ================= 網頁主要互動 =================
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += 1;
-            document.getElementById('progress-bar').style.width = progress + '%';
-            document.getElementById('percent-text').innerText = progress + '%';
-            if (progress >= 100) {
-                clearInterval(interval);
-                setTimeout(() => { 
-                    const loader = document.getElementById('loader');
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.style.display = 'none', 500);
-                }, 500);
-            }
-        }, 30);
-
         document.getElementById('menu-btn').addEventListener('click', () => {
             const menu = document.getElementById('side-menu');
             const submenu = document.getElementById('qa-submenu');
@@ -628,6 +727,7 @@
             if (pageName === 'home') targetPage = document.getElementById('home-page');
             else if (pageName === 'qa') targetPage = document.getElementById('qa-page');
             else if (pageName === 'changelog') targetPage = document.getElementById('changelog-page');
+            else if (pageName === 'settings') targetPage = document.getElementById('settings-page');
 
             if (targetPage) {
                 targetPage.style.display = 'block';
