@@ -33,8 +33,10 @@
         .card p { line-height: 1.6; }
 
         /* 搜尋框樣式 */
-        #search-input { width: 100%; padding: 12px; margin-bottom: 20px; background: #0b0f19; border: 1px solid #00ffcc; color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
+        #search-input { flex: 1; padding: 12px; background: #0b0f19; border: 1px solid #00ffcc; color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
         #search-input::placeholder { color: #557788; }
+        .adv-input { width: 100%; padding: 8px; background: #1a2332; border: 1px solid #557788; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
+        .adv-input:focus { border-color: #00ffcc; }
     </style>
 </head>
 <body>
@@ -66,8 +68,36 @@
     <div id="qa-page" style="display: none; padding: 20px; max-width: 600px; margin: 0 auto; padding-top: 80px;">
         <h2 style="color: #00ffcc; text-align: center;">📚 Roblox 基礎知識</h2>
         
-        <!-- 搜尋框 -->
-        <input type="text" id="search-input" placeholder="🔍 搜尋問答標題... (例如：Robux)" oninput="searchCards()">
+        <!-- 搜尋列 -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <input type="text" id="search-input" placeholder="🔍 快速搜尋標題..." oninput="searchCards()">
+            <button onclick="toggleAdvancedSearch()" style="background: #0b0f19; border: 1px solid #00ffcc; color: #00ffcc; padding: 0 15px; border-radius: 8px; cursor: pointer; white-space: nowrap;">⚙️ 進階搜尋</button>
+        </div>
+
+        <!-- 進階搜尋面板 (一開始隱藏) -->
+        <div id="advanced-search-panel" style="display: none; background: #0b0f19; border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+            <h4 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px;">🔍 進階搜尋</h4>
+            
+            <div style="margin-bottom: 10px;">
+                <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">包含所有字詞 (用空格分隔)：</label>
+                <input type="text" id="adv-all" class="adv-input" placeholder="例如：Robux 免費" oninput="advancedSearch()">
+            </div>
+            
+            <div style="margin-bottom: 10px;">
+                <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">與以下字詞或語句完全相符：</label>
+                <input type="text" id="adv-exact" class="adv-input" placeholder="例如：什麼是 Roblox" oninput="advancedSearch()">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">不包含以下字詞：</label>
+                <input type="text" id="adv-none" class="adv-input" placeholder="例如：Premium" oninput="advancedSearch()">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button onclick="advancedSearch()" style="background: #00ffcc; color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">搜尋</button>
+                <button onclick="clearAdvancedSearch()" style="background: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">清除</button>
+            </div>
+        </div>
 
         <div class="card">
             <h3>❓ 什麼是 Roblox？</h3>
@@ -153,25 +183,78 @@
             } else if (pageName === 'qa') {
                 document.getElementById('home-page').style.display = 'none';
                 document.getElementById('qa-page').style.display = 'block';
+                // 切換到卡片頁時，重置搜尋狀態
+                document.getElementById('search-input').value = '';
+                clearAdvancedSearch();
             }
         }
 
-        // 4. 搜尋卡片魔法 (改良版：只搜尋標題)
+        // 4. 快速搜尋魔法 (只搜標題)
         function searchCards() {
             const input = document.getElementById('search-input').value.toLowerCase();
             const cards = document.querySelectorAll('.card');
             cards.forEach(card => {
                 const title = card.querySelector('h3').innerText.toLowerCase();
-                // 如果搜尋框是空的，顯示全部；如果有輸入，只顯示標題有包含關鍵字的卡片
-                if (input === '' || title.includes(input)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                card.style.display = (input === '' || title.includes(input)) ? 'block' : 'none';
             });
+            // 快速搜尋時，把進階搜尋的框框清空，避免混淆
+            document.getElementById('adv-all').value = '';
+            document.getElementById('adv-exact').value = '';
+            document.getElementById('adv-none').value = '';
         }
 
-        // 5. 使用者資訊與管理員魔法
+        // 5. 進階搜尋魔法
+        function toggleAdvancedSearch() {
+            const panel = document.getElementById('advanced-search-panel');
+            panel.style.display = (panel.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function advancedSearch() {
+            const allWords = document.getElementById('adv-all').value.toLowerCase().split(' ').filter(w => w.trim() !== '');
+            const exactPhrase = document.getElementById('adv-exact').value.toLowerCase().trim();
+            const noneWords = document.getElementById('adv-none').value.toLowerCase().split(' ').filter(w => w.trim() !== '');
+            
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                const content = card.innerText.toLowerCase();
+                
+                let show = true;
+
+                // 條件一：包含所有字詞
+                if (allWords.length > 0) {
+                    const hasAllWords = allWords.every(word => content.includes(word));
+                    if (!hasAllWords) show = false;
+                }
+
+                // 條件二：完全相符
+                if (exactPhrase !== '') {
+                    if (!content.includes(exactPhrase)) show = false;
+                }
+
+                // 條件三：不包含字詞
+                if (noneWords.length > 0) {
+                    const hasNoneWords = noneWords.some(word => content.includes(word));
+                    if (hasNoneWords) show = false;
+                }
+
+                card.style.display = show ? 'block' : 'none';
+            });
+
+            // 進階搜尋時，把快速搜尋框清空
+            document.getElementById('search-input').value = '';
+        }
+
+        function clearAdvancedSearch() {
+            document.getElementById('adv-all').value = '';
+            document.getElementById('adv-exact').value = '';
+            document.getElementById('adv-none').value = '';
+            // 重新顯示所有卡片
+            document.querySelectorAll('.card').forEach(card => card.style.display = 'block');
+        }
+
+        // 6. 使用者資訊與管理員魔法
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
 
