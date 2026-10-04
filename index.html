@@ -17,6 +17,11 @@
             --danger: #ff5555;
             --warning: #ffaa00;
             --success: #00ff88;
+            --vip-color: #00ffcc;
+            --pvip-color: #00ff88;
+            --svip-color: #00aaff;
+            --vvvip-color: #ffaa00;
+            --adssvip-color: #ff00cc;
         }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-main); transition: background 0.3s ease; overflow-x: hidden; }
         h1, h2, h3 { margin-top: 0; }
@@ -57,7 +62,7 @@
 
         /* ================= 漢堡選單 ================= */
         #menu-btn { position: fixed; top: 20px; left: 20px; font-size: 30px; color: var(--accent); z-index: 10005; background: var(--bg-color); padding: 5px 15px; border-radius: 5px; border: 1px solid var(--accent); }
-        #side-menu { position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border-right: 2px solid var(--accent); z-index: 10004; transition: left 0.3s ease; padding-top: 80px; padding-left: 20px; box-sizing: border-box; overflow-y: auto; }
+        #side-menu { position: fixed; top: 0; left: -320px; width: 280px; height: 100%; background: rgba(11, 15, 25, 0.98); backdrop-filter: blur(10px); border-right: 2px solid var(--accent); z-index: 10004; transition: left 0.3s ease; padding-top: 80px; padding-left: 20px; box-sizing: border-box; overflow-y: auto; }
         .menu-item { color: #fff; font-size: 18px; margin-bottom: 15px; }
         .submenu { padding-left: 15px; display: none; }
         .submenu div { font-size: 15px !important; color: var(--text-sub) !important; margin-bottom: 10px !important; }
@@ -127,16 +132,10 @@
         .comment-item .delete-comment { position: absolute; top: 10px; right: 10px; color: #ff5555; cursor: pointer; font-size: 12px; display: none; }
         .comment-item:hover .delete-comment { display: block; }
 
-        /* ================= 遊戲搜尋 ================= */
-        .search-box-lg { display: flex; gap: 10px; max-width: 600px; margin: 0 auto 30px; }
-        .search-box-lg input { flex: 1; padding: 15px; background: var(--bg-color); border: 2px solid var(--accent); color: #fff; border-radius: 10px; font-size: 18px; outline: none; }
-        .search-box-lg button { padding: 15px 30px; background: linear-gradient(90deg, var(--accent), var(--accent-blue)); border: none; color: #0b0f19; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; }
-        .game-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; display: flex; gap: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease; }
-        .game-icon { width: 100px; height: 100px; border-radius: 15px; background: #1a2332; object-fit: cover; }
-        .game-info h3 { color: var(--accent); margin-bottom: 10px; }
-        .game-info p { color: var(--text-sub); font-size: 14px; margin: 5px 0; }
-        .game-info .highlight { color: #fff; font-weight: bold; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* ================= 遊戲搜尋 (關閉狀態) ================= */
+        .game-disabled { text-align: center; padding: 50px 20px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; margin-top: 20px; }
+        .game-disabled h3 { color: var(--warning); font-size: 24px; margin-bottom: 15px; }
+        .game-disabled p { color: var(--text-sub); font-size: 16px; }
 
         /* ================= 更新日誌 ================= */
         .log-filter { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center; }
@@ -165,6 +164,49 @@
         .color-box { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .color-box:hover { transform: scale(1.1); }
         .color-box.active { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
+
+        /* ================= 個人中心 (QQ風格) ================= */
+        .profile-header { text-align: center; margin-bottom: 30px; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #1a2332; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 2px solid var(--accent); }
+        .profile-section { background: var(--bg-card); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+        .profile-section-title { padding: 15px 20px; color: var(--text-sub); font-size: 14px; border-bottom: 1px solid var(--border-color); }
+        .profile-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .profile-row:last-child { border-bottom: none; }
+        .profile-row:hover { background: #1a2332; }
+        .profile-row .left { display: flex; align-items: center; gap: 10px; color: #fff; }
+        .profile-row .right { color: var(--text-sub); font-size: 14px; display: flex; align-items: center; gap: 5px; }
+        .vip-badge { font-size: 12px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .vip-VIP { background: rgba(0,255,204,0.2); color: var(--vip-color); border: 1px solid var(--vip-color); }
+        .vip-PVIP { background: rgba(0,255,136,0.2); color: var(--pvip-color); border: 1px solid var(--pvip-color); }
+        .vip-SVIP { background: rgba(0,170,255,0.2); color: var(--svip-color); border: 1px solid var(--svip-color); }
+        .vip-VVVIP { background: rgba(255,170,0,0.2); color: var(--vvvip-color); border: 1px solid var(--vvvip-color); }
+        .vip-ADSSVIP { background: rgba(255,0,204,0.2); color: var(--adssvip-color); border: 1px solid var(--adssvip-color); }
+
+        /* ================= 論壇 ================= */
+        .forum-container { display: flex; flex-direction: column; gap: 20px; }
+        .forum-post { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .forum-post-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: var(--text-sub); }
+        .forum-post-title { font-size: 18px; color: var(--accent); margin-bottom: 10px; }
+        .forum-post-content { color: #d1d5db; line-height: 1.6; margin-bottom: 15px; }
+        .forum-post-actions { display: flex; gap: 15px; font-size: 14px; color: var(--text-sub); border-top: 1px solid var(--border-color); padding-top: 10px; }
+        .forum-reply-box { display: flex; gap: 10px; margin-top: 15px; }
+        .forum-reply-box input { flex: 1; padding: 8px; background: #1a2332; border: 1px solid var(--border-color); color: #fff; border-radius: 5px; outline: none; }
+        .forum-reply-box button { padding: 8px 15px; background: var(--accent); border: none; color: #0b0f19; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* ================= 登入系統 (仿Google) ================= */
+        #login-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f4f9; z-index: 30000; justify-content: center; align-items: center; flex-direction: column; }
+        .login-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; color: #202124; }
+        .login-card h2 { font-size: 24px; font-weight: 400; margin-bottom: 10px; }
+        .login-card p { font-size: 16px; color: #5f6368; margin-bottom: 30px; }
+        .login-input-group { position: relative; margin-bottom: 20px; text-align: left; }
+        .login-input-group input { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; box-sizing: border-box; outline: none; }
+        .login-input-group input:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
+        .login-btn { background: #1a73e8; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
+        .login-btn:hover { background: #1557b0; }
+        .login-error { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
+        .login-footer { margin-top: 30px; font-size: 12px; color: #5f6368; display: flex; justify-content: space-between; width: 100%; max-width: 400px; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } 100% { transform: translateX(0); } }
 
         /* ================= 管理員後台 ================= */
         #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 20000; flex-direction: column; }
@@ -195,11 +237,6 @@
         #op-message { font-size: 36px; color: #ff5555; margin-bottom: 20px; font-weight: bold; }
         #op-countdown { font-size: 60px; color: var(--accent); font-family: monospace; }
 
-        /* 封禁遮罩 */
-        #ban-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 25000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; padding: 20px; box-sizing: border-box; }
-        #ban-overlay h2 { color: var(--danger); font-size: 32px; margin-bottom: 20px; }
-        #ban-overlay p { font-size: 18px; line-height: 1.6; }
-
         /* ================= 右下角用戶資訊 ================= */
         #user-info { position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: var(--accent); padding: 15px; border-radius: 10px; border: 1px solid var(--accent); font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5; }
         #close-btn { position: absolute; top: 5px; right: 10px; color: #ff5555; font-weight: bold; cursor: pointer; }
@@ -213,6 +250,7 @@
             .quick-links { grid-template-columns: 1fr; }
             .admin-sidebar { width: 120px; font-size: 14px; }
             .game-card { flex-direction: column; align-items: center; text-align: center; }
+            .login-card { padding: 20px; margin: 20px; }
         }
     </style>
 </head>
@@ -243,34 +281,11 @@
         <div class="menu-item clickable" onclick="showPage('qa')" data-i18n="menu_qa">📚 問答卡片</div>
         
         <div id="qa-submenu" class="submenu">
-            <div class="clickable" onclick="showPage('qa', '📘 基礎知識')" data-i18n="topic_basic">📘 基礎知識</div>
-            <div class="clickable" onclick="showPage('qa', '🔒 帳號與安全')" data-i18n="topic_security">🔒 帳號與安全</div>
-            <div class="clickable" onclick="showPage('qa', '🪙 Robux 與變現')" data-i18n="topic_robux">🪙 Robux 與變現</div>
-            <div class="clickable" onclick="showPage('qa', '🎮 開發與技術')" data-i18n="topic_dev">🎮 開發與技術</div>
-            <div class="clickable" onclick="showPage('qa', '📱 平台支援')" data-i18n="topic_platform">📱 平台支援</div>
-            <div class="clickable" onclick="showPage('qa', '💬 社群與設定')" data-i18n="topic_community">💬 社群與設定</div>
-            <div class="clickable" onclick="showPage('qa', '🆕 最新動態')" data-i18n="topic_latest">🆕 最新動態</div>
-            <div class="clickable" onclick="showPage('qa', '🎨 Avatar 與外觀')" data-i18n="topic_avatar">🎨 Avatar 與外觀</div>
-            <div class="clickable" onclick="showPage('qa', '🗺️ 建造與地圖')" data-i18n="topic_build">🗺️ 建造與地圖</div>
-            <div class="clickable" onclick="showPage('qa', '🧩 腳本邏輯')" data-i18n="topic_script">🧩 腳本邏輯</div>
-            <div class="clickable" onclick="showPage('qa', '🛠️ Studio 工具')" data-i18n="topic_studio">🛠️ Studio 工具</div>
-            <div class="clickable" onclick="showPage('qa', '📈 行銷與經營')" data-i18n="topic_marketing">📈 行銷與經營</div>
-            <div class="clickable" onclick="showPage('qa', '💰 收益與 DevEx')" data-i18n="topic_revenue">💰 收益與 DevEx</div>
-            <div class="clickable" onclick="showPage('qa', '🚀 發布與版本')" data-i18n="topic_release">🚀 發布與版本</div>
-            <div class="clickable" onclick="showPage('qa', '🛡️ 反作弊與防護')" data-i18n="topic_anticheat">🛡️ 反作弊與防護</div>
-            <div class="clickable" onclick="showPage('qa', '🤝 團隊與協作')" data-i18n="topic_team">🤝 團隊與協作</div>
-            <div class="clickable" onclick="showPage('qa', '⚡ 性能與優化')" data-i18n="topic_perf">⚡ 性能與優化</div>
-            <div class="clickable" onclick="showPage('qa', '🎵 音效與材質')" data-i18n="topic_audio">🎵 音效與材質</div>
-            <div class="clickable" onclick="showPage('qa', '🤖 AI 與未來科技')" data-i18n="topic_ai">🤖 AI 與未來科技</div>
-            <div class="clickable" onclick="showPage('qa', '📚 學習資源')" data-i18n="topic_learn">📚 學習資源</div>
-            <div class="clickable" onclick="showPage('qa', '🧑‍⚖️ 審核與申訴')" data-i18n="topic_moderation">🧑‍⚖️ 審核與申訴</div>
-            <div class="clickable" onclick="showPage('qa', '🎁 活動與物品')" data-i18n="topic_event">🎁 活動與物品</div>
-            <div class="clickable" onclick="showPage('qa', '🧠 遊戲設計理論')" data-i18n="topic_design">🧠 遊戲設計理論</div>
-            <div class="clickable" onclick="showPage('qa', '🌐 本地化與多語言')" data-i18n="topic_localization">🌐 本地化與多語言</div>
-            <div class="clickable" onclick="showPage('qa', '🐛 故障排除')" data-i18n="topic_troubleshoot">🐛 故障排除</div>
+            <!-- 由 JS 動態生成 -->
         </div>
 
-        <div class="menu-item clickable" onclick="showPage('game-search')" data-i18n="menu_game_search">🎮 遊戲搜尋</div>
+        <div class="menu-item clickable" onclick="showPage('forum')" data-i18n="menu_forum">💬 論壇</div>
+        <div class="menu-item clickable" onclick="showPage('profile')" data-i18n="menu_profile">👤 個人中心</div>
         <div class="menu-item clickable" onclick="showPage('changelog')" data-i18n="menu_changelog">📜 更新日誌</div>
         <div class="menu-item clickable" onclick="showPage('settings')" data-i18n="menu_settings">⚙️ 設定</div>
         <div class="menu-item clickable" onclick="showPage('intro')" data-i18n="menu_intro">ℹ️ 關於我們</div>
@@ -284,8 +299,8 @@
             </select>
         </div>
         
-        <!-- 管理員按鈕 (隱藏) -->
-        <div id="admin-menu-item" class="menu-item clickable" style="color: #ff5555; display: none;" onclick="openAdminDashboard()" data-i18n="menu_admin">👑 管理後台</div>
+        <!-- 管理員按鈕 -->
+        <div id="admin-menu-item" class="menu-item clickable" style="color: #ff5555; margin-top: 15px;" onclick="showLoginPage()" data-i18n="menu_admin">👑 管理員登入</div>
     </div>
 
     <!-- 箱子 1：首頁 -->
@@ -329,7 +344,7 @@
                 </div>
             </div>
         </div>
-        <div class="hero-version" data-i18n="version_text">v0.2.0 版本</div>
+        <div class="hero-version" data-i18n="version_text">v0.3.0 版本</div>
     </div>
 
     <!-- 箱子 2：關於我們 -->
@@ -379,7 +394,6 @@
                         <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;" data-i18n="adv_topic_label">選擇主題：</label>
                         <select id="adv-topic" class="clickable" onchange="advancedSearch()">
                             <option value="" data-i18n="topic_all">全部主題</option>
-                            <!-- 由 JS 動態生成 -->
                         </select>
                     </div>
                     <div style="margin-bottom: 10px;">
@@ -406,17 +420,13 @@
         </div>
     </div>
 
-    <!-- 箱子 4：遊戲搜尋 -->
+    <!-- 箱子 4：遊戲搜尋 (關閉) -->
     <div id="game-search-page" class="page-section container">
         <h2 style="color: var(--accent); text-align: center;" data-i18n="game_title">🎮 Roblox 遊戲搜尋</h2>
-        <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;" data-i18n="game_subtitle">輸入遊戲名稱，查看最新數據</p>
-        
-        <div class="search-box-lg">
-            <input type="text" id="game-search-input" placeholder="輸入遊戲名稱 (例如：Adopt Me)" class="clickable">
-            <button onclick="searchGame()" class="clickable" data-i18n="game_btn">搜尋</button>
+        <div class="game-disabled">
+            <h3>🚧 目前搜尋功能開發中</h3>
+            <p>僅限內部人員使用，敬請期待。</p>
         </div>
-        
-        <div id="game-results"></div>
     </div>
 
     <!-- 箱子 5：更新日誌 -->
@@ -464,11 +474,125 @@
         </div>
     </div>
 
+    <!-- 箱子 7：個人中心 -->
+    <div id="profile-page" class="page-section container">
+        <h2 style="color: var(--accent); text-align: center;" data-i18n="profile_title">👤 個人中心</h2>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;" data-i18n="profile_subtitle">管理你的帳號與安全設定</p>
+
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <h3 style="color: #fff;">leoreoroblox</h3>
+            <p style="color: var(--text-sub);">UID: 1001</p>
+            <span class="vip-badge vip-ADSSVIP">ADSSVIP 管理員</span>
+        </div>
+
+        <div class="profile-section">
+            <div class="profile-section-title" data-i18n="profile_section_account">帳號管理</div>
+            <div class="profile-row clickable" onclick="showToast('📧 此功能開發中，敬請期待！', 'warning')">
+                <div class="left"><span>📧</span> <span data-i18n="profile_email">綁定電子郵件</span></div>
+                <div class="right"><span style="color: var(--success);">已綁定</span> <span>›</span></div>
+            </div>
+            <div class="profile-row clickable" onclick="showToast('📱 此功能開發中，敬請期待！', 'warning')">
+                <div class="left"><span>📱</span> <span data-i18n="profile_phone">綁定電話號碼</span></div>
+                <div class="right"><span style="color: var(--text-sub);">未綁定</span> <span>›</span></div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <div class="profile-section-title" data-i18n="profile_section_link">帳號關聯</div>
+            <div class="profile-row clickable" onclick="showToast('🔗 此功能開發中，敬請期待！', 'warning')">
+                <div class="left"><span>🔗</span> <span data-i18n="profile_google">綁定 Google 帳號</span></div>
+                <div class="right"><span style="color: var(--text-sub);">未綁定</span> <span>›</span></div>
+            </div>
+            <div class="profile-row clickable" onclick="requestExclusiveID()">
+                <div class="left"><span>🆔</span> <span data-i18n="profile_id">專屬 ID</span></div>
+                <div class="right"><span id="profile-exclusive-id" style="color: var(--warning);">未獲取</span> <span>›</span></div>
+            </div>
+            <div class="profile-row clickable" onclick="showToast('🔒 此功能開發中，敬請期待！', 'warning')">
+                <div class="left"><span>🔒</span> <span data-i18n="profile_auth">帳號綁定與授權管理</span></div>
+                <div class="right"><span>›</span></div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <div class="profile-section-title" data-i18n="profile_section_security">安全管理</div>
+            <div class="profile-row clickable" onclick="showToast('🔑 此功能開發中，敬請期待！', 'warning')">
+                <div class="left"><span>🔑</span> <span data-i18n="profile_password">修改密碼</span></div>
+                <div class="right"><span>›</span></div>
+            </div>
+            <div class="profile-row clickable" onclick="showToast('🛡️ 此功能開發中，敬請期待！', 'warning')">
+                <div class="left"><span>🛡️</span> <span data-i18n="profile_2fa">兩步驟驗證</span></div>
+                <div class="right"><span style="color: var(--text-sub);">未設置</span> <span>›</span></div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <div class="profile-section-title" data-i18n="profile_section_vip">會員等級</div>
+            <div class="profile-row">
+                <div class="left"><span>👑</span> <span data-i18n="profile_current_vip">當前等級</span></div>
+                <div class="right"><span class="vip-badge vip-ADSSVIP">ADSSVIP</span></div>
+            </div>
+            <div class="profile-row clickable" onclick="showToast('📊 會員權益對比表開發中，敬請期待！', 'info')">
+                <div class="left"><span>📊</span> <span data-i18n="profile_vip_compare">查看會員權益對比</span></div>
+                <div class="right"><span>›</span></div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="hero-btn clickable" onclick="showPage('home')" style="font-size: 16px; padding: 12px 30px;" data-i18n="profile_back">返回首頁</button>
+        </div>
+    </div>
+
+    <!-- 箱子 8：論壇 -->
+    <div id="forum-page" class="page-section container">
+        <h2 style="color: var(--accent); text-align: center;" data-i18n="forum_title">💬 Leo 論壇</h2>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;" data-i18n="forum_subtitle">與其他 Roblox 玩家交流討論</p>
+
+        <div class="forum-container">
+            <!-- 發文區 -->
+            <div class="forum-post">
+                <h3 style="color: var(--accent); margin-bottom: 15px;" data-i18n="forum_new_post">✍️ 發布新文章</h3>
+                <div class="form-group">
+                    <input type="text" id="forum-title-input" placeholder="請輸入文章標題..." class="clickable">
+                </div>
+                <div class="form-group">
+                    <textarea id="forum-content-input" rows="4" placeholder="分享你的想法..." class="clickable"></textarea>
+                </div>
+                <button class="btn-submit clickable" onclick="createForumPost()" data-i18n="forum_post_btn">發布文章</button>
+            </div>
+
+            <!-- 文章列表 -->
+            <div id="forum-post-list"></div>
+        </div>
+    </div>
+
+    <!-- ================= 登入頁面 (仿 Google) ================= -->
+    <div id="login-page">
+        <div class="login-card" id="login-card">
+            <h2 data-i18n="login_title">管理員登入</h2>
+            <p data-i18n="login_subtitle">如果你是管理員,請輸入管理員密碼:</p>
+            <div class="login-input-group">
+                <input type="password" id="admin-password-input" placeholder="請輸入密碼..." class="clickable">
+            </div>
+            <button class="login-btn clickable" onclick="submitAdminLogin()" data-i18n="login_btn">登入</button>
+            <div class="login-error" id="login-error-msg">密碼錯誤，請重試！</div>
+        </div>
+        <div class="login-footer">
+            <span>English (US)</span>
+            <span>Help</span>
+            <span>Privacy</span>
+            <span>Terms</span>
+        </div>
+    </div>
+
     <!-- ================= 管理員後台 ================= -->
     <div id="admin-dashboard">
         <div class="admin-header">
             <h2>👑 Roblox 問答網 - 管理後台</h2>
-            <button class="close-admin-btn clickable" onclick="closeAdminDashboard()">退出後台</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="close-admin-btn clickable" onclick="closeAdminDashboard()" style="background: var(--accent); color: #000;">🏠 返回前台</button>
+                <button class="close-admin-btn clickable" onclick="logoutAdmin()" style="background: #ff5555;">退出登入</button>
+            </div>
         </div>
         <div class="admin-body">
             <div class="admin-sidebar">
@@ -478,6 +602,7 @@
                 <div class="clickable" onclick="switchAdminPage('announce')" data-i18n="admin_sidebar_announce">📢 公告管理</div>
                 <div class="clickable" onclick="switchAdminPage('add-card')" data-i18n="admin_sidebar_addcard">➕ 新增問答</div>
                 <div class="clickable" onclick="switchAdminPage('manage-cards')" data-i18n="admin_sidebar_manage">📝 管理問答</div>
+                <div class="clickable" onclick="switchAdminPage('vip')" data-i18n="admin_sidebar_vip">👑 VIP 管理</div>
                 <div class="clickable" onclick="switchAdminPage('banned')" data-i18n="admin_sidebar_banned">🚫 封禁名單</div>
                 <div class="clickable" onclick="switchAdminPage('settings')" data-i18n="admin_sidebar_settings">⚙️ 系統設置</div>
             </div>
@@ -491,6 +616,19 @@
                         <div class="stat-card"><div class="label">👥 會員數</div><div class="number" id="stat-users">1</div></div>
                         <div class="stat-card"><div class="label">💬 總留言數</div><div class="number" id="stat-comments">0</div></div>
                         <div class="stat-card"><div class="label">🚫 封禁數</div><div class="number" id="stat-bans">0</div></div>
+                        <div class="stat-card"><div class="label">📊 系統負載</div><div class="number" style="color: var(--success);">15%</div></div>
+                    </div>
+                    <!-- 模擬圖表 -->
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div class="stat-card" style="flex: 1; min-width: 300px;">
+                            <h4 style="color: var(--accent);">👥 用戶組分佈</h4>
+                            <div style="width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(var(--danger) 0% 2%, var(--accent) 2% 5%, var(--accent-blue) 5% 10%, var(--warning) 10% 100%); margin: 20px auto; position: relative;">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: var(--bg-card); border-radius: 50%;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-around; font-size: 12px; color: var(--text-sub);">
+                                <span>管理員</span><span>版主</span><span>普通用戶</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -554,6 +692,31 @@
                     <div id="manage-cards-list"></div>
                 </div>
 
+                <!-- VIP 管理 -->
+                <div id="admin-page-vip" style="display: none;">
+                    <h3 style="color: var(--accent); margin-top: 0;">👑 VIP 管理</h3>
+                    <p style="color: var(--text-sub); margin-bottom: 20px;">在此處為指定用戶發放 VIP 等級或專屬 ID。</p>
+                    <div class="form-group">
+                        <label>選擇用戶 (UID)</label>
+                        <input type="text" id="vip-uid" placeholder="輸入 UID，例如：1001">
+                    </div>
+                    <div class="form-group">
+                        <label>發放等級</label>
+                        <select id="vip-level">
+                            <option value="VIP">VIP</option>
+                            <option value="PVIP">PVIP</option>
+                            <option value="SVIP">SVIP</option>
+                            <option value="VVVIP">VVVIP</option>
+                            <option value="ADSSVIP">ADSSVIP (管理員專屬)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>專屬 ID (選填)</label>
+                        <input type="text" id="vip-exclusive-id" placeholder="輸入專屬 ID，例如：LEO_VIP_001">
+                    </div>
+                    <button class="btn-submit clickable" onclick="grantVIP()">🎁 發放特權</button>
+                </div>
+
                 <!-- 封禁名單 -->
                 <div id="admin-page-banned" style="display: none;">
                     <h3 style="color: var(--accent); margin-top: 0;">🚫 封禁名單</h3>
@@ -586,13 +749,6 @@
         <div id="op-countdown">10:00</div>
     </div>
 
-    <!-- 封禁遮罩 -->
-    <div id="ban-overlay">
-        <h2>🚫 你已被封禁</h2>
-        <p id="ban-reason-text">原因：違反社群規範</p>
-        <p id="ban-contact-text">如想解封，請聯繫網站作者。</p>
-    </div>
-
     <!-- 右下角用戶資訊 -->
     <div id="user-info">
         <span id="close-btn" class="clickable">✖</span>
@@ -607,10 +763,11 @@
         const translations = {
             zh: {
                 menu_title: "📋 功能選單", menu_home: "🏠 首頁", menu_qa: "📚 問答卡片", 
-                menu_game_search: "🎮 遊戲搜尋", menu_changelog: "📜 更新日誌", menu_settings: "⚙️ 設定", menu_intro: "ℹ️ 關於我們", menu_lang: "🌐 語言：", menu_admin: "👑 管理後台",
+                menu_game_search: "🎮 遊戲搜尋", menu_changelog: "📜 更新日誌", menu_settings: "⚙️ 設定", menu_intro: "ℹ️ 關於我們", menu_lang: "🌐 語言：", menu_admin: "👑 管理員登入",
+                menu_forum: "💬 論壇", menu_profile: "👤 個人中心",
                 topic_basic: "📘 基礎知識", topic_security: "🔒 帳號與安全", topic_robux: "🪙 Robux 與變現", topic_dev: "🎮 開發與技術", topic_platform: "📱 平台支援", topic_community: "💬 社群與設定", topic_latest: "🆕 最新動態", topic_avatar: "🎨 Avatar 與外觀", topic_build: "🗺️ 建造與地圖", topic_script: "🧩 腳本邏輯", topic_studio: "🛠️ Studio 工具", topic_marketing: "📈 行銷與經營", topic_revenue: "💰 收益與 DevEx", topic_release: "🚀 發布與版本", topic_anticheat: "🛡️ 反作弊與防護", topic_team: "🤝 團隊與協作", topic_perf: "⚡ 性能與優化", topic_audio: "🎵 音效與材質", topic_ai: "🤖 AI 與未來科技", topic_learn: "📚 學習資源", topic_moderation: "🧑‍⚖️ 審核與申訴", topic_event: "🎁 活動與物品", topic_design: "🧠 遊戲設計理論", topic_localization: "🌐 本地化與多語言", topic_troubleshoot: "🐛 故障排除", topic_all: "全部主題",
                 desc_basic: "Roblox 是什麼？Experience 和 Game 差在哪？", desc_security: "被盜怎麼辦？教你如何保護自己的帳號。", desc_robux: "合法的 Robux 獲取方式與創作者收益解析。", desc_community: "聊天功能限制、家長監護與社群規範。", desc_latest: "掌握 Roblox 最新的功能與平台更新。", desc_avatar: "如何打扮你的虛擬角色？",
-                home_title: "Roblox 知識庫", home_subtitle: "你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。", home_btn: "🚀 開始探索", version_text: "v0.2.0 版本",
+                home_title: "Roblox 知識庫", home_subtitle: "你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。", home_btn: "🚀 開始探索", version_text: "v0.3.0 版本",
                 intro_title: "關於 Leo Studio", intro_subtitle: "了解我們的故事與使命", intro_h3: "👋 哈囉！我們是 Leo Studio",
                 intro_p1: "歡迎來到 Roblox 問答網！我們是一群熱愛 Roblox 的玩家與開發者，致力於整理最完整、最正確的 Roblox 知識庫。",
                 intro_p2: "這裡包含了從基礎知識、帳號安全、Robux 變現、到開發技術的所有常見問題。我們的目標是讓每一位玩家都能輕鬆找到解答，不再為疑難雜症煩惱！",
@@ -620,14 +777,18 @@
                 game_title: "🎮 Roblox 遊戲搜尋", game_subtitle: "輸入遊戲名稱，查看最新數據", game_btn: "搜尋",
                 log_title: "📜 網站更新日誌", log_subtitle: "記錄著這個網站一路以來的成長", log_filter_all: "全部", log_filter_major: "🚀 大型更新", log_filter_feature: "✨ 新功能", log_filter_minor: "🔧 小型更新", log_filter_bug: "🐛 Bug修復",
                 settings_title: "⚙️ 網站設定", settings_subtitle: "調整你的個人化偏好", settings_loader_title: "🎬 載入動畫", settings_loader_label: "開啟載入動畫", settings_loader_desc: "關閉後，重新整理網頁將直接進入網站，不再顯示載入畫面。", settings_bg_title: "🎨 背景顏色", settings_bg_desc: "選擇一個你喜歡的背景顏色，設定會自動儲存。",
-                admin_sidebar_dash: "📊 儀表板", admin_sidebar_users: "👥 用戶管理", admin_sidebar_comments: "💬 留言管理", admin_sidebar_announce: "📢 公告管理", admin_sidebar_addcard: "➕ 新增問答", admin_sidebar_manage: "📝 管理問答", admin_sidebar_banned: "🚫 封禁名單", admin_sidebar_settings: "⚙️ 系統設置"
+                profile_title: "👤 個人中心", profile_subtitle: "管理你的帳號與安全設定", profile_section_account: "帳號管理", profile_email: "綁定電子郵件", profile_phone: "綁定電話號碼", profile_section_link: "帳號關聯", profile_google: "綁定 Google 帳號", profile_id: "專屬 ID", profile_auth: "帳號綁定與授權管理", profile_section_security: "安全管理", profile_password: "修改密碼", profile_2fa: "兩步驟驗證", profile_section_vip: "會員等級", profile_current_vip: "當前等級", profile_vip_compare: "查看會員權益對比", profile_back: "返回首頁",
+                forum_title: "💬 Leo 論壇", forum_subtitle: "與其他 Roblox 玩家交流討論", forum_new_post: "✍️ 發布新文章", forum_post_btn: "發布文章",
+                login_title: "管理員登入", login_subtitle: "如果你是管理員,請輸入管理員密碼:", login_btn: "登入",
+                admin_sidebar_dash: "📊 儀表板", admin_sidebar_users: "👥 用戶管理", admin_sidebar_comments: "💬 留言管理", admin_sidebar_announce: "📢 公告管理", admin_sidebar_addcard: "➕ 新增問答", admin_sidebar_manage: "📝 管理問答", admin_sidebar_vip: "👑 VIP 管理", admin_sidebar_banned: "🚫 封禁名單", admin_sidebar_settings: "⚙️ 系統設置"
             },
             en: {
                 menu_title: "📋 Menu", menu_home: "🏠 Home", menu_qa: "📚 Q&A Cards", 
-                menu_game_search: "🎮 Game Search", menu_changelog: "📜 Changelog", menu_settings: "⚙️ Settings", menu_intro: "ℹ️ About Us", menu_lang: "🌐 Language:", menu_admin: "👑 Admin Panel",
+                menu_game_search: "🎮 Game Search", menu_changelog: "📜 Changelog", menu_settings: "⚙️ Settings", menu_intro: "ℹ️ About Us", menu_lang: "🌐 Language:", menu_admin: "👑 Admin Login",
+                menu_forum: "💬 Forum", menu_profile: "👤 Profile",
                 topic_basic: "📘 Basics", topic_security: "🔒 Account & Security", topic_robux: "🪙 Robux & Monetization", topic_dev: "🎮 Development", topic_platform: "📱 Platforms", topic_community: "💬 Community & Settings", topic_latest: "🆕 Latest News", topic_avatar: "🎨 Avatar & Appearance", topic_build: "🗺️ Building", topic_script: "🧩 Scripting", topic_studio: "🛠️ Studio Tools", topic_marketing: "📈 Marketing", topic_revenue: "💰 Revenue & DevEx", topic_release: "🚀 Publishing", topic_anticheat: "🛡️ Anti-Cheat", topic_team: "🤝 Teamwork", topic_perf: "⚡ Performance", topic_audio: "🎵 Audio & Materials", topic_ai: "🤖 AI & Future", topic_learn: "📚 Learning Resources", topic_moderation: "🧑‍⚖️ Moderation", topic_event: "🎁 Events & Items", topic_design: "🧠 Game Design", topic_localization: "🌐 Localization", topic_troubleshoot: "🐛 Troubleshooting", topic_all: "All Topics",
                 desc_basic: "What is Roblox? Experience vs Game?", desc_security: "How to protect your account from being hacked.", desc_robux: "Legal ways to get Robux and creator earnings.", desc_community: "Chat restrictions, parental controls, and rules.", desc_latest: "Latest Roblox features and platform updates.", desc_avatar: "How to customize your avatar?",
-                home_title: "Roblox Knowledge Base", home_subtitle: "Find answers to all your Roblox questions!<br>From account security to Robux and development.", home_btn: "🚀 Explore Now", version_text: "v0.2.0 Version",
+                home_title: "Roblox Knowledge Base", home_subtitle: "Find answers to all your Roblox questions!<br>From account security to Robux and development.", home_btn: "🚀 Explore Now", version_text: "v0.3.0 Version",
                 intro_title: "About Leo Studio", intro_subtitle: "Our Story and Mission", intro_h3: "👋 Hello! We are Leo Studio",
                 intro_p1: "Welcome to Roblox FAQ! We are a group of passionate Roblox players and developers.",
                 intro_p2: "This site covers basics, account security, Robux, and development. Our goal is to help every player find answers easily.",
@@ -637,7 +798,10 @@
                 game_title: "🎮 Roblox Game Search", game_subtitle: "Enter a game name to see stats", game_btn: "Search",
                 log_title: "📜 Changelog", log_subtitle: "The growth of this website", log_filter_all: "All", log_filter_major: "🚀 Major", log_filter_feature: "✨ Feature", log_filter_minor: "🔧 Minor", log_filter_bug: "🐛 Bugfix",
                 settings_title: "⚙️ Settings", settings_subtitle: "Personalize your experience", settings_loader_title: "🎬 Loading Animation", settings_loader_label: "Enable Loading Animation", settings_loader_desc: "If disabled, the site loads immediately on refresh.", settings_bg_title: "🎨 Background Color", settings_bg_desc: "Choose a background color, it saves automatically.",
-                admin_sidebar_dash: "📊 Dashboard", admin_sidebar_users: "👥 User Management", admin_sidebar_comments: "💬 Comment Management", admin_sidebar_announce: "📢 Announcements", admin_sidebar_addcard: "➕ Add Q&A", admin_sidebar_manage: "📝 Manage Q&A", admin_sidebar_banned: "🚫 Banned List", admin_sidebar_settings: "⚙️ System Settings"
+                profile_title: "👤 Profile", profile_subtitle: "Manage your account and security", profile_section_account: "Account Management", profile_email: "Bind Email", profile_phone: "Bind Phone", profile_section_link: "Account Linking", profile_google: "Bind Google Account", profile_id: "Exclusive ID", profile_auth: "Binding & Authorization", profile_section_security: "Security Management", profile_password: "Change Password", profile_2fa: "Two-Step Verification", profile_section_vip: "Membership", profile_current_vip: "Current Tier", profile_vip_compare: "View VIP Benefits", profile_back: "Back to Home",
+                forum_title: "💬 Leo Forum", forum_subtitle: "Discuss with other Roblox players", forum_new_post: "✍️ New Post", forum_post_btn: "Post",
+                login_title: "Admin Login", login_subtitle: "If you are an admin, please enter the password:", login_btn: "Login",
+                admin_sidebar_dash: "📊 Dashboard", admin_sidebar_users: "👥 User Management", admin_sidebar_comments: "💬 Comment Management", admin_sidebar_announce: "📢 Announcements", admin_sidebar_addcard: "➕ Add Q&A", admin_sidebar_manage: "📝 Manage Q&A", admin_sidebar_vip: "👑 VIP Management", admin_sidebar_banned: "🚫 Banned List", admin_sidebar_settings: "⚙️ System Settings"
             }
         };
 
@@ -657,15 +821,15 @@
             currentLang = lang;
             localStorage.setItem('siteLang', lang);
             applyLanguage(lang);
-            renderTopicNav(); // 重新渲染側邊欄以更新語言
+            renderTopicNav();
             renderCards();
             renderLogs();
+            renderForumPosts();
             showToast('🌐 語言已切換為 ' + (lang === 'zh' ? '中文' : 'English'), 'info');
         }
 
         // ================= 2. 資料庫與卡片資料 =================
-        const currentVersion = 'v0.2.0';
-        // 20+ 主題，每主題 3 張卡片，總計 60+ 張
+        const currentVersion = 'v0.3.0';
         const defaultCards = [
             // 📘 基礎知識
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
@@ -791,8 +955,18 @@
         function saveBanned() { localStorage.setItem('robloxBanned', JSON.stringify(bannedUsers)); }
 
         // 用戶資料
-        let usersData = JSON.parse(localStorage.getItem('robloxUsers')) || [{ uid: 1001, name: 'leoreoroblox', role: '管理員', status: '在線' }];
+        let usersData = JSON.parse(localStorage.getItem('robloxUsers')) || [{ uid: 1001, name: 'leoreoroblox', role: 'ADSSVIP', status: '在線', vip: 'ADSSVIP', exclusiveId: 'LEO_ADMIN' }];
         function saveUsers() { localStorage.setItem('robloxUsers', JSON.stringify(usersData)); }
+
+        // 論壇文章資料庫
+        let forumPosts = JSON.parse(localStorage.getItem('robloxForum')) || [
+            { id: 1, uid: 1001, title: '歡迎來到 Leo 論壇！', content: '這是一個讓大家交流 Roblox 心得的地方，請遵守社群規範！', time: '2026-10-04 10:00', replies: [] }
+        ];
+        function saveForum() { localStorage.setItem('robloxForum', JSON.stringify(forumPosts)); }
+
+        // 登入安全資料
+        let loginAttempts = JSON.parse(localStorage.getItem('robloxLoginAttempts')) || { count: 0, lockUntil: 0, banned: false };
+        function saveLoginAttempts() { localStorage.setItem('robloxLoginAttempts', JSON.stringify(loginAttempts)); }
 
         // ================= 3. Toast 通知系統 =================
         function showToast(message, type = 'info') {
@@ -883,6 +1057,18 @@
                 btn.onclick = () => filterByTopic(topic);
                 nav.appendChild(btn);
             });
+
+            // 更新側邊選單子分類
+            const submenu = document.getElementById('qa-submenu');
+            submenu.innerHTML = '';
+            topics.forEach(topic => {
+                const div = document.createElement('div');
+                div.className = 'clickable';
+                div.innerText = topic;
+                div.onclick = () => showPage('qa', topic);
+                submenu.appendChild(div);
+            });
+
             // 更新進階搜尋下拉選單
             const select = document.getElementById('adv-topic');
             select.innerHTML = `<option value="">${currentLang === 'zh' ? '全部主題' : 'All Topics'}</option>`;
@@ -892,6 +1078,18 @@
                 opt.innerText = topic;
                 select.appendChild(opt);
             });
+
+            // 更新新增問答下拉選單
+            const newTopicSelect = document.getElementById('new-topic');
+            if (newTopicSelect) {
+                newTopicSelect.innerHTML = '';
+                topics.forEach(topic => {
+                    const opt = document.createElement('option');
+                    opt.value = topic;
+                    opt.innerText = topic;
+                    newTopicSelect.appendChild(opt);
+                });
+            }
         }
 
         function filterByTopic(topic) {
@@ -1023,10 +1221,9 @@
 
         // ================= 6. 更新日誌 =================
         const defaultLogs = [
-            { version: 'v0.2.0', date: '2026-10-04', type: 'major', title: '大型更新 - 20+ 主題與全站互動', content: ['新增 20+ 個主題，60+ 張卡片', '全站 Toast 互動通知上線', 'UI 特效與毛玻璃質感', '多語言修復與完美翻譯', '修復遊戲搜尋功能', '管理員後台自定義封禁與 OP 按鈕'] },
-            { version: 'v0.1.0', date: '2026-10-04', type: 'major', title: '大型更新 - Leo Studio 品牌建立', content: ['新增 Leo Studio 關於我們頁面', '新增多語言切換功能', '新增 Roblox 遊戲搜尋功能', '新增模擬評論區'] },
-            { version: 'v0.0.5', date: '2026-10-04', type: 'feature', title: '新功能 - 最新動態上線', content: ['新增「🆕 最新動態」主題'] },
-            { version: 'v0.0.3', date: '2026-10-04', type: 'minor', title: '小型更新 - 設定與載入優化', content: ['載入畫面新增跳過按鈕', '設定頁面可開關載入動畫與更換背景顏色'] },
+            { version: 'v0.3.0', date: '2026-10-04', type: 'major', title: '大型更新 - VIP體系與論壇上線', content: ['新增 VIP/PVIP/SVIP/VVVIP/ADSSVIP 等級體系', '新增論壇系統骨架', '新增個人中心與專屬ID', '管理員後台完整優化（Xiuno BBS風格）', '新增防撞密碼機制', '修復多語言翻譯與遊戲搜尋'] },
+            { version: 'v0.2.0', date: '2026-10-04', type: 'major', title: '大型更新 - 20+ 主題與全站互動', content: ['新增 20+ 個主題，60+ 張卡片', '全站 Toast 互動通知上線', 'UI 特效與毛玻璃質感', '修復遊戲搜尋功能'] },
+            { version: 'v0.1.0', date: '2026-10-04', type: 'major', title: '大型更新 - Leo Studio 品牌建立', content: ['新增 Leo Studio 關於我們頁面', '新增多語言切換功能', '新增模擬評論區'] },
             { version: 'v0.0.1', date: '2026-10-02', type: 'bug', title: 'Bug修復 - 網站誕生', content: ['建立 GitHub 倉庫與基礎架構', '修復排版與跳轉問題'] }
         ];
 
@@ -1061,55 +1258,169 @@
             renderLogs(type);
         }
 
-        // ================= 7. 遊戲搜尋 (修復版) =================
-        async function searchGame() {
-            const input = document.getElementById('game-search-input').value.trim();
-            if (!input) return;
-            const results = document.getElementById('game-results');
-            results.innerHTML = '<p style="text-align:center; color:var(--accent);">🔍 搜尋中...</p>';
+        // ================= 7. 論壇 =================
+        function createForumPost() {
+            const title = document.getElementById('forum-title-input').value.trim();
+            const content = document.getElementById('forum-content-input').value.trim();
+            if (!title || !content) { showToast('⚠️ 請填寫標題和內容！', 'warning'); return; }
             
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超時
+            forumPosts.unshift({
+                id: Date.now(),
+                uid: 1001,
+                title: title,
+                content: content,
+                time: new Date().toLocaleString(),
+                replies: []
+            });
+            saveForum();
+            document.getElementById('forum-title-input').value = '';
+            document.getElementById('forum-content-input').value = '';
+            renderForumPosts();
+            showToast('✅ 文章發布成功！', 'success');
+        }
 
-                // 使用更穩定的 CORS Proxy
-                const proxyUrl = 'https://corsproxy.io/?';
-                const apiUrl = `https://games.roblox.com/v1/games/list?model.keyword=${encodeURIComponent(input)}`;
-                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), { signal: controller.signal });
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                
-                if (!data.games || data.games.length === 0) {
-                    results.innerHTML = '<p style="text-align:center; color:#ff5555;">找不到相關遊戲，請嘗試其他關鍵字。</p>';
-                    return;
-                }
+        function renderForumPosts() {
+            const list = document.getElementById('forum-post-list');
+            list.innerHTML = '';
+            forumPosts.forEach(post => {
+                const div = document.createElement('div');
+                div.className = 'forum-post';
+                div.innerHTML = `
+                    <div class="forum-post-header">
+                        <span>👤 UID: ${post.uid}</span>
+                        <span>${post.time}</span>
+                    </div>
+                    <div class="forum-post-title">${post.title}</div>
+                    <div class="forum-post-content">${post.content}</div>
+                    <div class="forum-post-actions">
+                        <span class="clickable" onclick="toggleReply(${post.id})">💬 回覆</span>
+                        <span class="clickable" onclick="likePost(${post.id})">👍 讚</span>
+                    </div>
+                    <div class="forum-reply-box" id="reply-box-${post.id}" style="display: none;">
+                        <input type="text" id="reply-input-${post.id}" placeholder="輸入回覆...">
+                        <button onclick="submitReply(${post.id})">送出</button>
+                    </div>
+                    <div id="reply-list-${post.id}" style="margin-top: 15px;"></div>
+                `;
+                list.appendChild(div);
+                renderReplies(post.id);
+            });
+        }
 
-                results.innerHTML = '';
-                data.games.slice(0, 5).forEach(game => {
-                    const card = document.createElement('div');
-                    card.className = 'game-card';
-                    card.innerHTML = `
-                        <img src="${game.thumbnailUrl || 'https://via.placeholder.com/100'}" class="game-icon" alt="Icon">
-                        <div class="game-info">
-                            <h3>${game.name}</h3>
-                            <p>👤 創作者：<span class="highlight">${game.creatorName || '未知'}</span></p>
-                            <p>📅 創作日期：<span class="highlight">${new Date(game.created).toLocaleDateString() || '未知'}</span></p>
-                            <p>🔄 最後更新：<span class="highlight">${new Date(game.updated).toLocaleDateString() || '未知'}</span></p>
-                            <p>🟢 目前線上：<span class="highlight">${game.playing || 0}</span> 人</p>
-                            <p>⭐ 收藏數：<span class="highlight">${game.favoritedCount || 0} 次</span></p>
-                        </div>
-                    `;
-                    results.appendChild(card);
-                });
-            } catch (error) {
-                console.error(error);
-                results.innerHTML = '<p style="text-align:center; color:#ff5555;">讀取失敗！可能是 API 限制或網路問題，請稍後再試。</p>';
+        function toggleReply(postId) {
+            const box = document.getElementById(`reply-box-${postId}`);
+            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function submitReply(postId) {
+            const input = document.getElementById(`reply-input-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+            const post = forumPosts.find(p => p.id === postId);
+            if (post) {
+                post.replies.push({ uid: 1001, text: text, time: new Date().toLocaleString() });
+                saveForum();
+                input.value = '';
+                renderReplies(postId);
+                showToast('✅ 回覆成功！', 'success');
             }
         }
 
-        // ================= 8. 管理員後台邏輯 =================
+        function renderReplies(postId) {
+            const list = document.getElementById(`reply-list-${postId}`);
+            const post = forumPosts.find(p => p.id === postId);
+            if (!post || !list) return;
+            list.innerHTML = '';
+            post.replies.forEach(reply => {
+                const div = document.createElement('div');
+                div.style.cssText = 'background: #1a2332; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 14px;';
+                div.innerHTML = `<span style="color: var(--accent); font-size: 12px;">UID: ${reply.uid} | ${reply.time}</span><br><span style="color: #d1d5db;">${reply.text}</span>`;
+                list.appendChild(div);
+            });
+        }
+
+        function likePost(postId) {
+            showToast('👍 感謝你的讚！', 'success');
+        }
+
+        // ================= 8. 登入系統 (防撞密碼) =================
+        function showLoginPage() {
+            document.getElementById('login-page').style.display = 'flex';
+            document.getElementById('admin-password-input').value = '';
+            document.getElementById('login-error-msg').style.display = 'none';
+            
+            // 檢查是否被封禁
+            if (loginAttempts.banned) {
+                document.getElementById('login-error-msg').innerText = '您已被封禁，請聯繫管理員解封。';
+                document.getElementById('login-error-msg').style.display = 'block';
+                document.getElementById('admin-password-input').disabled = true;
+                document.querySelector('.login-btn').disabled = true;
+                return;
+            }
+            
+            // 檢查是否鎖定
+            if (loginAttempts.lockUntil > Date.now()) {
+                const remaining = Math.ceil((loginAttempts.lockUntil - Date.now()) / 1000 / 60);
+                document.getElementById('login-error-msg').innerText = `嘗試次數過多，請等待 ${remaining} 分鐘後再試。`;
+                document.getElementById('login-error-msg').style.display = 'block';
+                document.getElementById('admin-password-input').disabled = true;
+                document.querySelector('.login-btn').disabled = true;
+                return;
+            }
+            
+            document.getElementById('admin-password-input').disabled = false;
+            document.querySelector('.login-btn').disabled = false;
+        }
+
+        function submitAdminLogin() {
+            const password = document.getElementById('admin-password-input').value;
+            const correctPassword = atob('YWRtaW4xMjM='); // admin123
+            
+            if (password === correctPassword) {
+                // 登入成功，重置嘗試次數
+                loginAttempts.count = 0;
+                loginAttempts.lockUntil = 0;
+                saveLoginAttempts();
+                document.getElementById('login-page').style.display = 'none';
+                openAdminDashboard();
+                showToast('👑 管理員已登入後台', 'success');
+            } else {
+                // 登入失敗
+                loginAttempts.count++;
+                if (loginAttempts.count >= 6) {
+                    loginAttempts.banned = true;
+                    saveLoginAttempts();
+                    document.getElementById('login-error-msg').innerText = '您已被封禁，請聯繫管理員解封。';
+                    document.getElementById('login-error-msg').style.display = 'block';
+                    document.getElementById('admin-password-input').disabled = true;
+                    document.querySelector('.login-btn').disabled = true;
+                    showToast('❌ 嘗試次數過多，您已被封禁！', 'error');
+                } else if (loginAttempts.count >= 3) {
+                    loginAttempts.lockUntil = Date.now() + 10 * 60 * 1000; // 鎖定 10 分鐘
+                    saveLoginAttempts();
+                    document.getElementById('login-error-msg').innerText = '嘗試次數過多，請等待 10 分鐘後再試。';
+                    document.getElementById('login-error-msg').style.display = 'block';
+                    document.getElementById('admin-password-input').disabled = true;
+                    document.querySelector('.login-btn').disabled = true;
+                    showToast('⚠️ 密碼錯誤 3 次，已鎖定 10 分鐘。', 'warning');
+                } else {
+                    const remaining = 3 - loginAttempts.count;
+                    document.getElementById('login-error-msg').innerText = `密碼錯誤，剩餘 ${remaining} 次機會。`;
+                    document.getElementById('login-error-msg').style.display = 'block';
+                    document.getElementById('login-card').classList.add('shake');
+                    setTimeout(() => document.getElementById('login-card').classList.remove('shake'), 500);
+                    showToast(`❌ 密碼錯誤，剩餘 ${remaining} 次機會。`, 'error');
+                }
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('login-page').style.display = 'none';
+            showToast('👋 已退出管理員後台，下次進入需重新登入。', 'info');
+        }
+
+        // ================= 9. 管理員後台邏輯 =================
         function openAdminDashboard() {
             document.getElementById('admin-dashboard').style.display = 'flex';
             switchAdminPage('dashboard');
@@ -1118,7 +1429,8 @@
             renderAdminComments();
             renderBannedList();
             renderAnnounceHistory();
-            showToast('👑 管理員已登入後台', 'success');
+            renderUserTable();
+            renderVIPSelect();
         }
 
         function closeAdminDashboard() {
@@ -1129,7 +1441,7 @@
             const sidebarItems = document.querySelectorAll('.admin-sidebar div');
             sidebarItems.forEach(item => item.classList.remove('active'));
             
-            const pages = ['dashboard', 'users', 'comments', 'announce', 'add-card', 'manage-cards', 'banned', 'settings'];
+            const pages = ['dashboard', 'users', 'comments', 'announce', 'add-card', 'manage-cards', 'vip', 'banned', 'settings'];
             pages.forEach(p => {
                 const el = document.getElementById(`admin-page-${p}`);
                 if (el) el.style.display = 'none';
@@ -1147,6 +1459,7 @@
             if (page === 'manage-cards') renderManageCards();
             if (page === 'banned') renderBannedList();
             if (page === 'announce') renderAnnounceHistory();
+            if (page === 'vip') renderVIPSelect();
         }
 
         function renderAdminStats() {
@@ -1166,7 +1479,7 @@
                 tr.innerHTML = `
                     <td>${user.uid}</td>
                     <td>${user.name}</td>
-                    <td><span style="color: ${user.role === '管理員' ? '#ff5555' : '#00ffcc'};">${user.role}</span></td>
+                    <td><span style="color: ${user.role === 'ADSSVIP' ? '#ff00cc' : '#00ffcc'};">${user.role}</span></td>
                     <td>${user.status}</td>
                     <td>
                         <button class="clickable" onclick="warnUser(${user.uid})" style="background: #ffaa00; border: none; color: #000; padding: 5px 10px; border-radius: 3px; cursor: pointer;">⚠️ 警告</button>
@@ -1187,8 +1500,8 @@
                 resultDiv.innerHTML = `
                     <div class="stat-card" style="text-align: left; margin-bottom: 15px;">
                         <p>🔍 找到用戶：<strong>${user.name}</strong> (UID: ${user.uid})</p>
-                        <p>狀態：${user.status} | 角色：${user.role}</p>
-                        <p>當前位置：正在查看「問答卡片」頁面</p>
+                        <p>狀態：${user.status} | 角色：${user.role} | VIP：${user.vip || '無'}</p>
+                        <p>專屬 ID：${user.exclusiveId || '未獲取'}</p>
                     </div>
                 `;
             } else {
@@ -1204,7 +1517,6 @@
             showToast(`🔇 已禁言 UID ${uid}！`, 'warning');
         }
 
-        // 自定義封禁彈窗
         function banUserModal(uid) {
             const reason = prompt(`請輸入封禁 UID ${uid} 的原因：`, '違反社群規範');
             if (reason === null) return;
@@ -1212,7 +1524,6 @@
             if (adminName === null) return;
             
             const hideAdmin = confirm('是否隱藏管理員名稱？');
-            
             const displayAdmin = hideAdmin || adminName.trim() === '' ? '系統管理員' : adminName;
             
             bannedUsers.push({ uid: uid, name: usersData.find(u => u.uid == uid)?.name || 'Unknown', reason: reason, type: '永久', admin: displayAdmin });
@@ -1275,6 +1586,34 @@
             });
         }
 
+        // VIP 管理
+        function renderVIPSelect() {
+            const select = document.getElementById('vip-uid');
+            if (!select) return;
+            // 這裡可以做成下拉選單，但為了靈活，我們讓管理員直接輸入 UID
+        }
+
+        function grantVIP() {
+            const uid = document.getElementById('vip-uid').value.trim();
+            const level = document.getElementById('vip-level').value;
+            const exclusiveId = document.getElementById('vip-exclusive-id').value.trim();
+            
+            if (!uid) { showToast('⚠️ 請輸入用戶 UID！', 'warning'); return; }
+            
+            const user = usersData.find(u => u.uid == uid);
+            if (!user) { showToast('❌ 找不到該用戶！', 'error'); return; }
+            
+            user.vip = level;
+            user.role = level === 'ADSSVIP' ? 'ADSSVIP' : user.role;
+            if (exclusiveId) user.exclusiveId = exclusiveId;
+            saveUsers();
+            
+            showToast(`🎁 已成功為 UID ${uid} 發放 ${level} 特權！`, 'success');
+            renderUserTable();
+            document.getElementById('vip-uid').value = '';
+            document.getElementById('vip-exclusive-id').value = '';
+        }
+
         // 封禁名單
         function renderBannedList() {
             const tbody = document.getElementById('banned-table-body');
@@ -1327,7 +1666,8 @@
                 comments: commentsData,
                 users: usersData,
                 announcements: announcements,
-                banned: bannedUsers
+                banned: bannedUsers,
+                forum: forumPosts
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -1385,7 +1725,7 @@
             showToast('📝 問答卡片已成功發布！', 'success');
         }
 
-        // ================= 9. 網頁主要互動 =================
+        // ================= 10. 網頁主要互動 =================
         document.getElementById('menu-btn').addEventListener('click', () => {
             const menu = document.getElementById('side-menu');
             const submenu = document.getElementById('qa-submenu');
@@ -1413,6 +1753,8 @@
             else if (pageName === 'game-search') targetPage = document.getElementById('game-search-page');
             else if (pageName === 'changelog') targetPage = document.getElementById('changelog-page');
             else if (pageName === 'settings') targetPage = document.getElementById('settings-page');
+            else if (pageName === 'profile') targetPage = document.getElementById('profile-page');
+            else if (pageName === 'forum') targetPage = document.getElementById('forum-page');
 
             if (targetPage) {
                 targetPage.style.display = 'block';
@@ -1422,6 +1764,8 @@
                         filterByTopic(topic);
                     } else if (pageName === 'changelog') {
                         renderLogs();
+                    } else if (pageName === 'forum') {
+                        renderForumPosts();
                     } else {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
@@ -1491,7 +1835,11 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ================= 10. 用戶資訊與管理員觸發 =================
+        function requestExclusiveID() {
+            showToast('🆔 專屬 ID 僅限管理員發放，請聯繫網站作者領取！', 'warning');
+        }
+
+        // ================= 11. 用戶資訊與管理員觸發 =================
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
 
@@ -1517,31 +1865,12 @@
             document.getElementById('user-info').style.display = 'none';
         });
 
-        // 管理員觸發
-        let clickCount = 0;
-        document.getElementById('user-info').addEventListener('click', () => {
-            clickCount++;
-            if (clickCount === 5) {
-                document.getElementById('admin-menu-item').style.display = 'block';
-                clickCount = 0;
-                showToast('👑 管理員權限已解鎖！請點擊左側選單的「👑 管理後台」。', 'success');
-            }
-        });
-
-        document.getElementById('admin-menu-item').addEventListener('click', () => {
-            const password = prompt('請輸入管理員密碼：');
-            if (atob('YWRtaW4xMjM=') === password) {
-                openAdminDashboard();
-            } else {
-                showToast('❌ 密碼錯誤！你以為你是管理員嗎？😎', 'error');
-            }
-        });
-
         // 初始化渲染
         renderCards();
         renderTopicNav();
         renderLogs();
+        renderForumPosts();
         applyLanguage(currentLang);
     </script>
 </body>
-</html>a
+</html>
