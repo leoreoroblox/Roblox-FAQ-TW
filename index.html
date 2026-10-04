@@ -45,11 +45,11 @@
         .card-security h3 { color: #ffaa00; }
         .tag-security { background: rgba(255, 170, 0, 0.2); color: #ffaa00; border: 1px solid #ffaa00; }
 
-        /* 搜尋框樣式 */
+        /* 搜尋框與下拉選單樣式 */
         #search-input { flex: 1; padding: 12px; background: #0b0f19; border: 1px solid #00ffcc; color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
         #search-input::placeholder { color: #557788; }
-        .adv-input { width: 100%; padding: 8px; background: #1a2332; border: 1px solid #557788; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
-        .adv-input:focus { border-color: #00ffcc; }
+        .adv-input, #adv-topic { width: 100%; padding: 8px; background: #1a2332; border: 1px solid #557788; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
+        .adv-input:focus, #adv-topic:focus { border-color: #00ffcc; }
     </style>
 </head>
 <body>
@@ -90,6 +90,16 @@
         <!-- 進階搜尋面板 -->
         <div id="advanced-search-panel" style="display: none; background: #0b0f19; border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
             <h4 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px;">🔍 進階搜尋</h4>
+            
+            <div style="margin-bottom: 10px;">
+                <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">選擇主題：</label>
+                <select id="adv-topic" onchange="advancedSearch()">
+                    <option value="">全部主題</option>
+                    <option value="📘 基礎知識">📘 基礎知識</option>
+                    <option value="🔒 帳號與安全">🔒 帳號與安全</option>
+                </select>
+            </div>
+
             <div style="margin-bottom: 10px;">
                 <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">包含所有字詞 (用空格分隔)：</label>
                 <input type="text" id="adv-all" class="adv-input" placeholder="例如：帳號 安全" oninput="advancedSearch()">
@@ -249,7 +259,7 @@
             }
         }
 
-        // 4. 快速搜尋魔法 (搜尋標題 + 主題標籤)
+        // 4. 快速搜尋魔法 (搜尋標題 + 主題)
         function searchCards() {
             const input = document.getElementById('search-input').value.toLowerCase();
             const cards = document.querySelectorAll('.card');
@@ -259,9 +269,11 @@
                 const tag = tagEl ? tagEl.innerText.toLowerCase() : '';
                 card.style.display = (input === '' || title.includes(input) || tag.includes(input)) ? 'block' : 'none';
             });
+            // 清空進階搜尋
             document.getElementById('adv-all').value = '';
             document.getElementById('adv-exact').value = '';
             document.getElementById('adv-none').value = '';
+            document.getElementById('adv-topic').value = '';
         }
 
         // 5. 進階搜尋魔法
@@ -271,6 +283,7 @@
         }
 
         function advancedSearch() {
+            const topic = document.getElementById('adv-topic').value;
             const allWords = document.getElementById('adv-all').value.toLowerCase().split(' ').filter(w => w.trim() !== '');
             const exactPhrase = document.getElementById('adv-exact').value.toLowerCase().trim();
             const noneWords = document.getElementById('adv-none').value.toLowerCase().split(' ').filter(w => w.trim() !== '');
@@ -279,25 +292,39 @@
             
             cards.forEach(card => {
                 const content = card.innerText.toLowerCase();
+                const tagEl = card.querySelector('.tag');
+                const tag = tagEl ? tagEl.innerText : '';
                 let show = true;
 
+                // 條件一：選擇主題
+                if (topic !== '' && !tag.includes(topic)) {
+                    show = false;
+                }
+
+                // 條件二：包含所有字詞
                 if (allWords.length > 0) {
                     const hasAllWords = allWords.every(word => content.includes(word));
                     if (!hasAllWords) show = false;
                 }
+
+                // 條件三：完全相符
                 if (exactPhrase !== '') {
                     if (!content.includes(exactPhrase)) show = false;
                 }
+
+                // 條件四：不包含字詞
                 if (noneWords.length > 0) {
                     const hasNoneWords = noneWords.some(word => content.includes(word));
                     if (hasNoneWords) show = false;
                 }
+
                 card.style.display = show ? 'block' : 'none';
             });
             document.getElementById('search-input').value = '';
         }
 
         function clearAdvancedSearch() {
+            document.getElementById('adv-topic').value = '';
             document.getElementById('adv-all').value = '';
             document.getElementById('adv-exact').value = '';
             document.getElementById('adv-none').value = '';
