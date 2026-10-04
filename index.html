@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox 問答網 v0.0.1</title>
+    <title>Roblox 問答網 v0.0.2</title>
     <style>
         body { margin: 0; font-family: sans-serif; background: #0b0f19; color: #fff; }
         
@@ -36,8 +36,29 @@
         .submenu div { font-size: 15px !important; color: #9ca3af !important; margin-bottom: 10px !important; }
         .submenu div:hover { color: #00ffcc !important; }
 
-        /* 首頁 */
-        #home-page h1 { color: #0055ff; text-align: center; margin-top: 100px; }
+        /* ================= 首頁專屬魔法 ================= */
+        #home-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        /* 背景科技感光暈 */
+        #home-page::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0, 255, 204, 0.05) 0%, transparent 70%); z-index: 0; }
+        
+        .hero-content { position: relative; z-index: 1; text-align: center; padding: 20px; width: 100%; max-width: 800px; }
+        .hero-title { font-size: 48px; font-weight: bold; margin-bottom: 15px; background: linear-gradient(90deg, #00ffcc, #0055ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 255, 204, 0.3); }
+        .hero-subtitle { font-size: 18px; color: #9ca3af; margin-bottom: 40px; line-height: 1.6; }
+        
+        /* 首頁大按鈕 */
+        .hero-btn { background: linear-gradient(90deg, #00ffcc, #0055ff); color: #0b0f19; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 50px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4); margin-bottom: 60px; }
+        .hero-btn:hover { box-shadow: 0 0 30px rgba(0, 255, 204, 0.8); transform: scale(1.05); }
+        
+        /* 快速導航格子 */
+        .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
+        .quick-card { background: rgba(11, 15, 25, 0.8); border: 1px solid #1f2937; border-radius: 12px; padding: 20px; text-align: left; transition: 0.3s; }
+        .quick-card:hover { border-color: #00ffcc; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); transform: translateY(-5px); }
+        .quick-card .emoji { font-size: 28px; margin-bottom: 10px; display: block; }
+        .quick-card .title { font-size: 16px; font-weight: bold; color: #00ffcc; margin-bottom: 5px; }
+        .quick-card .desc { font-size: 12px; color: #9ca3af; line-height: 1.4; }
+        
+        /* 首頁底部版本號 */
+        .hero-version { position: absolute; bottom: 30px; font-size: 14px; color: #4b5563; }
 
         /* 問答卡片區 */
         .qa-container { display: flex; gap: 20px; }
@@ -119,6 +140,9 @@
             .qa-sidebar button { flex-shrink: 0; font-size: 13px; padding: 8px 12px; }
             #loader div:first-child { font-size: 24px !important; }
             .admin-sidebar { width: 120px; font-size: 14px; }
+            .hero-title { font-size: 32px; }
+            .hero-subtitle { font-size: 16px; }
+            .quick-links { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -155,8 +179,36 @@
 
     <!-- 箱子 1：首頁 -->
     <div id="home-page" class="page-section active">
-        <h1>歡迎使用roblox問答網</h1>
-        <p style="text-align: center; color: #9ca3af;">v0.0.1 版本</p>
+        <div class="hero-content">
+            <h1 class="hero-title">Roblox 知識庫</h1>
+            <p class="hero-subtitle">你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。</p>
+            
+            <button class="hero-btn clickable" onclick="showPage('qa')">🚀 開始探索</button>
+            
+            <div class="quick-links">
+                <div class="quick-card clickable" onclick="showPage('qa', '📘 基礎知識')">
+                    <span class="emoji">📘</span>
+                    <div class="title">基礎知識</div>
+                    <div class="desc">Roblox 是什麼？Experience 和 Game 差在哪？</div>
+                </div>
+                <div class="quick-card clickable" onclick="showPage('qa', '🔒 帳號與安全')">
+                    <span class="emoji">🔒</span>
+                    <div class="title">帳號與安全</div>
+                    <div class="desc">被盜怎麼辦？教你如何保護自己的帳號。</div>
+                </div>
+                <div class="quick-card clickable" onclick="showPage('qa', '🪙 Robux 與變現')">
+                    <span class="emoji">🪙</span>
+                    <div class="title">Robux 與變現</div>
+                    <div class="desc">合法的 Robux 獲取方式與創作者收益解析。</div>
+                </div>
+                <div class="quick-card clickable" onclick="showPage('qa', '💬 社群與設定')">
+                    <span class="emoji">💬</span>
+                    <div class="title">社群與設定</div>
+                    <div class="desc">聊天功能限制、家長監護與社群規範。</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-version">v0.0.2 版本</div>
     </div>
 
     <!-- 箱子 2：問答卡片區 -->
@@ -214,7 +266,21 @@
         <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">記錄著這個網站一路以來的成長</p>
 
         <div class="log-item">
-            <div class="log-version">v0.0.1 - 專業導航與內容爆發 <span class="log-tag">當前版本</span></div>
+            <div class="log-version">v0.0.2 - 首頁大改造 <span class="log-tag">當前版本</span></div>
+            <div class="log-date">📅 2026-10-04</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 首頁全新改版，加入科技感標題與副標題</li>
+                    <li>✅ 新增超大「開始探索」按鈕，引導使用者進入知識庫</li>
+                    <li>✅ 首頁加入四大主題快速導航卡片（基礎、安全、Robux、社群）</li>
+                    <li>✅ 頁面整體排版優化，手機版閱讀更舒適</li>
+                </ul>
+                <button class="log-btn clickable" onclick="showPage('home')">🚀 回首頁看看</button>
+            </div>
+        </div>
+
+        <div class="log-item">
+            <div class="log-version">v0.0.1 - 專業導航與內容爆發 <span class="log-tag">重要更新</span></div>
             <div class="log-date">📅 2026-10-04</div>
             <div class="log-content">
                 <ul>
@@ -227,7 +293,6 @@
                     <li>✅ 加入頁面進出動畫與點按回饋</li>
                     <li>✅ 密碼進行簡易加密偽裝，提升基礎安全性</li>
                 </ul>
-                <button class="log-btn clickable" onclick="showPage('qa')">🚀 前往知識庫</button>
             </div>
         </div>
 
@@ -323,7 +388,7 @@
     <!-- 所有魔法 -->
     <script>
         // ================= 資料庫 =================
-        const currentVersion = 'v0.0.1';
+        const currentVersion = 'v0.0.2';
         const defaultCards = [
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
@@ -550,7 +615,6 @@
             }
         });
 
-        // 頁面切換（加入淡入滑入動畫）
         function showPage(pageName, topic = '') {
             document.getElementById('side-menu').style.left = '-300px';
             document.getElementById('qa-submenu').style.display = 'none';
@@ -665,10 +729,8 @@
             document.getElementById('user-info').style.display = 'none';
         });
 
-        // 管理員觸發與密碼驗證
         document.getElementById('admin-btn').addEventListener('click', () => {
             const password = prompt('請輸入管理員密碼：');
-            // 這裡用 atob 將 Base64 字串解碼成 'admin123' 進行比對，避免密碼直接出現在原始碼中
             if (atob('YWRtaW4xMjM=') === password) {
                 openAdminDashboard();
             } else {
@@ -687,4 +749,4 @@
         });
     </script>
 </body>
-</html>：
+</html>
