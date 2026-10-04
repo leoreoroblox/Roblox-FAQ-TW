@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox 問答網 v0.0.3</title>
+    <title>Roblox 問答網 v0.0.4</title>
     <style>
         body { margin: 0; font-family: sans-serif; background: #0b0f19; color: #fff; transition: background 0.3s ease; }
         
@@ -106,14 +106,12 @@
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1f2937; }
         .settings-row:last-child { border-bottom: none; }
         .settings-row label { color: #d1d5db; font-size: 16px; }
-        /* 開關按鈕 */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4b5563; transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #00ffcc; }
         input:checked + .slider:before { transform: translateX(24px); }
-        /* 顏色選擇 */
         .color-options { display: flex; gap: 15px; flex-wrap: wrap; }
         .color-box { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .color-box:hover { transform: scale(1.1); }
@@ -190,7 +188,7 @@
 
         <div class="menu-item clickable" onclick="showPage('changelog')">📜 更新日誌</div>
         <div class="menu-item clickable" onclick="showPage('settings')">⚙️ 設定</div>
-        <div class="menu-item clickable" onclick="alert('這頁面還在施工中 🚧')">ℹ️ 關於我們</div>
+        <div class="menu-item clickable" onclick="showPage('intro')">ℹ️ 關於我們</div>
     </div>
 
     <!-- 箱子 1：首頁 -->
@@ -199,7 +197,7 @@
             <h1 class="hero-title">Roblox 知識庫</h1>
             <p class="hero-subtitle">你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。</p>
             
-            <button class="hero-btn clickable" onclick="showPage('qa')">🚀 開始探索</button>
+            <button class="hero-btn clickable" onclick="showPage('intro')">🚀 開始探索</button>
             
             <div class="quick-links">
                 <div class="quick-card clickable" onclick="showPage('qa', '📘 基礎知識')">
@@ -224,10 +222,33 @@
                 </div>
             </div>
         </div>
-        <div class="hero-version">v0.0.3 版本</div>
+        <div class="hero-version">v0.0.4 版本</div>
     </div>
 
-    <!-- 箱子 2：問答卡片區 -->
+    <!-- 箱子 2：關於我們 (新頁面) -->
+    <div id="intro-page" class="page-section container">
+        <h2 style="color: #00ffcc; text-align: center;">關於 Leo Studio</h2>
+        <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">了解我們的故事與使命</p>
+
+        <div style="background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+            <h3 style="color: #00ffcc; margin-bottom: 15px;">👋 哈囉！我們是 Leo Studio</h3>
+            <p style="line-height: 1.8; color: #d1d5db; margin-bottom: 15px;">
+                歡迎來到 Roblox 問答網！我們是一群熱愛 Roblox 的玩家與開發者，致力於整理最完整、最正確的 Roblox 知識庫。
+            </p>
+            <p style="line-height: 1.8; color: #d1d5db; margin-bottom: 15px;">
+                這裡包含了從基礎知識、帳號安全、Robux 變現、到開發技術的所有常見問題。我們的目標是讓每一位玩家都能輕鬆找到解答，不再為疑難雜症煩惱！
+            </p>
+            <p style="line-height: 1.8; color: #d1d5db;">
+                如果你喜歡這個網站，歡迎分享給你的朋友，一起加入 Roblox 的大家庭 🎉
+            </p>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="hero-btn clickable" onclick="showPage('qa')" style="font-size: 16px; padding: 12px 30px;">進入知識庫 🚀</button>
+        </div>
+    </div>
+
+    <!-- 箱子 3：問答卡片區 -->
     <div id="qa-page" class="page-section container">
         <div class="qa-container">
             <div class="qa-main-content">
@@ -276,52 +297,39 @@
         </div>
     </div>
 
-    <!-- 箱子 3：更新日誌 -->
+    <!-- 箱子 4：更新日誌 -->
     <div id="changelog-page" class="page-section container">
         <h2 style="color: #00ffcc; text-align: center;">📜 網站更新日誌</h2>
         <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">記錄著這個網站一路以來的成長</p>
 
         <div class="log-item">
-            <div class="log-version">v0.0.3 - 設定與載入優化 <span class="log-tag">當前版本</span></div>
+            <div class="log-version">v0.0.4 - 關於頁面與品牌建立 <span class="log-tag">當前版本</span></div>
             <div class="log-date">📅 2026-10-04</div>
             <div class="log-content">
                 <ul>
-                    <li>✅ 載入畫面新增「跳過」按鈕與「載入成功」提示</li>
-                    <li>✅ 三橫選單新增「⚙️ 設定」頁面</li>
-                    <li>✅ 設定頁面可開關載入動畫（關閉後重新整理將直接進入網頁）</li>
-                    <li>✅ 設定頁面可更換背景顏色，並自動儲存偏好</li>
+                    <li>✅ 新增「關於我們」頁面，介紹 Leo Studio 與網站使命</li>
+                    <li>✅ 首頁「開始探索」按鈕改為跳轉至介紹頁面</li>
+                    <li>✅ 側邊選單「關於我們」正式啟用，不再彈出施工中視窗</li>
                 </ul>
                 <button class="log-btn clickable" onclick="showPage('home')">🚀 回首頁看看</button>
             </div>
         </div>
 
         <div class="log-item">
-            <div class="log-version">v0.0.2 - 首頁大改造 <span class="log-tag">重要更新</span></div>
+            <div class="log-version">v0.0.3 - 設定與載入優化 <span class="log-tag">重要更新</span></div>
             <div class="log-date">📅 2026-10-04</div>
             <div class="log-content">
                 <ul>
-                    <li>✅ 首頁全新改版，加入科技感標題與副標題</li>
-                    <li>✅ 新增超大「開始探索」按鈕，引導使用者進入知識庫</li>
-                    <li>✅ 首頁加入四大主題快速導航卡片</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="log-item">
-            <div class="log-version">v0.0.1 - 專業導航與內容爆發 <span class="log-tag">重要更新</span></div>
-            <div class="log-date">📅 2026-10-04</div>
-            <div class="log-content">
-                <ul>
-                    <li>✅ 問答卡片大幅擴充至 38 張，涵蓋六大主題</li>
-                    <li>✅ 卡片新增顏色標籤，用顏色區分不同主題</li>
-                    <li>✅ 新增管理員後台與右側快速主題導航欄</li>
-                    <li>✅ 加入頁面進出動畫與點按回饋</li>
+                    <li>✅ 載入畫面新增「跳過」按鈕與「載入成功」提示</li>
+                    <li>✅ 三橫選單新增「⚙️ 設定」頁面</li>
+                    <li>✅ 設定頁面可開關載入動畫</li>
+                    <li>✅ 設定頁面可更換背景顏色，並自動儲存偏好</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <!-- 箱子 4：設定頁面 -->
+    <!-- 箱子 5：設定頁面 -->
     <div id="settings-page" class="page-section container">
         <h2 style="color: #00ffcc; text-align: center;">⚙️ 網站設定</h2>
         <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">調整你的個人化偏好</p>
@@ -428,7 +436,7 @@
     <!-- 所有魔法 -->
     <script>
         // ================= 資料庫 =================
-        const currentVersion = 'v0.0.3';
+        const currentVersion = 'v0.0.4';
         const defaultCards = [
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
@@ -725,6 +733,7 @@
 
             let targetPage;
             if (pageName === 'home') targetPage = document.getElementById('home-page');
+            else if (pageName === 'intro') targetPage = document.getElementById('intro-page');
             else if (pageName === 'qa') targetPage = document.getElementById('qa-page');
             else if (pageName === 'changelog') targetPage = document.getElementById('changelog-page');
             else if (pageName === 'settings') targetPage = document.getElementById('settings-page');
