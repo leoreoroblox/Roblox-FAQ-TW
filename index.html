@@ -136,7 +136,7 @@
             </div>
         </div>
 
-        <!-- 卡片們 (由 JavaScript 動態生成) -->
+        <!-- 卡片區 (由 JavaScript 動態生成) -->
         <div id="cards-container">
             <!-- 卡片會由 JavaScript 插入這裡 -->
         </div>
@@ -223,7 +223,6 @@
     <!-- 所有魔法 -->
     <script>
         // ================= 資料庫 (LocalStorage) =================
-        // 預設卡片資料
         const defaultCards = [
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
@@ -241,19 +240,16 @@
             { title: "如何舉報 Roblox 違規玩家？", topic: "🔒 帳號與安全", content: "最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。" }
         ];
 
-        // 從 localStorage 讀取資料，如果沒有就用預設的
         let cardsData = JSON.parse(localStorage.getItem('robloxCards'));
         if (!cardsData) {
             cardsData = defaultCards;
             localStorage.setItem('robloxCards', JSON.stringify(cardsData));
         }
 
-        // 渲染卡片到網頁上
         function renderCards() {
             const container = document.getElementById('cards-container');
-            container.innerHTML = ''; // 清空
-            
-            cardsData.forEach((card, index) => {
+            container.innerHTML = '';
+            cardsData.forEach((card) => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = `card ${card.topic.includes('基礎知識') ? 'card-basic' : 'card-security'}`;
                 cardDiv.innerHTML = `
@@ -263,19 +259,16 @@
                 `;
                 container.appendChild(cardDiv);
             });
-
-            // 更新儀表板的帖子數
             document.getElementById('stat-posts').innerText = cardsData.length;
         }
 
-        // 初始化渲染
         renderCards();
 
         // ================= 管理員後台魔法 =================
         function openAdminDashboard() {
             document.getElementById('admin-dashboard').style.display = 'flex';
             switchAdminPage('dashboard');
-            renderManageCards(); // 渲染管理列表
+            renderManageCards();
         }
 
         function closeAdminDashboard() {
@@ -285,7 +278,6 @@
         function switchAdminPage(page) {
             const sidebarItems = document.querySelectorAll('.admin-sidebar div');
             sidebarItems.forEach(item => item.classList.remove('active'));
-            
             document.getElementById('admin-page-dashboard').style.display = 'none';
             document.getElementById('admin-page-users').style.display = 'none';
             document.getElementById('admin-page-add-card').style.display = 'none';
@@ -306,32 +298,20 @@
             }
         }
 
-        // 新增卡片
         function addNewCard() {
             const title = document.getElementById('new-title').value.trim();
             const topic = document.getElementById('new-topic').value;
             const content = document.getElementById('new-content').value.trim();
-
-            if (!title || !content) {
-                alert('請填寫標題和內容！');
-                return;
-            }
-
-            // 加入資料庫
+            if (!title || !content) { alert('請填寫標題和內容！'); return; }
             cardsData.push({ title, topic, content });
             localStorage.setItem('robloxCards', JSON.stringify(cardsData));
-
-            // 清空表單
             document.getElementById('new-title').value = '';
             document.getElementById('new-content').value = '';
-
-            // 重新渲染
             renderCards();
             renderManageCards();
             alert('卡片發布成功！');
         }
 
-        // 渲染管理列表
         function renderManageCards() {
             const list = document.getElementById('manage-cards-list');
             list.innerHTML = '';
@@ -349,7 +329,6 @@
             });
         }
 
-        // 刪除卡片
         function deleteCard(index) {
             if (confirm('確定要刪除這張卡片嗎？')) {
                 cardsData.splice(index, 1);
@@ -360,7 +339,6 @@
         }
 
         // ================= 其他原有魔法 =================
-        // 1. 進度條魔法
         let progress = 0;
         const interval = setInterval(() => {
             progress += 1;
@@ -372,13 +350,11 @@
             }
         }, 30);
 
-        // 2. 漢堡選單開關
         document.getElementById('menu-btn').addEventListener('click', () => {
             const menu = document.getElementById('side-menu');
             menu.style.left = menu.style.left === '0px' ? '-300px' : '0px';
         });
 
-        // 3. 頁面切換魔法
         function showPage(pageName) {
             document.getElementById('side-menu').style.left = '-300px';
             if (pageName === 'home') {
@@ -392,7 +368,6 @@
             }
         }
 
-        // 4. 搜尋魔法 (略，維持原本邏輯)
         function searchCards() {
             const input = document.getElementById('search-input').value.toLowerCase();
             const cards = document.querySelectorAll('.card');
@@ -449,7 +424,6 @@
             document.querySelectorAll('.card').forEach(card => card.style.display = 'block');
         }
 
-        // 5. 使用者資訊與管理員觸發
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
 
@@ -484,7 +458,6 @@
             }
         });
 
-        // 解鎖管理員按鈕
         let clickCount = 0;
         document.getElementById('user-info').addEventListener('click', () => {
             clickCount++;
