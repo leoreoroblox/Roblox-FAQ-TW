@@ -31,6 +31,10 @@
         .card { background: #0b0f19; border: 1px solid #00ffcc; border-radius: 10px; padding: 20px; margin-bottom: 20px; color: #fff; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
         .card h3 { color: #00ffcc; margin-top: 0; }
         .card p { line-height: 1.6; }
+
+        /* 搜尋框樣式 */
+        #search-input { width: 100%; padding: 12px; margin-bottom: 20px; background: #0b0f19; border: 1px solid #00ffcc; color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
+        #search-input::placeholder { color: #557788; }
     </style>
 </head>
 <body>
@@ -61,6 +65,9 @@
     <!-- 箱子 2：問答卡片區 -->
     <div id="qa-page" style="display: none; padding: 20px; max-width: 600px; margin: 0 auto; padding-top: 80px;">
         <h2 style="color: #00ffcc; text-align: center;">📚 Roblox 基礎知識</h2>
+        
+        <!-- 搜尋框 -->
+        <input type="text" id="search-input" placeholder="🔍 搜尋問答... (例如：Robux)" oninput="searchCards()">
 
         <div class="card">
             <h3>❓ 什麼是 Roblox？</h3>
@@ -149,7 +156,17 @@
             }
         }
 
-        // 4. 使用者資訊與管理員魔法
+        // 4. 搜尋卡片魔法
+        function searchCards() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(input) ? 'block' : 'none';
+            });
+        }
+
+        // 5. 使用者資訊與管理員魔法
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
 
