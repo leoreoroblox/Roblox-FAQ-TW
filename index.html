@@ -209,14 +209,24 @@
         <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">記錄著這個網站一路以來的成長</p>
 
         <div class="log-item">
-            <div class="log-version">v4.0 - 專業版介面 <span class="log-tag">最新版本</span></div>
+            <div class="log-version">v4.1 - 導航優化 <span class="log-tag">最新版本</span></div>
+            <div class="log-date">📅 2026-10-04</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 修復側邊選單與右側導航的跳轉過濾功能</li>
+                    <li>✅ 點擊主題後自動平滑滾動至頂部</li>
+                    <li>✅ 整體排版優化，電腦版與手機版閱讀更舒適</li>
+                </ul>
+            </div>
+        </div>
+        <div class="log-item">
+            <div class="log-version">v4.0 - 專業版介面 <span class="log-tag">重要更新</span></div>
             <div class="log-date">📅 2026-10-04</div>
             <div class="log-content">
                 <ul>
                     <li>✅ 新增「社群與設定」主題卡片</li>
                     <li>✅ 問答卡片介面新增右側快速主題導航欄（手機版自動變為橫向滑動）</li>
                     <li>✅ 側邊選單加入「問答卡片」主題子選單，可直接跳轉對應分類</li>
-                    <li>✅ 整體排版優化，電腦版與手機版閱讀更舒適</li>
                 </ul>
             </div>
         </div>
@@ -229,30 +239,6 @@
                     <li>✅ 卡片新增顏色標籤，用顏色區分不同主題</li>
                     <li>✅ 管理員後台升級：新增「新增問答」與「管理問答」功能</li>
                     <li>✅ 新增「更新日誌」頁面，記錄網站的成長歷程</li>
-                </ul>
-            </div>
-        </div>
-        <div class="log-item">
-            <div class="log-version">v2.0 - 功能大躍進 <span class="log-tag">重要更新</span></div>
-            <div class="log-date">📅 2026-10-03</div>
-            <div class="log-content">
-                <ul>
-                    <li>✅ 新增「漢堡選單」側邊欄，網站更像 App</li>
-                    <li>✅ 新增問答卡片系統，並加入基礎知識卡片</li>
-                    <li>✅ 新增管理員專屬後台（點擊 IP 卡片 5 下解鎖）</li>
-                    <li>✅ 修復 IP 與地區顯示功能（改用 ipwho.is 服務）</li>
-                    <li>✅ 新增快速搜尋與進階搜尋功能</li>
-                </ul>
-            </div>
-        </div>
-        <div class="log-item">
-            <div class="log-version">v1.0 - 網站誕生 <span class="log-tag">最初版本</span></div>
-            <div class="log-date">📅 2026-10-02</div>
-            <div class="log-content">
-                <ul>
-                    <li>✅ 建立 GitHub 倉庫與網站基礎架構</li>
-                    <li>✅ 加入科技感載入畫面（進度條與百分比）</li>
-                    <li>✅ 建立第一個「歡迎來到 Roblox 問答網」標題</li>
                 </ul>
             </div>
         </div>
@@ -336,9 +322,8 @@
     <!-- 所有魔法 -->
     <script>
         // ================= 資料庫 =================
-        const currentVersion = 'v4.0';
+        const currentVersion = 'v4.1';
         const defaultCards = [
-            // 📘 基礎知識
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
             { title: "玩家、開發者和創作者的區別？", topic: "📘 基礎知識", content: "玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。玩家也可以同時成為創作者！" },
@@ -346,8 +331,6 @@
             { title: "什麼是 Avatar？", topic: "📘 基礎知識", content: "Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。玩家可以透過 Avatar Editor 調整外觀。" },
             { title: "什麼是 Robux？", topic: "📘 基礎知識", content: "Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買符合條件的 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。" },
             { title: "什麼是 Roblox Premium？", topic: "📘 基礎知識", content: "Roblox Premium 是 Roblox 的訂閱會員服務。官方已宣布在 2026 年出現重大變更，2026-04-30 起不再提供新的購買；既有訂閱者可能維持訂閱，福利也有所調整。舊版福利不可視為目前福利。" },
-            
-            // 🔒 帳號與安全
             { title: "如何建立 Roblox 帳號？", topic: "🔒 帳號與安全", content: "建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊，按照官方要求輸入資料，完成後按需要驗證電子郵件。" },
             { title: "忘記 Roblox 密碼怎麼辦？", topic: "🔒 帳號與安全", content: "可以使用 Roblox 官方 Account Recovery 功能重設密碼。使用帳號關聯的電子郵件進行恢復，某些帳號也可以使用已關聯的電話號碼。如果沒有可用的恢復方式，需要聯絡 Roblox Customer Support。不要把重設連結或驗證碼提供給其他人。" },
             { title: "Roblox 帳號被盜怎麼辦？", topic: "🔒 帳號與安全", content: "如果其他人未經授權取得帳號控制權，應優先清除可能的惡意軟體，使用官方帳號恢復流程。立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。" },
@@ -355,30 +338,22 @@
             { title: "Roblox 常見詐騙手法？", topic: "🔒 帳號與安全", content: "常見詐騙通常利用虛假的 Robux、物品、交易、贈品或帳號服務，誘導玩家提供帳號資訊或付款。「免費大量 Robux」是常見手法。可疑網站可能偽裝成 Roblox 登入頁面。官方不會要求玩家把密碼或驗證碼交給其他玩家。" },
             { title: "免費 Robux 網站是否可信？", topic: "🔒 帳號與安全", content: "聲稱可以透過第三方網站免費產生大量 Robux 的服務通常不應被視為 Roblox 官方 Robux 取得方式。不存在應由官方宣稱的「Robux Generator」。不應輸入 Roblox 密碼、驗證碼或帳號 Cookie，也不應下載聲稱可以產生 Robux 的不明程式。" },
             { title: "如何舉報 Roblox 違規玩家？", topic: "🔒 帳號與安全", content: "最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。" },
-            
-            // 🪙 Robux 與變現
             { title: "Robux 可以做什麼？", topic: "🪙 Robux 與變現", content: "可用於購買符合條件的 Avatar 物品。可用於 Experience 內的部分付費內容。可用於部分 Pass、Developer Product、Private Server 等。具體價格由 Roblox 或創作者設定，可能改變。" },
             { title: "Robux 的合法取得方式？", topic: "🪙 Robux 與變現", content: "玩家可以透過 Roblox 官方支援的購買方式取得 Robux。Roblox Gift Card 可以兌換 Roblox Credit 或符合卡片規則的內容。創作者可以透過符合條件的創作活動取得 Earned Robux。不應把第三方交易視為 Roblox 官方方式，也不應聲稱存在「秘密免費 Robux 方法」。" },
             { title: "Roblox Gift Card 是什麼？", topic: "🪙 Robux 與變現", content: "Roblox Gift Card 是 Roblox 官方支援的禮品卡。可以透過 Roblox 官方兌換頁面兌換。多數裝置需要使用網頁瀏覽器兌換。Gift Card 並不等同於免費 Robux。前往官方兌換頁面，登入帳號，輸入卡片代碼，選擇 Redeem，確認兌換結果。" },
             { title: "Experience Pass 是什麼？", topic: "🪙 Robux 與變現", content: "Pass 是 Experience 的一次性付費產品，可以提供永久性或特殊權限。例如特殊區域、永久能力或其他 Experience 內福利。Pass 通常與 Developer Product 不同，一般設計為一次購買。" },
             { title: "Developer Product 是什麼？", topic: "🪙 Robux 與變現", content: "Developer Product 是 Experience 內可以重複購買的產品。常見用途包括遊戲貨幣、消耗品和可重複購買能力。與一次性 Pass 不同。開發者必須正確處理購買收據。" },
-            
-            // 🎮 開發與技術
             { title: "玩家資料保存的基本概念？", topic: "🎮 開發與技術", content: "Roblox Experience 可以使用 DataStoreService 保存跨伺服器、跨遊戲工作階段的玩家資料。可保存玩家背包、技能點等持久資料。DataStore 由伺服器端 Script 使用。LocalScript 不能直接存取 DataStore。Studio 測試 DataStore 時需要特別注意不要操作正式資料。" },
             { title: "Script、LocalScript、ModuleScript 的區別？", topic: "🎮 開發與技術", content: "三者都是 Roblox 中的程式腳本類型，但執行方式和用途不同。Script 通常用於伺服器端邏輯。LocalScript 用於客戶端邏輯。ModuleScript 用於建立可重用的程式模組。ModuleScript 的同一側 require() 可以共享其返回結果。" },
             { title: "RemoteEvent 是什麼？", topic: "🎮 開發與技術", content: "RemoteEvent 用於客戶端與伺服器之間進行非同步、單向事件通訊。Client 可以傳送事件給 Server。Server 可以傳送事件給 Client。常放在 ReplicatedStorage，讓兩端都可以存取。Server 不應盲目信任 Client 傳來的資料。" },
             { title: "RemoteFunction 是什麼？", topic: "🎮 開發與技術", content: "RemoteFunction 用於客戶端和伺服器之間進行同步、雙向請求和回應。呼叫端會等待對方返回結果。Client 可以 InvokeServer。Server 可以 InvokeClient。如果不需要等待返回值，通常可以考慮使用 RemoteEvent。" },
             { title: "Roblox Client / Server 模型？", topic: "🎮 開發與技術", content: "Roblox Experience 使用客戶端和伺服器共同運作的架構。Client 負責玩家裝置上的部分顯示和輸入。Server 負責多人遊戲中的權威遊戲狀態。Client 與 Server 可以透過 RemoteEvent 和 RemoteFunction 通訊。不應把重要安全判斷完全交給 Client。" },
-            
-            // 📱 平台支援
             { title: "Roblox 支援 Windows 嗎？", topic: "📱 平台支援", content: "Windows 是 Roblox 支援的桌面平台之一。官方目前列出的要求包括 64-bit Windows 10 或 Windows 11。PC 網站支援 Chrome、Firefox 和 Microsoft Edge。Roblox PC App 的具體要求可能更新。" },
             { title: "Roblox 支援 macOS 嗎？", topic: "📱 平台支援", content: "macOS 是 Roblox 支援的桌面平台。官方目前資料列出 macOS 10.13 High Sierra 或更高版本。Mac 網站支援 Chrome、Firefox 和 Safari。新版本 macOS 的支援狀態可能更新。" },
             { title: "Roblox 支援手機嗎？", topic: "📱 平台支援", content: "Roblox 可以在支援的 iOS 和 Android 行動裝置上使用。行動裝置的效能和可用功能取決於裝置及 Roblox 當時的要求。行動版介面與電腦版不同。某些功能可能因裝置或地區而不同。" },
             { title: "Roblox 支援 Xbox 嗎？", topic: "📱 平台支援", content: "Xbox 是 Roblox 支援的平台之一。Xbox 上的 Roblox 介面和輸入方式與 PC、手機不同。功能支援可能因 Roblox 更新而變化。不應假設 PC 的所有功能都能在 Xbox 使用。" },
             { title: "Roblox 支援 PlayStation 嗎？", topic: "📱 平台支援", content: "PlayStation 是 Roblox 支援的平台之一。PlayStation 使用主機控制器操作。某些 Roblox 功能可能與 PC/手機存在差異。Experience 必須支援相應平台才能正常遊玩。" },
             { title: "Roblox 支援 ChromeOS 嗎？", topic: "📱 平台支援", content: "ChromeOS 裝置可以在符合 Roblox 官方要求的情況下使用 Roblox。官方目前資料要求 ChromeOS 53 或更高版本。需要先啟用 Google Play Store。ChromeOS 的功能與 Windows/macOS 不完全相同。" },
-
-            // 💬 社群與設定 (新主題)
             { title: "什麼是 Roblox Friends？", topic: "💬 社群與設定", content: "Friends 是 Roblox 中玩家建立的社交連結。屬於 Roblox 社交系統。社交和聊天功能受到年齡、安全及地區政策影響。不能假設所有帳號都具有完全相同的社交功能。" },
             { title: "什麼是 Roblox Groups/Communities？", topic: "💬 社群與設定", content: "Roblox 的群組或社群功能可以讓玩家圍繞共同主題建立組織及管理角色。可以有不同角色和權限。管理權限取決於 Roblox 的權限系統及群組設定。不應假設所有角色都有發布、編輯或管理 Experience 的權限。" },
             { title: "Roblox Voice Chat 是什麼？", topic: "💬 社群與設定", content: "Voice Chat 是 Roblox 的語音通訊功能。官方目前要求符合條件的 13+ 使用者完成 age check，必須位於支援地區，且 Voice Chat 必須由 Experience 支援。Voice Chat 非所有帳號預設啟用。Phone verification 已不是取得 Voice Chat 的有效方法。" },
@@ -397,7 +372,6 @@
             localStorage.setItem('robloxCardsVersion', currentVersion);
         }
 
-        // 渲染主題導航欄
         function renderTopicNav() {
             const nav = document.getElementById('topic-nav');
             nav.innerHTML = '';
@@ -416,17 +390,24 @@
             });
         }
 
-        // 過濾卡片
+        // 過濾卡片的核心功能
         function filterByTopic(topic) {
+            // 1. 更新側邊欄按鈕的 active 狀態
             const buttons = document.querySelectorAll('.qa-sidebar button');
             buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // 高亮當前按鈕
             buttons.forEach(btn => {
                 if (btn.innerText === '📂 全部' && topic === '') btn.classList.add('active');
                 else if (btn.innerText === topic) btn.classList.add('active');
             });
 
+            // 2. 清空所有搜尋框（不重置卡片顯示，避免與過濾打架）
+            document.getElementById('search-input').value = '';
+            document.getElementById('adv-topic').value = '';
+            document.getElementById('adv-all').value = '';
+            document.getElementById('adv-exact').value = '';
+            document.getElementById('adv-none').value = '';
+
+            // 3. 執行過濾
             const cards = document.querySelectorAll('.card');
             cards.forEach(card => {
                 const tagEl = card.querySelector('.tag');
@@ -437,9 +418,9 @@
                     card.style.display = 'none';
                 }
             });
-            // 清除搜尋框
-            document.getElementById('search-input').value = '';
-            clearAdvancedSearch();
+
+            // 4. 平滑滾動到頂部，讓使用者看到過濾結果
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function renderCards() {
@@ -560,7 +541,6 @@
         document.getElementById('menu-btn').addEventListener('click', () => {
             const menu = document.getElementById('side-menu');
             const submenu = document.getElementById('qa-submenu');
-            // 如果選單打開了，也順便打開子選單
             menu.style.left = menu.style.left === '0px' ? '-300px' : '0px';
             if (menu.style.left === '0px') {
                 submenu.style.display = 'block';
@@ -596,7 +576,6 @@
                 const tag = tagEl ? tagEl.innerText.toLowerCase() : '';
                 card.style.display = (input === '' || title.includes(input) || tag.includes(input)) ? 'block' : 'none';
             });
-            // 搜尋時取消側邊欄高亮
             document.querySelectorAll('.qa-sidebar button').forEach(btn => btn.classList.remove('active'));
             document.getElementById('adv-all').value = '';
             document.getElementById('adv-exact').value = '';
@@ -636,6 +615,7 @@
             });
             document.getElementById('search-input').value = '';
             document.querySelectorAll('.qa-sidebar button').forEach(btn => btn.classList.remove('active'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function clearAdvancedSearch() {
@@ -645,7 +625,8 @@
             document.getElementById('adv-none').value = '';
             document.querySelectorAll('.card').forEach(card => card.style.display = 'block');
             document.querySelectorAll('.qa-sidebar button').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.qa-sidebar button').classList.add('active'); // 預設為全部
+            document.querySelector('.qa-sidebar button').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
