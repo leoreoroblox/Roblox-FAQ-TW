@@ -43,7 +43,7 @@
         .adv-input, #adv-topic { width: 100%; padding: 8px; background: #1a2332; border: 1px solid #557788; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
         .adv-input:focus, #adv-topic:focus { border-color: #00ffcc; }
 
-        /* ================= 管理員後台樣式 ================= */
+        /* 管理員後台樣式 */
         #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 20000; color: #fff; display: flex; flex-direction: column; }
         .admin-header { height: 60px; background: #111827; border-bottom: 1px solid #1f2937; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .admin-header h2 { margin: 0; font-size: 18px; color: #00ffcc; }
@@ -58,15 +58,18 @@
         .stat-card .number { font-size: 28px; color: #00ffcc; font-weight: bold; margin: 10px 0; }
         .stat-card .label { font-size: 14px; color: #9ca3af; }
         
-        .chart-container { background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 20px; }
-        .chart-bar { height: 20px; background: #1f2937; border-radius: 10px; overflow: hidden; margin: 10px 0; display: flex; }
-        .chart-segment { height: 100%; }
-        
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid #1f2937; }
         .admin-table th { color: #00ffcc; font-weight: normal; }
         
         .close-admin-btn { background: #ff5555; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        /* 新增卡片表單 */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; color: #9ca3af; margin-bottom: 5px; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #00ffcc; }
+        .btn-submit { background: #00ffcc; color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -133,132 +136,37 @@
             </div>
         </div>
 
-        <!-- 卡片們 -->
-        <div class="card card-basic">
-            <span class="tag tag-basic">📘 基礎知識</span>
-            <h3>❓ 什麼是 Roblox？</h3>
-            <p>Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。</p>
-        </div>
-        <div class="card card-basic">
-            <span class="tag tag-basic">📘 基礎知識</span>
-            <h3>❓ 什麼是 Experience？</h3>
-            <p>Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。</p>
-        </div>
-        <div class="card card-basic">
-            <span class="tag tag-basic">📘 基礎知識</span>
-            <h3>❓ 玩家、開發者和創作者的區別？</h3>
-            <p>玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。玩家也可以同時成為創作者！</p>
-        </div>
-        <div class="card card-basic">
-            <span class="tag tag-basic">📘 基礎知識</span>
-            <h3>❓ 什麼是 Roblox Studio？</h3>
-            <p>Roblox Studio 是用於建立 3D 世界、寫 Luau 程式、進行本機測試，並將 Experience 發布到 Roblox 的官方開發工具。主要用於電腦開發。</p>
-        </div>
-        <div class="card card-basic">
-            <span class="tag tag-basic">📘 基礎知識</span>
-            <h3>❓ 什麼是 Avatar？</h3>
-            <p>Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。玩家可以透過 Avatar Editor 調整外觀。</p>
-        </div>
-        <div class="card card-basic">
-            <span class="tag tag-basic">📘 基礎知識</span>
-            <h3>❓ 什麼是 Robux？</h3>
-            <p>Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買符合條件的 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。</p>
-        </div>
-        <div class="card card-basic">
-            <span class="tag tag-basic">📘 基礎知識</span>
-            <h3>❓ 什麼是 Roblox Premium？</h3>
-            <p>Roblox Premium 是 Roblox 的訂閱會員服務。官方已宣布在 2026 年出現重大變更，2026-04-30 起不再提供新的購買；既有訂閱者可能維持訂閱，福利也有所調整。舊版福利不可視為目前福利。</p>
-        </div>
-
-        <div class="card card-security">
-            <span class="tag tag-security">🔒 帳號與安全</span>
-            <h3>❓ 如何建立 Roblox 帳號？</h3>
-            <p>建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊，按照官方要求輸入資料，完成後按需要驗證電子郵件。</p>
-        </div>
-        <div class="card card-security">
-            <span class="tag tag-security">🔒 帳號與安全</span>
-            <h3>❓ 忘記 Roblox 密碼怎麼辦？</h3>
-            <p>可以使用 Roblox 官方 Account Recovery 功能重設密碼。使用帳號關聯的電子郵件進行恢復，某些帳號也可以使用已關聯的電話號碼。如果沒有可用的恢復方式，需要聯絡 Roblox Customer Support。不要把重設連結或驗證碼提供給其他人。</p>
-        </div>
-        <div class="card card-security">
-            <span class="tag tag-security">🔒 帳號與安全</span>
-            <h3>❓ Roblox 帳號被盜怎麼辦？</h3>
-            <p>如果其他人未經授權取得帳號控制權，應優先清除可能的惡意軟體，使用官方帳號恢復流程。立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。</p>
-        </div>
-        <div class="card card-security">
-            <span class="tag tag-security">🔒 帳號與安全</span>
-            <h3>❓ Roblox 兩步驗證 (2SV) 是什麼？</h3>
-            <p>2-Step Verification 是 Roblox 提供的額外帳號安全層，可降低單純密碼洩露造成帳號被登入的風險。登入 Roblox 後，開啟 Settings，進入 Security，選擇可用的 2SV 方法並按畫面完成設定。不要把驗證碼交給其他人。</p>
-        </div>
-        <div class="card card-security">
-            <span class="tag tag-security">🔒 帳號與安全</span>
-            <h3>❓ Roblox 常見詐騙手法？</h3>
-            <p>常見詐騙通常利用虛假的 Robux、物品、交易、贈品或帳號服務，誘導玩家提供帳號資訊或付款。「免費大量 Robux」是常見手法。可疑網站可能偽裝成 Roblox 登入頁面。官方不會要求玩家把密碼或驗證碼交給其他玩家。</p>
-        </div>
-        <div class="card card-security">
-            <span class="tag tag-security">🔒 帳號與安全</span>
-            <h3>❓ 免費 Robux 網站是否可信？</h3>
-            <p>聲稱可以透過第三方網站免費產生大量 Robux 的服務通常不應被視為 Roblox 官方 Robux 取得方式。不存在應由官方宣稱的「Robux Generator」。不應輸入 Roblox 密碼、驗證碼或帳號 Cookie，也不應下載聲稱可以產生 Robux 的不明程式。</p>
-        </div>
-        <div class="card card-security">
-            <span class="tag tag-security">🔒 帳號與安全</span>
-            <h3>❓ 如何舉報 Roblox 違規玩家？</h3>
-            <p>最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。</p>
+        <!-- 卡片們 (由 JavaScript 動態生成) -->
+        <div id="cards-container">
+            <!-- 卡片會由 JavaScript 插入這裡 -->
         </div>
     </div>
 
     <!-- 管理員觸發按鈕 -->
     <div id="admin-btn" style="position: fixed; bottom: 20px; right: 20px; font-size: 30px; cursor: pointer; z-index: 10001; display: none;">⚙️</div>
 
-    <!-- ================= 管理員後台 (全螢幕) ================= -->
-    <div id="admin-dashboard" style="display: none;">
-        <!-- 後台頂部 -->
+    <!-- ================= 管理員後台 ================= -->
+    <div id="admin-dashboard">
         <div class="admin-header">
             <h2>👑 Roblox 問答網 - 管理後台</h2>
             <button class="close-admin-btn" onclick="closeAdminDashboard()">退出後台</button>
         </div>
-        <!-- 後台主體 -->
         <div class="admin-body">
-            <!-- 側邊欄 -->
             <div class="admin-sidebar">
                 <div class="active" onclick="switchAdminPage('dashboard')">📊 儀表板</div>
                 <div onclick="switchAdminPage('users')">👥 用戶管理</div>
-                <div onclick="alert('這功能還在開發中 🚧')">📝 帖子管理</div>
-                <div onclick="alert('這功能還在開發中 🚧')">⚙️ 系統設置</div>
+                <div onclick="switchAdminPage('add-card')">➕ 新增問答</div>
+                <div onclick="switchAdminPage('manage-cards')">📝 管理問答</div>
             </div>
-            <!-- 內容區 -->
             <div class="admin-content">
                 <!-- 儀表板頁面 -->
                 <div id="admin-page-dashboard">
                     <h3 style="color: #00ffcc; margin-top: 0;">📊 數據總覽</h3>
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="label">📝 帖子數</div><div class="number">1,250</div></div>
+                        <div class="stat-card"><div class="label">📝 帖子數</div><div class="number" id="stat-posts">0</div></div>
                         <div class="stat-card"><div class="label">🟢 在線人數</div><div class="number">32</div></div>
                         <div class="stat-card"><div class="label">👥 會員數</div><div class="number">8,520</div></div>
                         <div class="stat-card"><div class="label">📁 附件數</div><div class="number">5,692</div></div>
-                    </div>
-                    
-                    <h3 style="color: #00ffcc;">📈 用戶組分佈</h3>
-                    <div class="chart-container">
-                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; margin-bottom: 5px;">
-                            <span>管理員 (10)</span>
-                            <span>超級版主 (1)</span>
-                            <span>版主 (2)</span>
-                            <span>實習版主 (0)</span>
-                            <span>待驗證用戶 (0)</span>
-                            <span>關禁閉組 (443)</span>
-                        </div>
-                        <div class="chart-bar">
-                            <div class="chart-segment" style="width: 2%; background: #ff5555;"></div>
-                            <div class="chart-segment" style="width: 1%; background: #ffaa00;"></div>
-                            <div class="chart-segment" style="width: 1%; background: #00ffcc;"></div>
-                            <div class="chart-segment" style="width: 1%; background: #0055ff;"></div>
-                            <div class="chart-segment" style="width: 1%; background: #9ca3af;"></div>
-                            <div class="chart-segment" style="width: 94%; background: #1f2937;"></div>
-                        </div>
-                        <div style="margin-top: 15px; font-size: 14px; color: #9ca3af;">
-                            💡 這是一個模擬的數據圖表，未來可以接上真實的資料庫。
-                        </div>
                     </div>
                 </div>
 
@@ -266,15 +174,39 @@
                 <div id="admin-page-users" style="display: none;">
                     <h3 style="color: #00ffcc; margin-top: 0;">👥 用戶列表</h3>
                     <table class="admin-table">
-                        <thead>
-                            <tr><th>用戶名</th><th>用戶組</th><th>狀態</th><th>操作</th></tr>
-                        </thead>
+                        <thead><tr><th>用戶名</th><th>用戶組</th><th>狀態</th><th>操作</th></tr></thead>
                         <tbody>
                             <tr><td>leoreoroblox</td><td style="color: #ff5555;">管理員</td><td>🟢 在線</td><td><button style="background: #ff5555; border: none; color: white; padding: 5px 10px; border-radius: 3px; cursor: pointer;">封禁</button></td></tr>
                             <tr><td>RobloxFan123</td><td style="color: #00ffcc;">版主</td><td>🟢 在線</td><td><button style="background: #ff5555; border: none; color: white; padding: 5px 10px; border-radius: 3px; cursor: pointer;">封禁</button></td></tr>
-                            <tr><td>NewbiePlayer</td><td style="color: #9ca3af;">待驗證用戶</td><td>⚪ 離線</td><td><button style="background: #ff5555; border: none; color: white; padding: 5px 10px; border-radius: 3px; cursor: pointer;">封禁</button></td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- 新增問答頁面 -->
+                <div id="admin-page-add-card" style="display: none;">
+                    <h3 style="color: #00ffcc; margin-top: 0;">➕ 新增問答卡片</h3>
+                    <div class="form-group">
+                        <label>標題</label>
+                        <input type="text" id="new-title" placeholder="例如：什麼是 Robux？">
+                    </div>
+                    <div class="form-group">
+                        <label>主題分類</label>
+                        <select id="new-topic">
+                            <option value="📘 基礎知識">📘 基礎知識</option>
+                            <option value="🔒 帳號與安全">🔒 帳號與安全</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>內容</label>
+                        <textarea id="new-content" rows="5" placeholder="輸入問答內容..."></textarea>
+                    </div>
+                    <button class="btn-submit" onclick="addNewCard()">發布卡片</button>
+                </div>
+
+                <!-- 管理問答頁面 -->
+                <div id="admin-page-manage-cards" style="display: none;">
+                    <h3 style="color: #00ffcc; margin-top: 0;">📝 管理問答</h3>
+                    <div id="manage-cards-list"></div>
                 </div>
             </div>
         </div>
@@ -290,6 +222,144 @@
 
     <!-- 所有魔法 -->
     <script>
+        // ================= 資料庫 (LocalStorage) =================
+        // 預設卡片資料
+        const defaultCards = [
+            { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
+            { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
+            { title: "玩家、開發者和創作者的區別？", topic: "📘 基礎知識", content: "玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。玩家也可以同時成為創作者！" },
+            { title: "什麼是 Roblox Studio？", topic: "📘 基礎知識", content: "Roblox Studio 是用於建立 3D 世界、寫 Luau 程式、進行本機測試，並將 Experience 發布到 Roblox 的官方開發工具。主要用於電腦開發。" },
+            { title: "什麼是 Avatar？", topic: "📘 基礎知識", content: "Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。玩家可以透過 Avatar Editor 調整外觀。" },
+            { title: "什麼是 Robux？", topic: "📘 基礎知識", content: "Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買符合條件的 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。" },
+            { title: "什麼是 Roblox Premium？", topic: "📘 基礎知識", content: "Roblox Premium 是 Roblox 的訂閱會員服務。官方已宣布在 2026 年出現重大變更，2026-04-30 起不再提供新的購買；既有訂閱者可能維持訂閱，福利也有所調整。舊版福利不可視為目前福利。" },
+            { title: "如何建立 Roblox 帳號？", topic: "🔒 帳號與安全", content: "建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊，按照官方要求輸入資料，完成後按需要驗證電子郵件。" },
+            { title: "忘記 Roblox 密碼怎麼辦？", topic: "🔒 帳號與安全", content: "可以使用 Roblox 官方 Account Recovery 功能重設密碼。使用帳號關聯的電子郵件進行恢復，某些帳號也可以使用已關聯的電話號碼。如果沒有可用的恢復方式，需要聯絡 Roblox Customer Support。不要把重設連結或驗證碼提供給其他人。" },
+            { title: "Roblox 帳號被盜怎麼辦？", topic: "🔒 帳號與安全", content: "如果其他人未經授權取得帳號控制權，應優先清除可能的惡意軟體，使用官方帳號恢復流程。立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。" },
+            { title: "Roblox 兩步驗證 (2SV) 是什麼？", topic: "🔒 帳號與安全", content: "2-Step Verification 是 Roblox 提供的額外帳號安全層，可降低單純密碼洩露造成帳號被登入的風險。登入 Roblox 後，開啟 Settings，進入 Security，選擇可用的 2SV 方法並按畫面完成設定。不要把驗證碼交給其他人。" },
+            { title: "Roblox 常見詐騙手法？", topic: "🔒 帳號與安全", content: "常見詐騙通常利用虛假的 Robux、物品、交易、贈品或帳號服務，誘導玩家提供帳號資訊或付款。「免費大量 Robux」是常見手法。可疑網站可能偽裝成 Roblox 登入頁面。官方不會要求玩家把密碼或驗證碼交給其他玩家。" },
+            { title: "免費 Robux 網站是否可信？", topic: "🔒 帳號與安全", content: "聲稱可以透過第三方網站免費產生大量 Robux 的服務通常不應被視為 Roblox 官方 Robux 取得方式。不存在應由官方宣稱的「Robux Generator」。不應輸入 Roblox 密碼、驗證碼或帳號 Cookie，也不應下載聲稱可以產生 Robux 的不明程式。" },
+            { title: "如何舉報 Roblox 違規玩家？", topic: "🔒 帳號與安全", content: "最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。" }
+        ];
+
+        // 從 localStorage 讀取資料，如果沒有就用預設的
+        let cardsData = JSON.parse(localStorage.getItem('robloxCards'));
+        if (!cardsData) {
+            cardsData = defaultCards;
+            localStorage.setItem('robloxCards', JSON.stringify(cardsData));
+        }
+
+        // 渲染卡片到網頁上
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = ''; // 清空
+            
+            cardsData.forEach((card, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card ${card.topic.includes('基礎知識') ? 'card-basic' : 'card-security'}`;
+                cardDiv.innerHTML = `
+                    <span class="tag ${card.topic.includes('基礎知識') ? 'tag-basic' : 'tag-security'}">${card.topic}</span>
+                    <h3>❓ ${card.title}</h3>
+                    <p>${card.content}</p>
+                `;
+                container.appendChild(cardDiv);
+            });
+
+            // 更新儀表板的帖子數
+            document.getElementById('stat-posts').innerText = cardsData.length;
+        }
+
+        // 初始化渲染
+        renderCards();
+
+        // ================= 管理員後台魔法 =================
+        function openAdminDashboard() {
+            document.getElementById('admin-dashboard').style.display = 'flex';
+            switchAdminPage('dashboard');
+            renderManageCards(); // 渲染管理列表
+        }
+
+        function closeAdminDashboard() {
+            document.getElementById('admin-dashboard').style.display = 'none';
+        }
+
+        function switchAdminPage(page) {
+            const sidebarItems = document.querySelectorAll('.admin-sidebar div');
+            sidebarItems.forEach(item => item.classList.remove('active'));
+            
+            document.getElementById('admin-page-dashboard').style.display = 'none';
+            document.getElementById('admin-page-users').style.display = 'none';
+            document.getElementById('admin-page-add-card').style.display = 'none';
+            document.getElementById('admin-page-manage-cards').style.display = 'none';
+
+            if (page === 'dashboard') {
+                sidebarItems[0].classList.add('active');
+                document.getElementById('admin-page-dashboard').style.display = 'block';
+            } else if (page === 'users') {
+                sidebarItems[1].classList.add('active');
+                document.getElementById('admin-page-users').style.display = 'block';
+            } else if (page === 'add-card') {
+                sidebarItems[2].classList.add('active');
+                document.getElementById('admin-page-add-card').style.display = 'block';
+            } else if (page === 'manage-cards') {
+                sidebarItems[3].classList.add('active');
+                document.getElementById('admin-page-manage-cards').style.display = 'block';
+            }
+        }
+
+        // 新增卡片
+        function addNewCard() {
+            const title = document.getElementById('new-title').value.trim();
+            const topic = document.getElementById('new-topic').value;
+            const content = document.getElementById('new-content').value.trim();
+
+            if (!title || !content) {
+                alert('請填寫標題和內容！');
+                return;
+            }
+
+            // 加入資料庫
+            cardsData.push({ title, topic, content });
+            localStorage.setItem('robloxCards', JSON.stringify(cardsData));
+
+            // 清空表單
+            document.getElementById('new-title').value = '';
+            document.getElementById('new-content').value = '';
+
+            // 重新渲染
+            renderCards();
+            renderManageCards();
+            alert('卡片發布成功！');
+        }
+
+        // 渲染管理列表
+        function renderManageCards() {
+            const list = document.getElementById('manage-cards-list');
+            list.innerHTML = '';
+            cardsData.forEach((card, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'background: #1f2937; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;';
+                div.innerHTML = `
+                    <div>
+                        <strong style="color: #00ffcc;">${card.title}</strong>
+                        <div style="font-size: 12px; color: #9ca3af;">${card.topic}</div>
+                    </div>
+                    <button onclick="deleteCard(${index})" style="background: #ff5555; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">刪除</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // 刪除卡片
+        function deleteCard(index) {
+            if (confirm('確定要刪除這張卡片嗎？')) {
+                cardsData.splice(index, 1);
+                localStorage.setItem('robloxCards', JSON.stringify(cardsData));
+                renderCards();
+                renderManageCards();
+            }
+        }
+
+        // ================= 其他原有魔法 =================
         // 1. 進度條魔法
         let progress = 0;
         const interval = setInterval(() => {
@@ -322,7 +392,7 @@
             }
         }
 
-        // 4. 搜尋魔法
+        // 4. 搜尋魔法 (略，維持原本邏輯)
         function searchCards() {
             const input = document.getElementById('search-input').value.toLowerCase();
             const cards = document.querySelectorAll('.card');
@@ -379,33 +449,7 @@
             document.querySelectorAll('.card').forEach(card => card.style.display = 'block');
         }
 
-        // ================= 管理員後台魔法 =================
-        function openAdminDashboard() {
-            document.getElementById('admin-dashboard').style.display = 'flex';
-            // 預設顯示儀表板
-            switchAdminPage('dashboard');
-        }
-
-        function closeAdminDashboard() {
-            document.getElementById('admin-dashboard').style.display = 'none';
-        }
-
-        function switchAdminPage(page) {
-            // 切換側邊欄 active 狀態
-            const sidebarItems = document.querySelectorAll('.admin-sidebar div');
-            sidebarItems.forEach(item => item.classList.remove('active'));
-            if (page === 'dashboard') {
-                sidebarItems[0].classList.add('active');
-                document.getElementById('admin-page-dashboard').style.display = 'block';
-                document.getElementById('admin-page-users').style.display = 'none';
-            } else if (page === 'users') {
-                sidebarItems[1].classList.add('active');
-                document.getElementById('admin-page-dashboard').style.display = 'none';
-                document.getElementById('admin-page-users').style.display = 'block';
-            }
-        }
-
-        // 6. 使用者資訊與管理員觸發
+        // 5. 使用者資訊與管理員觸發
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
 
@@ -440,7 +484,7 @@
             }
         });
 
-        // 解鎖管理員按鈕 (點擊右下角用戶資訊 5 次)
+        // 解鎖管理員按鈕
         let clickCount = 0;
         document.getElementById('user-info').addEventListener('click', () => {
             clickCount++;
