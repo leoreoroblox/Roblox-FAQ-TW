@@ -14,6 +14,9 @@
             --accent: #00ffcc;
             --accent-blue: #0055ff;
             --border-color: #1f2937;
+            --danger: #ff5555;
+            --warning: #ffaa00;
+            --success: #00ff88;
         }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-main); transition: background 0.3s ease; overflow-x: hidden; }
         h1, h2, h3 { margin-top: 0; }
@@ -24,6 +27,15 @@
         .page-section { display: none; opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
         .page-section.active { display: block; opacity: 1; transform: translateY(0); }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; padding-top: 100px; }
+
+        /* Toast 通知 */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(17, 24, 39, 0.95); border-left: 4px solid var(--accent); color: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-size: 14px; display: flex; align-items: center; gap: 10px; animation: slideInRight 0.3s ease forwards; backdrop-filter: blur(10px); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
         /* ================= 跑馬燈公告 ================= */
         #announcement-bar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(0, 255, 204, 0.15); border-bottom: 1px solid var(--accent); color: var(--accent); padding: 8px 0; z-index: 10003; overflow: hidden; display: none; }
@@ -45,7 +57,7 @@
 
         /* ================= 漢堡選單 ================= */
         #menu-btn { position: fixed; top: 20px; left: 20px; font-size: 30px; color: var(--accent); z-index: 10005; background: var(--bg-color); padding: 5px 15px; border-radius: 5px; border: 1px solid var(--accent); }
-        #side-menu { position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: var(--bg-color); border-right: 2px solid var(--accent); z-index: 10004; transition: left 0.3s ease; padding-top: 80px; padding-left: 20px; box-sizing: border-box; overflow-y: auto; }
+        #side-menu { position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px); border-right: 2px solid var(--accent); z-index: 10004; transition: left 0.3s ease; padding-top: 80px; padding-left: 20px; box-sizing: border-box; overflow-y: auto; }
         .menu-item { color: #fff; font-size: 18px; margin-bottom: 15px; }
         .submenu { padding-left: 15px; display: none; }
         .submenu div { font-size: 15px !important; color: var(--text-sub) !important; margin-bottom: 10px !important; }
@@ -70,7 +82,7 @@
         /* ================= 問答卡片區 ================= */
         .qa-container { display: flex; gap: 20px; }
         .qa-main-content { flex: 1; min-width: 0; }
-        .qa-sidebar { width: 140px; position: sticky; top: 100px; height: fit-content; display: flex; flex-direction: column; gap: 8px; }
+        .qa-sidebar { width: 160px; position: sticky; top: 100px; height: fit-content; display: flex; flex-direction: column; gap: 8px; max-height: 80vh; overflow-y: auto; }
         .qa-sidebar button { background: var(--bg-color); border: 1px solid #557788; color: var(--text-sub); padding: 10px; border-radius: 8px; text-align: left; font-size: 14px; }
         .qa-sidebar button:hover, .qa-sidebar button.active { border-color: var(--accent); color: var(--accent); background: #1a2332; }
         #search-input { flex: 1; padding: 12px; background: var(--bg-color); border: 1px solid var(--accent); color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
@@ -80,7 +92,8 @@
         #advanced-search-panel { display: none; background: var(--bg-color); border: 1px solid var(--accent); padding: 15px; margin-bottom: 20px; border-radius: 8px; }
 
         /* 卡片樣式 */
-        .card { background: var(--bg-color); border: 1px solid var(--accent); border-radius: 10px; padding: 20px; margin-bottom: 20px; color: #fff; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); position: relative; }
+        .card { background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(5px); border: 1px solid var(--accent); border-radius: 10px; padding: 20px; margin-bottom: 20px; color: #fff; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); position: relative; transition: transform 0.3s, box-shadow 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(0, 255, 204, 0.4); }
         .tag { font-size: 12px; padding: 4px 10px; border-radius: 5px; margin-bottom: 12px; display: inline-block; font-weight: bold; }
         .card-basic { border-color: #00ffcc; } .card-basic h3 { color: #00ffcc; }
         .tag-basic { background: rgba(0, 255, 204, 0.2); color: #00ffcc; border: 1px solid #00ffcc; }
@@ -96,6 +109,9 @@
         .tag-community { background: rgba(255, 102, 170, 0.2); color: #ff66aa; border: 1px solid #ff66aa; }
         .card-latest { border-color: #ff00cc; } .card-latest h3 { color: #ff00cc; }
         .tag-latest { background: rgba(255, 0, 204, 0.2); color: #ff00cc; border: 1px solid #ff00cc; }
+        .card-misc { border-color: #557788; } .card-misc h3 { color: #aabbcc; }
+        .tag-misc { background: rgba(85, 119, 136, 0.2); color: #aabbcc; border: 1px solid #557788; }
+        
         .card-actions { display: flex; gap: 15px; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 10px; font-size: 14px; color: var(--text-sub); }
         .card-actions span { cursor: pointer; transition: 0.2s; }
         .card-actions span:hover { color: var(--accent); }
@@ -111,28 +127,28 @@
         .comment-item .delete-comment { position: absolute; top: 10px; right: 10px; color: #ff5555; cursor: pointer; font-size: 12px; display: none; }
         .comment-item:hover .delete-comment { display: block; }
 
+        /* ================= 遊戲搜尋 ================= */
+        .search-box-lg { display: flex; gap: 10px; max-width: 600px; margin: 0 auto 30px; }
+        .search-box-lg input { flex: 1; padding: 15px; background: var(--bg-color); border: 2px solid var(--accent); color: #fff; border-radius: 10px; font-size: 18px; outline: none; }
+        .search-box-lg button { padding: 15px 30px; background: linear-gradient(90deg, var(--accent), var(--accent-blue)); border: none; color: #0b0f19; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .game-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; display: flex; gap: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease; }
+        .game-icon { width: 100px; height: 100px; border-radius: 15px; background: #1a2332; object-fit: cover; }
+        .game-info h3 { color: var(--accent); margin-bottom: 10px; }
+        .game-info p { color: var(--text-sub); font-size: 14px; margin: 5px 0; }
+        .game-info .highlight { color: #fff; font-weight: bold; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         /* ================= 更新日誌 ================= */
         .log-filter { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center; }
         .log-filter button { background: var(--bg-color); border: 1px solid var(--text-sub); color: var(--text-sub); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.2s; }
         .log-filter button.active { border-color: var(--accent); color: var(--accent); background: #1a2332; }
-        .log-item { background: var(--bg-card); border-left: 4px solid var(--accent); padding: 15px 20px; margin-bottom: 20px; border-radius: 0 10px 10px 0; position: relative; }
+        .log-item { background: var(--bg-card); border-left: 4px solid var(--accent); padding: 15px 20px; margin-bottom: 20px; border-radius: 0 10px 10px 0; position: relative; animation: fadeIn 0.5s ease; }
         .log-item::before { content: ''; position: absolute; left: -12px; top: 20px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg-color); border: 4px solid var(--accent); }
         .log-tag { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
         .tag-major { background: rgba(255, 0, 204, 0.2); color: #ff00cc; border: 1px solid #ff00cc; }
         .tag-feature { background: rgba(0, 255, 204, 0.2); color: #00ffcc; border: 1px solid #00ffcc; }
         .tag-minor { background: rgba(0, 170, 255, 0.2); color: #00aaff; border: 1px solid #00aaff; }
         .tag-bug { background: rgba(255, 85, 85, 0.2); color: #ff5555; border: 1px solid #ff5555; }
-
-        /* ================= 遊戲搜尋 ================= */
-        #game-search-page { padding-top: 100px; }
-        .search-box-lg { display: flex; gap: 10px; max-width: 600px; margin: 0 auto 30px; }
-        .search-box-lg input { flex: 1; padding: 15px; background: var(--bg-color); border: 2px solid var(--accent); color: #fff; border-radius: 10px; font-size: 18px; outline: none; }
-        .search-box-lg button { padding: 15px 30px; background: linear-gradient(90deg, var(--accent), var(--accent-blue)); border: none; color: #0b0f19; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; }
-        .game-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; display: flex; gap: 20px; margin-bottom: 20px; }
-        .game-icon { width: 100px; height: 100px; border-radius: 15px; background: #1a2332; object-fit: cover; }
-        .game-info h3 { color: var(--accent); margin-bottom: 10px; }
-        .game-info p { color: var(--text-sub); font-size: 14px; margin: 5px 0; }
-        .game-info .highlight { color: #fff; font-weight: bold; }
 
         /* ================= 設定頁面 ================= */
         .settings-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
@@ -155,12 +171,13 @@
         .admin-header { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .admin-header h2 { margin: 0; font-size: 18px; color: var(--accent); }
         .admin-body { display: flex; flex: 1; overflow: hidden; }
-        .admin-sidebar { width: 200px; background: #0f172a; border-right: 1px solid var(--border-color); padding: 20px 0; display: flex; flex-direction: column; }
-        .admin-sidebar div { padding: 15px 20px; color: var(--text-sub); transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; }
+        .admin-sidebar { width: 220px; background: #0f172a; border-right: 1px solid var(--border-color); padding: 20px 0; display: flex; flex-direction: column; overflow-y: auto; }
+        .admin-sidebar div { padding: 12px 20px; color: var(--text-sub); transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; font-size: 15px; }
         .admin-sidebar div:hover, .admin-sidebar div.active { background: #1e293b; color: var(--accent); border-left-color: var(--accent); }
-        .admin-content { flex: 1; padding: 20px; overflow-y: auto; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .admin-content { flex: 1; padding: 25px; overflow-y: auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); border-color: var(--accent); }
         .stat-card .number { font-size: 28px; color: var(--accent); font-weight: bold; margin: 10px 0; }
         .stat-card .label { font-size: 14px; color: var(--text-sub); }
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -178,6 +195,11 @@
         #op-message { font-size: 36px; color: #ff5555; margin-bottom: 20px; font-weight: bold; }
         #op-countdown { font-size: 60px; color: var(--accent); font-family: monospace; }
 
+        /* 封禁遮罩 */
+        #ban-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 25000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; padding: 20px; box-sizing: border-box; }
+        #ban-overlay h2 { color: var(--danger); font-size: 32px; margin-bottom: 20px; }
+        #ban-overlay p { font-size: 18px; line-height: 1.6; }
+
         /* ================= 右下角用戶資訊 ================= */
         #user-info { position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: var(--accent); padding: 15px; border-radius: 10px; border: 1px solid var(--accent); font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5; }
         #close-btn { position: absolute; top: 5px; right: 10px; color: #ff5555; font-weight: bold; cursor: pointer; }
@@ -185,7 +207,7 @@
         /* 手機排版 */
         @media (max-width: 768px) {
             .qa-container { flex-direction: column; }
-            .qa-sidebar { width: 100%; position: static; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+            .qa-sidebar { width: 100%; position: static; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); max-height: none; }
             .qa-sidebar button { flex-shrink: 0; font-size: 13px; padding: 8px 12px; }
             .hero-title { font-size: 32px; }
             .quick-links { grid-template-columns: 1fr; }
@@ -195,6 +217,9 @@
     </style>
 </head>
 <body data-theme="dark">
+
+    <!-- Toast 通知容器 -->
+    <div id="toast-container"></div>
 
     <!-- 跑馬燈公告 -->
     <div id="announcement-bar"><div id="announcement-text">歡迎來到 Leo Studio 的 Roblox 知識庫！</div></div>
@@ -225,6 +250,24 @@
             <div class="clickable" onclick="showPage('qa', '📱 平台支援')" data-i18n="topic_platform">📱 平台支援</div>
             <div class="clickable" onclick="showPage('qa', '💬 社群與設定')" data-i18n="topic_community">💬 社群與設定</div>
             <div class="clickable" onclick="showPage('qa', '🆕 最新動態')" data-i18n="topic_latest">🆕 最新動態</div>
+            <div class="clickable" onclick="showPage('qa', '🎨 Avatar 與外觀')" data-i18n="topic_avatar">🎨 Avatar 與外觀</div>
+            <div class="clickable" onclick="showPage('qa', '🗺️ 建造與地圖')" data-i18n="topic_build">🗺️ 建造與地圖</div>
+            <div class="clickable" onclick="showPage('qa', '🧩 腳本邏輯')" data-i18n="topic_script">🧩 腳本邏輯</div>
+            <div class="clickable" onclick="showPage('qa', '🛠️ Studio 工具')" data-i18n="topic_studio">🛠️ Studio 工具</div>
+            <div class="clickable" onclick="showPage('qa', '📈 行銷與經營')" data-i18n="topic_marketing">📈 行銷與經營</div>
+            <div class="clickable" onclick="showPage('qa', '💰 收益與 DevEx')" data-i18n="topic_revenue">💰 收益與 DevEx</div>
+            <div class="clickable" onclick="showPage('qa', '🚀 發布與版本')" data-i18n="topic_release">🚀 發布與版本</div>
+            <div class="clickable" onclick="showPage('qa', '🛡️ 反作弊與防護')" data-i18n="topic_anticheat">🛡️ 反作弊與防護</div>
+            <div class="clickable" onclick="showPage('qa', '🤝 團隊與協作')" data-i18n="topic_team">🤝 團隊與協作</div>
+            <div class="clickable" onclick="showPage('qa', '⚡ 性能與優化')" data-i18n="topic_perf">⚡ 性能與優化</div>
+            <div class="clickable" onclick="showPage('qa', '🎵 音效與材質')" data-i18n="topic_audio">🎵 音效與材質</div>
+            <div class="clickable" onclick="showPage('qa', '🤖 AI 與未來科技')" data-i18n="topic_ai">🤖 AI 與未來科技</div>
+            <div class="clickable" onclick="showPage('qa', '📚 學習資源')" data-i18n="topic_learn">📚 學習資源</div>
+            <div class="clickable" onclick="showPage('qa', '🧑‍⚖️ 審核與申訴')" data-i18n="topic_moderation">🧑‍⚖️ 審核與申訴</div>
+            <div class="clickable" onclick="showPage('qa', '🎁 活動與物品')" data-i18n="topic_event">🎁 活動與物品</div>
+            <div class="clickable" onclick="showPage('qa', '🧠 遊戲設計理論')" data-i18n="topic_design">🧠 遊戲設計理論</div>
+            <div class="clickable" onclick="showPage('qa', '🌐 本地化與多語言')" data-i18n="topic_localization">🌐 本地化與多語言</div>
+            <div class="clickable" onclick="showPage('qa', '🐛 故障排除')" data-i18n="topic_troubleshoot">🐛 故障排除</div>
         </div>
 
         <div class="menu-item clickable" onclick="showPage('game-search')" data-i18n="menu_game_search">🎮 遊戲搜尋</div>
@@ -279,9 +322,14 @@
                     <div class="title" data-i18n="topic_latest">最新動態</div>
                     <div class="desc" data-i18n="desc_latest">掌握 Roblox 最新的功能與平台更新。</div>
                 </div>
+                <div class="quick-card clickable" onclick="showPage('qa', '🎨 Avatar 與外觀')">
+                    <span class="emoji">🎨</span>
+                    <div class="title" data-i18n="topic_avatar">Avatar 與外觀</div>
+                    <div class="desc" data-i18n="desc_avatar">如何打扮你的虛擬角色？</div>
+                </div>
             </div>
         </div>
-        <div class="hero-version" data-i18n="version_text">v0.1.0 版本</div>
+        <div class="hero-version" data-i18n="version_text">v0.2.0 版本</div>
     </div>
 
     <!-- 箱子 2：關於我們 -->
@@ -331,13 +379,7 @@
                         <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;" data-i18n="adv_topic_label">選擇主題：</label>
                         <select id="adv-topic" class="clickable" onchange="advancedSearch()">
                             <option value="" data-i18n="topic_all">全部主題</option>
-                            <option value="📘 基礎知識" data-i18n="topic_basic">📘 基礎知識</option>
-                            <option value="🔒 帳號與安全" data-i18n="topic_security">🔒 帳號與安全</option>
-                            <option value="🪙 Robux 與變現" data-i18n="topic_robux">🪙 Robux 與變現</option>
-                            <option value="🎮 開發與技術" data-i18n="topic_dev">🎮 開發與技術</option>
-                            <option value="📱 平台支援" data-i18n="topic_platform">📱 平台支援</option>
-                            <option value="💬 社群與設定" data-i18n="topic_community">💬 社群與設定</option>
-                            <option value="🆕 最新動態" data-i18n="topic_latest">🆕 最新動態</option>
+                            <!-- 由 JS 動態生成 -->
                         </select>
                     </div>
                     <div style="margin-bottom: 10px;">
@@ -390,9 +432,7 @@
             <button class="clickable" onclick="filterLog('bug', this)" data-i18n="log_filter_bug">🐛 Bug修復</button>
         </div>
 
-        <div id="log-list">
-            <!-- 由 JS 動態生成 -->
-        </div>
+        <div id="log-list"></div>
     </div>
 
     <!-- 箱子 6：設定頁面 -->
@@ -498,13 +538,7 @@
                     <div class="form-group">
                         <label>主題分類</label>
                         <select id="new-topic">
-                            <option value="📘 基礎知識">📘 基礎知識</option>
-                            <option value="🔒 帳號與安全">🔒 帳號與安全</option>
-                            <option value="🪙 Robux 與變現">🪙 Robux 與變現</option>
-                            <option value="🎮 開發與技術">🎮 開發與技術</option>
-                            <option value="📱 平台支援">📱 平台支援</option>
-                            <option value="💬 社群與設定">💬 社群與設定</option>
-                            <option value="🆕 最新動態">🆕 最新動態</option>
+                            <!-- 由 JS 動態生成 -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -552,6 +586,13 @@
         <div id="op-countdown">10:00</div>
     </div>
 
+    <!-- 封禁遮罩 -->
+    <div id="ban-overlay">
+        <h2>🚫 你已被封禁</h2>
+        <p id="ban-reason-text">原因：違反社群規範</p>
+        <p id="ban-contact-text">如想解封，請聯繫網站作者。</p>
+    </div>
+
     <!-- 右下角用戶資訊 -->
     <div id="user-info">
         <span id="close-btn" class="clickable">✖</span>
@@ -567,9 +608,9 @@
             zh: {
                 menu_title: "📋 功能選單", menu_home: "🏠 首頁", menu_qa: "📚 問答卡片", 
                 menu_game_search: "🎮 遊戲搜尋", menu_changelog: "📜 更新日誌", menu_settings: "⚙️ 設定", menu_intro: "ℹ️ 關於我們", menu_lang: "🌐 語言：", menu_admin: "👑 管理後台",
-                topic_basic: "📘 基礎知識", topic_security: "🔒 帳號與安全", topic_robux: "🪙 Robux 與變現", topic_dev: "🎮 開發與技術", topic_platform: "📱 平台支援", topic_community: "💬 社群與設定", topic_latest: "🆕 最新動態", topic_all: "全部主題",
-                desc_basic: "Roblox 是什麼？Experience 和 Game 差在哪？", desc_security: "被盜怎麼辦？教你如何保護自己的帳號。", desc_robux: "合法的 Robux 獲取方式與創作者收益解析。", desc_community: "聊天功能限制、家長監護與社群規範。", desc_latest: "掌握 Roblox 最新的功能與平台更新。",
-                home_title: "Roblox 知識庫", home_subtitle: "你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。", home_btn: "🚀 開始探索", version_text: "v0.1.0 版本",
+                topic_basic: "📘 基礎知識", topic_security: "🔒 帳號與安全", topic_robux: "🪙 Robux 與變現", topic_dev: "🎮 開發與技術", topic_platform: "📱 平台支援", topic_community: "💬 社群與設定", topic_latest: "🆕 最新動態", topic_avatar: "🎨 Avatar 與外觀", topic_build: "🗺️ 建造與地圖", topic_script: "🧩 腳本邏輯", topic_studio: "🛠️ Studio 工具", topic_marketing: "📈 行銷與經營", topic_revenue: "💰 收益與 DevEx", topic_release: "🚀 發布與版本", topic_anticheat: "🛡️ 反作弊與防護", topic_team: "🤝 團隊與協作", topic_perf: "⚡ 性能與優化", topic_audio: "🎵 音效與材質", topic_ai: "🤖 AI 與未來科技", topic_learn: "📚 學習資源", topic_moderation: "🧑‍⚖️ 審核與申訴", topic_event: "🎁 活動與物品", topic_design: "🧠 遊戲設計理論", topic_localization: "🌐 本地化與多語言", topic_troubleshoot: "🐛 故障排除", topic_all: "全部主題",
+                desc_basic: "Roblox 是什麼？Experience 和 Game 差在哪？", desc_security: "被盜怎麼辦？教你如何保護自己的帳號。", desc_robux: "合法的 Robux 獲取方式與創作者收益解析。", desc_community: "聊天功能限制、家長監護與社群規範。", desc_latest: "掌握 Roblox 最新的功能與平台更新。", desc_avatar: "如何打扮你的虛擬角色？",
+                home_title: "Roblox 知識庫", home_subtitle: "你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。", home_btn: "🚀 開始探索", version_text: "v0.2.0 版本",
                 intro_title: "關於 Leo Studio", intro_subtitle: "了解我們的故事與使命", intro_h3: "👋 哈囉！我們是 Leo Studio",
                 intro_p1: "歡迎來到 Roblox 問答網！我們是一群熱愛 Roblox 的玩家與開發者，致力於整理最完整、最正確的 Roblox 知識庫。",
                 intro_p2: "這裡包含了從基礎知識、帳號安全、Robux 變現、到開發技術的所有常見問題。我們的目標是讓每一位玩家都能輕鬆找到解答，不再為疑難雜症煩惱！",
@@ -584,9 +625,9 @@
             en: {
                 menu_title: "📋 Menu", menu_home: "🏠 Home", menu_qa: "📚 Q&A Cards", 
                 menu_game_search: "🎮 Game Search", menu_changelog: "📜 Changelog", menu_settings: "⚙️ Settings", menu_intro: "ℹ️ About Us", menu_lang: "🌐 Language:", menu_admin: "👑 Admin Panel",
-                topic_basic: "📘 Basics", topic_security: "🔒 Account & Security", topic_robux: "🪙 Robux & Monetization", topic_dev: "🎮 Development", topic_platform: "📱 Platforms", topic_community: "💬 Community & Settings", topic_latest: "🆕 Latest News", topic_all: "All Topics",
-                desc_basic: "What is Roblox? Experience vs Game?", desc_security: "How to protect your account from being hacked.", desc_robux: "Legal ways to get Robux and creator earnings.", desc_community: "Chat restrictions, parental controls, and rules.", desc_latest: "Latest Roblox features and platform updates.",
-                home_title: "Roblox Knowledge Base", home_subtitle: "Find answers to all your Roblox questions!<br>From account security to Robux and development.", home_btn: "🚀 Explore Now", version_text: "v0.1.0 Version",
+                topic_basic: "📘 Basics", topic_security: "🔒 Account & Security", topic_robux: "🪙 Robux & Monetization", topic_dev: "🎮 Development", topic_platform: "📱 Platforms", topic_community: "💬 Community & Settings", topic_latest: "🆕 Latest News", topic_avatar: "🎨 Avatar & Appearance", topic_build: "🗺️ Building", topic_script: "🧩 Scripting", topic_studio: "🛠️ Studio Tools", topic_marketing: "📈 Marketing", topic_revenue: "💰 Revenue & DevEx", topic_release: "🚀 Publishing", topic_anticheat: "🛡️ Anti-Cheat", topic_team: "🤝 Teamwork", topic_perf: "⚡ Performance", topic_audio: "🎵 Audio & Materials", topic_ai: "🤖 AI & Future", topic_learn: "📚 Learning Resources", topic_moderation: "🧑‍⚖️ Moderation", topic_event: "🎁 Events & Items", topic_design: "🧠 Game Design", topic_localization: "🌐 Localization", topic_troubleshoot: "🐛 Troubleshooting", topic_all: "All Topics",
+                desc_basic: "What is Roblox? Experience vs Game?", desc_security: "How to protect your account from being hacked.", desc_robux: "Legal ways to get Robux and creator earnings.", desc_community: "Chat restrictions, parental controls, and rules.", desc_latest: "Latest Roblox features and platform updates.", desc_avatar: "How to customize your avatar?",
+                home_title: "Roblox Knowledge Base", home_subtitle: "Find answers to all your Roblox questions!<br>From account security to Robux and development.", home_btn: "🚀 Explore Now", version_text: "v0.2.0 Version",
                 intro_title: "About Leo Studio", intro_subtitle: "Our Story and Mission", intro_h3: "👋 Hello! We are Leo Studio",
                 intro_p1: "Welcome to Roblox FAQ! We are a group of passionate Roblox players and developers.",
                 intro_p2: "This site covers basics, account security, Robux, and development. Our goal is to help every player find answers easily.",
@@ -610,76 +651,125 @@
                 }
             });
             document.getElementById('lang-select').value = lang;
-            // 更新公告欄文字
-            const announceBar = document.getElementById('announcement-bar');
-            if (announceBar.style.display === 'block') {
-                // 保持公告內容不變，但這裡可以根據語言切換預設公告
-            }
         }
 
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('siteLang', lang);
             applyLanguage(lang);
-            // 重新渲染卡片以更新分類標籤（如果需要的話）
+            renderTopicNav(); // 重新渲染側邊欄以更新語言
+            renderCards();
+            renderLogs();
+            showToast('🌐 語言已切換為 ' + (lang === 'zh' ? '中文' : 'English'), 'info');
         }
 
         // ================= 2. 資料庫與卡片資料 =================
-        const currentVersion = 'v0.1.0';
+        const currentVersion = 'v0.2.0';
+        // 20+ 主題，每主題 3 張卡片，總計 60+ 張
         const defaultCards = [
             // 📘 基礎知識
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
-            { title: "玩家、開發者和創作者的區別？", topic: "📘 基礎知識", content: "玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。玩家也可以同時成為創作者！" },
-            { title: "什麼是 Roblox Studio？", topic: "📘 基礎知識", content: "Roblox Studio 是用於建立 3D 世界、寫 Luau 程式、進行本機測試，並將 Experience 發布到 Roblox 的官方開發工具。主要用於電腦開發。" },
-            { title: "什麼是 Avatar？", topic: "📘 基礎知識", content: "Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。玩家可以透過 Avatar Editor 調整外觀。" },
-            { title: "什麼是 Robux？", topic: "📘 基礎知識", content: "Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買符合條件的 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。" },
-            { title: "什麼是 Roblox Premium？", topic: "📘 基礎知識", content: "Roblox Premium 是 Roblox 的訂閱會員服務。官方已宣布在 2026 年出現重大變更，2026-04-30 起不再提供新的購買；既有訂閱者可能維持訂閱，福利也有所調整。舊版福利不可視為目前福利。" },
+            { title: "玩家、開發者和創作者的區別？", topic: "📘 基礎知識", content: "玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。" },
             // 🔒 帳號與安全
-            { title: "如何建立 Roblox 帳號？", topic: "🔒 帳號與安全", content: "建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊，按照官方要求輸入資料，完成後按需要驗證電子郵件。" },
-            { title: "忘記 Roblox 密碼怎麼辦？", topic: "🔒 帳號與安全", content: "可以使用 Roblox 官方 Account Recovery 功能重設密碼。使用帳號關聯的電子郵件進行恢復，某些帳號也可以使用已關聯的電話號碼。如果沒有可用的恢復方式，需要聯絡 Roblox Customer Support。不要把重設連結或驗證碼提供給其他人。" },
-            { title: "Roblox 帳號被盜怎麼辦？", topic: "🔒 帳號與安全", content: "如果其他人未經授權取得帳號控制權，應優先清除可能的惡意軟體，使用官方帳號恢復流程。立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。" },
-            { title: "Roblox 兩步驗證 (2SV) 是什麼？", topic: "🔒 帳號與安全", content: "2-Step Verification 是 Roblox 提供的額外帳號安全層，可降低單純密碼洩露造成帳號被登入的風險。登入 Roblox 後，開啟 Settings，進入 Security，選擇可用的 2SV 方法並按畫面完成設定。不要把驗證碼交給其他人。" },
-            { title: "Roblox 常見詐騙手法？", topic: "🔒 帳號與安全", content: "常見詐騙通常利用虛假的 Robux、物品、交易、贈品或帳號服務，誘導玩家提供帳號資訊或付款。「免費大量 Robux」是常見手法。可疑網站可能偽裝成 Roblox 登入頁面。官方不會要求玩家把密碼或驗證碼交給其他玩家。" },
-            { title: "免費 Robux 網站是否可信？", topic: "🔒 帳號與安全", content: "聲稱可以透過第三方網站免費產生大量 Robux 的服務通常不應被視為 Roblox 官方 Robux 取得方式。不存在應由官方宣稱的「Robux Generator」。不應輸入 Roblox 密碼、驗證碼或帳號 Cookie，也不應下載聲稱可以產生 Robux 的不明程式。" },
-            { title: "如何舉報 Roblox 違規玩家？", topic: "🔒 帳號與安全", content: "最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。" },
+            { title: "如何建立 Roblox 帳號？", topic: "🔒 帳號與安全", content: "建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊。" },
+            { title: "Roblox 帳號被盜怎麼辦？", topic: "🔒 帳號與安全", content: "立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。" },
+            { title: "Roblox 兩步驗證 (2SV) 是什麼？", topic: "🔒 帳號與安全", content: "2SV 是 Roblox 提供的額外帳號安全層，可降低單純密碼洩露造成帳號被登入的風險。登入後開啟 Settings，進入 Security 設定。" },
             // 🪙 Robux 與變現
-            { title: "Robux 可以做什麼？", topic: "🪙 Robux 與變現", content: "可用於購買符合條件的 Avatar 物品。可用於 Experience 內的部分付費內容。可用於部分 Pass、Developer Product、Private Server 等。具體價格由 Roblox 或創作者設定，可能改變。" },
-            { title: "Robux 的合法取得方式？", topic: "🪙 Robux 與變現", content: "玩家可以透過 Roblox 官方支援的購買方式取得 Robux。Roblox Gift Card 可以兌換 Roblox Credit 或符合卡片規則的內容。創作者可以透過符合條件的創作活動取得 Earned Robux。不應把第三方交易視為 Roblox 官方方式，也不應聲稱存在「秘密免費 Robux 方法」。" },
-            { title: "Roblox Gift Card 是什麼？", topic: "🪙 Robux 與變現", content: "Roblox Gift Card 是 Roblox 官方支援的禮品卡。可以透過 Roblox 官方兌換頁面兌換。多數裝置需要使用網頁瀏覽器兌換。Gift Card 並不等同於免費 Robux。前往官方兌換頁面，登入帳號，輸入卡片代碼，選擇 Redeem，確認兌換結果。" },
-            { title: "Experience Pass 是什麼？", topic: "🪙 Robux 與變現", content: "Pass 是 Experience 的一次性付費產品，可以提供永久性或特殊權限。例如特殊區域、永久能力或其他 Experience 內福利。Pass 通常與 Developer Product 不同，一般設計為一次購買。" },
-            { title: "Developer Product 是什麼？", topic: "🪙 Robux 與變現", content: "Developer Product 是 Experience 內可以重複購買的產品。常見用途包括遊戲貨幣、消耗品和可重複購買能力。與一次性 Pass 不同。開發者必須正確處理購買收據。" },
+            { title: "Robux 的合法取得方式？", topic: "🪙 Robux 與變現", content: "玩家可以透過 Roblox 官方支援的購買方式取得 Robux。Roblox Gift Card 可以兌換。創作者可以透過符合條件的創作活動取得 Earned Robux。" },
+            { title: "免費 Robux 網站是否可信？", topic: "🪙 Robux 與變現", content: "聲稱可以免費產生大量 Robux 的服務通常不應被視為官方方式。不存在官方的「Robux Generator」。不應輸入密碼、驗證碼或帳號 Cookie。" },
+            { title: "Experience Pass 與 Developer Product 的區別？", topic: "🪙 Robux 與變現", content: "Pass 通常用於一次購買即可獲得的特殊權限；Developer Product 則用於可以重複購買的內容，例如遊戲貨幣或消耗品。" },
             // 🎮 開發與技術
-            { title: "玩家資料保存的基本概念？", topic: "🎮 開發與技術", content: "Roblox Experience 可以使用 DataStoreService 保存跨伺服器、跨遊戲工作階段的玩家資料。可保存玩家背包、技能點等持久資料。DataStore 由伺服器端 Script 使用。LocalScript 不能直接存取 DataStore。Studio 測試 DataStore 時需要特別注意不要操作正式資料。" },
-            { title: "Script、LocalScript、ModuleScript 的區別？", topic: "🎮 開發與技術", content: "三者都是 Roblox 中的程式腳本類型，但執行方式和用途不同。Script 通常用於伺服器端邏輯。LocalScript 用於客戶端邏輯。ModuleScript 用於建立可重用的程式模組。ModuleScript 的同一側 require() 可以共享其返回結果。" },
-            { title: "RemoteEvent 是什麼？", topic: "🎮 開發與技術", content: "RemoteEvent 用於客戶端與伺服器之間進行非同步、單向事件通訊。Client 可以傳送事件給 Server。Server 可以傳送事件給 Client。常放在 ReplicatedStorage，讓兩端都可以存取。Server 不應盲目信任 Client 傳來的資料。" },
-            { title: "RemoteFunction 是什麼？", topic: "🎮 開發與技術", content: "RemoteFunction 用於客戶端和伺服器之間進行同步、雙向請求和回應。呼叫端會等待對方返回結果。Client 可以 InvokeServer。Server 可以 InvokeClient。如果不需要等待返回值，通常可以考慮使用 RemoteEvent。" },
-            { title: "Roblox Client / Server 模型？", topic: "🎮 開發與技術", content: "Roblox Experience 使用客戶端和伺服器共同運作的架構。Client 負責玩家裝置上的部分顯示和輸入。Server 負責多人遊戲中的權威遊戲狀態。Client 與 Server 可以透過 RemoteEvent 和 RemoteFunction 通訊。不應把重要安全判斷完全交給 Client。" },
+            { title: "什麼是 Roblox Studio？", topic: "🎮 開發與技術", content: "Roblox Studio 是用於建立 3D 世界、寫 Luau 程式、進行本機測試，並將 Experience 發布到 Roblox 的官方開發工具。" },
+            { title: "Script、LocalScript、ModuleScript 的區別？", topic: "🎮 開發與技術", content: "Script 通常用於伺服器端邏輯。LocalScript 用於客戶端邏輯。ModuleScript 用於建立可重用的程式模組。" },
+            { title: "RemoteEvent 與 RemoteFunction 的區別？", topic: "🎮 開發與技術", content: "RemoteEvent 用於非同步、單向事件通訊。RemoteFunction 用於同步、雙向請求和回應。" },
             // 📱 平台支援
-            { title: "Roblox 支援 Windows 嗎？", topic: "📱 平台支援", content: "Windows 是 Roblox 支援的桌面平台之一。官方目前列出的要求包括 64-bit Windows 10 或 Windows 11。PC 網站支援 Chrome、Firefox 和 Microsoft Edge。Roblox PC App 的具體要求可能更新。" },
-            { title: "Roblox 支援 macOS 嗎？", topic: "📱 平台支援", content: "macOS 是 Roblox 支援的桌面平台。官方目前資料列出 macOS 10.13 High Sierra 或更高版本。Mac 網站支援 Chrome、Firefox 和 Safari。新版本 macOS 的支援狀態可能更新。" },
-            { title: "Roblox 支援手機嗎？", topic: "📱 平台支援", content: "Roblox 可以在支援的 iOS 和 Android 行動裝置上使用。行動裝置的效能和可用功能取決於裝置及 Roblox 當時的要求。行動版介面與電腦版不同。某些功能可能因裝置或地區而不同。" },
-            { title: "Roblox 支援 Xbox 嗎？", topic: "📱 平台支援", content: "Xbox 是 Roblox 支援的平台之一。Xbox 上的 Roblox 介面和輸入方式與 PC、手機不同。功能支援可能因 Roblox 更新而變化。不應假設 PC 的所有功能都能在 Xbox 使用。" },
-            { title: "Roblox 支援 PlayStation 嗎？", topic: "📱 平台支援", content: "PlayStation 是 Roblox 支援的平台之一。PlayStation 使用主機控制器操作。某些 Roblox 功能可能與 PC/手機存在差異。Experience 必須支援相應平台才能正常遊玩。" },
-            { title: "Roblox 支援 ChromeOS 嗎？", topic: "📱 平台支援", content: "ChromeOS 裝置可以在符合 Roblox 官方要求的情況下使用 Roblox。官方目前資料要求 ChromeOS 53 或更高版本。需要先啟用 Google Play Store。ChromeOS 的功能與 Windows/macOS 不完全相同。" },
+            { title: "Roblox 支援 Windows 嗎？", topic: "📱 平台支援", content: "Windows 是 Roblox 支援的桌面平台之一。官方目前列出的要求包括 64-bit Windows 10 或 Windows 11。" },
+            { title: "Roblox 支援手機嗎？", topic: "📱 平台支援", content: "Roblox 可以在支援的 iOS 和 Android 行動裝置上使用。行動裝置的效能和可用功能取決於裝置及 Roblox 當時的要求。" },
+            { title: "Roblox 支援 Xbox 和 PlayStation 嗎？", topic: "📱 平台支援", content: "Xbox 和 PlayStation 都是 Roblox 支援的平台。主機上的介面和輸入方式與 PC、手機不同。" },
             // 💬 社群與設定
-            { title: "什麼是 Roblox Friends？", topic: "💬 社群與設定", content: "Friends 是 Roblox 中玩家建立的社交連結。屬於 Roblox 社交系統。社交和聊天功能受到年齡、安全及地區政策影響。不能假設所有帳號都具有完全相同的社交功能。" },
-            { title: "什麼是 Roblox Groups/Communities？", topic: "💬 社群與設定", content: "Roblox 的群組或社群功能可以讓玩家圍繞共同主題建立組織及管理角色。可以有不同角色和權限。管理權限取決於 Roblox 的權限系統及群組設定。不應假設所有角色都有發布、編輯或管理 Experience 的權限。" },
-            { title: "Roblox Voice Chat 是什麼？", topic: "💬 社群與設定", content: "Voice Chat 是 Roblox 的語音通訊功能。官方目前要求符合條件的 13+ 使用者完成 age check，必須位於支援地區，且 Voice Chat 必須由 Experience 支援。Voice Chat 非所有帳號預設啟用。Phone verification 已不是取得 Voice Chat 的有效方法。" },
-            { title: "Roblox Chat 是什麼？", topic: "💬 社群與設定", content: "Roblox Chat 是平台提供的文字通訊功能。Roblox 目前要求使用者完成 age check 才能使用部分 Communication features。Chat 功能會根據年齡群組進行限制。地區和產品可能造成額外差異。某些玩家需要家長同意才能啟用特定聊天功能。" },
-            { title: "什麼是 Roblox 家長監護？", topic: "💬 社群與設定", content: "Roblox Parental Controls 是家長管理兒童帳號使用方式的官方功能。可以管理內容成熟度、部分聊天和通訊設定、遊戲存取限制、每月消費限制。家長帳號可以與兒童帳號建立連結。" },
-            { title: "Roblox 的社群規範是什麼？", topic: "💬 社群與設定", content: "Community Standards 是 Roblox 對平台內容和使用者行為制定的官方規範。涉及安全、欺詐、騷擾、個人資料等多個領域。玩家和創作者都需要遵守。社群習慣不能取代官方 Community Standards。" },
-            { title: "Roblox 的帳號處罰有哪些？", topic: "💬 社群與設定", content: "這些詞通常指 Roblox 對帳號或內容採取的不同程度處分。Warning 是一種平台處置。Timeout、Suspension 等可能限制帳號使用。更嚴重的帳號處分可能導致較長時間或其他限制。實際處分名稱、期限及適用情況應以 Roblox 當時的官方通知為準。" },
-            { title: "如何申訴 Roblox Moderation？", topic: "💬 社群與設定", content: "如果 Roblox 對帳號或內容作出 Moderation Decision，符合條件的使用者可以透過官方申訴流程要求重新審核。Roblox 的 Appeals team 可以重新查看部分處分。申訴不保證處分一定會被取消。官方資料指出部分申訴有 30 天限制。" },
-            // 🆕 最新動態 (2026 更新)
-            { title: "RDC 2026 重大發表", topic: "🆕 最新動態", content: "Roblox 在 RDC 2026 宣布了多項重大更新，包括「Play Roblox Everywhere」讓遊戲可發布為獨立應用、網頁直接遊玩、離線模式、2D 遊戲支援、Roblox Reality 影片世界模型，以及 Roblox Wallet 支付系統。" },
-            { title: "AI 遊戲創作工具 Build", topic: "🆕 最新動態", content: "Roblox 推出 AI 遊戲創作工具 Build，用戶可用自然語言描述來生成遊戲。從紐西蘭擴展至塞爾維亞和新加坡，並增加桌面端支持。今年晚些時候將加入基於提示詞的場景生成功能。" },
-            { title: "2026 春季創作者路線圖", topic: "🆕 最新動態", content: "Roblox 發布 2026 春季路線圖，完成 52 項功能上線，新增 21 項開發規劃。重點聚焦引擎能力（4K 紋理渲染、實時聲學模擬）、AI 創作助手、虛擬形象（R15 全身動畫）。同時加碼克隆遊戲治理。" },
-            { title: "安全政策與年齡驗證更新", topic: "🆕 最新動態", content: "Roblox 推出 Roblox Kids 和 Roblox Select 年齡專屬賬號。聊天功能需通過年齡檢查，且僅限同年齡段用戶交流。家長控制功能增強，可阻止遊戲和管理私信直到孩子年滿 16 歲。" },
-            { title: "開發者 API 與 Luau 更新", topic: "🆕 最新動態", content: "Luau 語言新增 pcall 和 xpcall 在用戶定義類型函數中的使用。新增 ViewportCamera 實例類型。NPC 能力增強：今年晚些時候將加入可自動進行遊戲測試的 NPC，幫助創作者發現問題。" },
-            { title: "Roblox 2026 使用條款更新", topic: "🆕 最新動態", content: "2026 年 4 月 30 日起生效的新使用條款，簡化了 AI 工具及數據使用的說明，並更新了創作者收益與平台規範的相關細則。" }
+            { title: "什麼是 Roblox Friends？", topic: "💬 社群與設定", content: "Friends 是 Roblox 中玩家建立的社交連結。社交和聊天功能受到年齡、安全及地區政策影響。" },
+            { title: "Roblox Voice Chat 是什麼？", topic: "💬 社群與設定", content: "Voice Chat 是語音通訊功能。官方目前要求符合條件的 13+ 使用者完成 age check，且必須位於支援地區。" },
+            { title: "什麼是 Roblox 家長監護？", topic: "💬 社群與設定", content: "Parental Controls 是家長管理兒童帳號使用方式的官方功能。可以管理內容成熟度、聊天設定、消費限制。" },
+            // 🆕 最新動態
+            { title: "RDC 2026 重大發表", topic: "🆕 最新動態", content: "Roblox 在 RDC 2026 宣布了多項重大更新，包括「Play Roblox Everywhere」讓遊戲可發布為獨立應用、網頁直接遊玩、離線模式、2D 遊戲支援。" },
+            { title: "AI 遊戲創作工具 Build", topic: "🆕 最新動態", content: "Roblox 推出 AI 遊戲創作工具 Build，用戶可用自然語言描述來生成遊戲。從紐西蘭擴展至塞爾維亞和新加坡。" },
+            { title: "安全政策與年齡驗證更新", topic: "🆕 最新動態", content: "Roblox 推出 Roblox Kids 和 Roblox Select 年齡專屬賬號。聊天功能需通過年齡檢查，且僅限同年齡段用戶交流。" },
+            // 🎨 Avatar 與外觀
+            { title: "什麼是 Avatar？", topic: "🎨 Avatar 與外觀", content: "Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。" },
+            { title: "如何獲得免費的 Avatar 物品？", topic: "🎨 Avatar 與外觀", content: "Roblox 經常在節日或活動期間發放免費物品。你也可以透過 Marketplace 尋找免費的配件。" },
+            { title: "Avatar Editor 在哪裡？", topic: "🎨 Avatar 與外觀", content: "玩家可以透過 Roblox App 或網頁版的 Avatar Editor 調整外觀，選擇身體、衣服和配件。" },
+            // 🗺️ 建造與地圖
+            { title: "如何在 Studio 中建造地形？", topic: "🗺️ 建造與地圖", content: "使用 Terrain Editor 工具，你可以創建山脈、河流、海洋等自然景觀。也可以使用 Part 來構建建築物。" },
+            { title: "什麼是 Model？", topic: "🗺️ 建造與地圖", content: "Model 是包含多個 Part 的群組，可以作為一個整體移動和複製。常用於建造複雜的建築或載具。" },
+            { title: "如何匯入外部 3D 模型？", topic: "🗺️ 建造與地圖", content: "Roblox Studio 支援匯入 .fbx 和 .obj 格式的 3D 模型。你可以使用第三方軟體（如 Blender）創建模型後匯入。" },
+            // 🧩 腳本邏輯
+            { title: "什麼是 Luau？", topic: "🧩 腳本邏輯", content: "Luau 是 Roblox 使用的程式語言，源自 Lua，並針對 Roblox 開發進行了擴展和優化。" },
+            { title: "如何使用變數 (Variable)？", topic: "🧩 腳本邏輯", content: "變數是用於保存資料或物件參考的名稱。Luau 常使用 local 宣告區域變數。可以保存數字、字串、布林值等。" },
+            { title: "什麼是 Event (事件)？", topic: "🧩 腳本邏輯", content: "Event 是 Roblox 用於通知程式某件事情發生的機制。例如 Player 加入、按鈕被觸發等。常使用 Connect() 連接事件。" },
+            // 🛠️ Studio 工具
+            { title: "什麼是 Explorer？", topic: "🛠️ Studio 工具", content: "Explorer 是 Roblox Studio 用來查看和管理 Experience DataModel 中物件層級的視窗。" },
+            { title: "什麼是 Properties？", topic: "🛠️ Studio 工具", content: "Properties 視窗用於查看和修改所選 Instance 的屬性。不同 Instance 類型具有不同 Properties。" },
+            { title: "如何進行 Playtest？", topic: "🛠️ Studio 工具", content: "Playtest 是在 Roblox Studio 中模擬玩家遊玩 Experience 的測試功能。有 Test、Test Here 和 Run 三種模式。" },
+            // 📈 行銷與經營
+            { title: "如何吸引玩家來玩我的遊戲？", topic: "📈 行銷與經營", content: "製作吸引人的縮圖和圖標，在社群媒體上宣傳，並確保遊戲有良好的新手引導體驗。" },
+            { title: "什麼是遊戲縮圖？", topic: "📈 行銷與經營", content: "遊戲縮圖是玩家在 Roblox 平台上看到的第一印象。好的縮圖能大幅提高點擊率和遊玩人數。" },
+            { title: "如何更新我的遊戲？", topic: "📈 行銷與經營", content: "在 Studio 中修改遊戲後，選擇 File -> Publish to Roblox 即可發布更新。定期更新能保持玩家的新鮮感。" },
+            // 💰 收益與 DevEx
+            { title: "什麼是 DevEx？", topic: "💰 收益與 DevEx", content: "Developer Exchange (DevEx) 是 Roblox 讓符合資格的創作者將 Earned Robux 兌換為現實貨幣的官方計畫。" },
+            { title: "如何獲得 Earned Robux？", topic: "💰 收益與 DevEx", content: "透過販售 Pass、Developer Product、私人伺服器等符合條件的內容，可以獲得 Earned Robux。" },
+            { title: "DevEx 的兌換率是多少？", topic: "💰 收益與 DevEx", content: "官方目前列出的標準兌換率為每 1 Earned Robux = 0.0038 美元；特定條件可能存在其他兌換率。匯率屬於高度時效性資訊。" },
+            // 🚀 發布與版本
+            { title: "如何將遊戲發布到 Roblox？", topic: "🚀 發布與版本", content: "在 Studio 中選擇 File -> Publish to Roblox。輸入名稱、設定描述及裝置，然後建立或更新 Experience。" },
+            { title: "發布後可以修改嗎？", topic: "🚀 發布與版本", content: "可以。發布後你可以從其他電腦繼續編輯。只要重新發布更新即可。" },
+            { title: "新建立的 Experience 預設是什麼狀態？", topic: "🚀 發布與版本", content: "新建立的 Experience 預設可以是私人狀態，之後再發布給玩家。" },
+            // 🛡️ 反作弊與防護
+            { title: "如何防止玩家作弊？", topic: "🛡️ 反作弊與防護", content: "重要的遊戲邏輯應在伺服器端驗證，不應盲目信任 Client 傳來的資料。RemoteEvent 的資料必須在 Server 檢查。" },
+            { title: "什麼是 Server Authority？", topic: "🛡️ 反作弊與防護", content: "Server Authority 是指由伺服器負責決定遊戲的權威狀態。Client 只負責顯示和輸入，不應決定遊戲結果。" },
+            { title: "如何保護我的遊戲免受攻擊？", topic: "🛡️ 反作弊與防護", content: "避免在 ReplicatedStorage 放置秘密金鑰或必須保密的伺服器資料。重要安全判斷應在 Server 進行。" },
+            // 🤝 團隊與協作
+            { title: "如何與其他開發者合作？", topic: "🤝 團隊與協作", content: "可以使用 Roblox 的 Team Create 功能，讓多個開發者同時編輯同一個 Experience。" },
+            { title: "什麼是 Group？", topic: "🤝 團隊與協作", content: "Roblox 的群組功能可以讓玩家圍繞共同主題建立組織及管理角色。可以有不同角色和權限。" },
+            { title: "如何分配團隊成員的權限？", topic: "🤝 團隊與協作", content: "在 Group 設定中，可以為不同成員分配不同的角色和權限，例如管理 Experience、發布更新等。" },
+            // ⚡ 性能與優化
+            { title: "如何優化遊戲性能？", topic: "⚡ 性能與優化", content: "減少不必要的 Part 和 Script，使用 StreamingEnabled 來動態載入地圖，並優化程式碼邏輯。" },
+            { title: "什麼是 FPS？", topic: "⚡ 性能與優化", content: "FPS 是每秒顯示的畫面更新數量。FPS 低通常代表畫面更新速度較慢，可能與裝置效能或遊戲負載有關。" },
+            { title: "什麼是 Ping？", topic: "⚡ 性能與優化", content: "Ping 是裝置與遊戲伺服器之間網路往返延遲的常見衡量方式。Ping 高可能造成操作延遲。" },
+            // 🎵 音效與材質
+            { title: "如何在遊戲中加入音效？", topic: "🎵 音效與材質", content: "使用 Sound 物件，並將 SoundId 設定為 Roblox 音效庫中的 ID，或上傳自己的音效檔案。" },
+            { title: "什麼是材質 (Material)？", topic: "🎵 音效與材質", content: "材質定義了 Part 的外觀，例如草地、金屬、木材等。可以在 Properties 中更改。" },
+            { title: "如何製作自訂材質？", topic: "🎵 音效與材質", content: "可以上傳自己的圖片作為材質，並在 MaterialService 中設定。需要符合 Roblox 的圖片審核規範。" },
+            // 🤖 AI 與未來科技
+            { title: "Roblox 有 AI 工具嗎？", topic: "🤖 AI 與未來科技", content: "有！Roblox 推出了 AI 遊戲創作工具 Build，可以用自然語言描述來生成遊戲。也有 AI 材質生成等工具。" },
+            { title: "什麼是 Roblox Reality？", topic: "🤖 AI 與未來科技", content: "Roblox Reality 是新的影片世界模型，可以為 Experience 提供更逼真的圖形效果。" },
+            { title: "AI 會取代開發者嗎？", topic: "🤖 AI 與未來科技", content: "AI 是輔助工具，可以加速開發流程，但創意和遊戲設計仍然需要人類開發者的參與。" },
+            // 📚 學習資源
+            { title: "哪裡可以學習 Roblox 開發？", topic: "📚 學習資源", content: "官方 Creator Hub 提供了完整的文件和教學。也可以參考 YouTube 上的開發者教學影片。" },
+            { title: "什麼是 Creator Hub？", topic: "📚 學習資源", content: "Creator Hub 是 Roblox 官方的開發者資源中心，包含 API 文件、教學、工具和下載。" },
+            { title: "如何加入 Roblox 開發者社群？", topic: "📚 學習資源", content: "可以加入 Roblox 官方論壇、Discord 伺服器，或參與當地的開發者聚會。" },
+            // 🧑‍⚖️ 審核與申訴
+            { title: "什麼是 Moderation？", topic: "🧑‍⚖️ 審核與申訴", content: "Moderation 是 Roblox 對平台內容及帳號行為進行審核和處置的系統。使用人工、自動化或兩者結合的審核流程。" },
+            { title: "如何申訴被鎖的帳號？", topic: "🧑‍⚖️ 審核與申訴", content: "如果 Roblox 對帳號作出處分，符合條件的使用者可以透過官方申訴流程要求重新審核。部分申訴有 30 天限制。" },
+            { title: "什麼是 Warning、Suspension、Ban？", topic: "🧑‍⚖️ 審核與申訴", content: "這些詞通常指 Roblox 對帳號或內容採取的不同程度處分。實際處分名稱、期限及適用情況應以官方通知為準。" },
+            // 🎁 活動與物品
+            { title: "Roblox 有哪些活動？", topic: "🎁 活動與物品", content: "Roblox 經常舉辦季節性活動，例如萬聖節、聖誕節等。活動期間通常會有限定物品和遊戲內容。" },
+            { title: "如何獲得限定物品？", topic: "🎁 活動與物品", content: "限定物品通常透過參與活動、完成任務或購買獲得。部分物品是期間限定，錯過就沒了。" },
+            { title: "什麼是 Roblox Marketplace？", topic: "🎁 活動與物品", content: "Marketplace 是 Roblox 的虛擬物品市場，玩家可以在這裡購買或取得 Avatar 相關物品。" },
+            // 🧠 遊戲設計理論
+            { title: "什麼是遊戲循環？", topic: "🧠 遊戲設計理論", content: "遊戲循環是玩家在遊戲中重複進行的核心動作，例如打怪、升級、獲取裝備。好的遊戲循環能讓玩家持續遊玩。" },
+            { title: "如何設計好的新手引導？", topic: "🧠 遊戲設計理論", content: "新手引導應該簡單明瞭，讓玩家在短時間內了解遊戲的基本操作和目標。" },
+            { title: "什麼是玩家留存率？", topic: "🧠 遊戲設計理論", content: "玩家留存率是衡量有多少玩家在第一次遊玩後會繼續回來的指標。是評估遊戲成功與否的重要數據。" },
+            // 🌐 本地化與多語言
+            { title: "如何將遊戲翻譯成其他語言？", topic: "🌐 本地化與多語言", content: "Roblox 提供了 Localization 工具，可以將遊戲中的文字翻譯成多種語言，讓全球玩家都能享受你的遊戲。" },
+            { title: "什麼是 LocalizationTable？", topic: "🌐 本地化與多語言", content: "LocalizationTable 是儲存翻譯文字的表格。開發者可以在 Studio 中建立和管理這些翻譯。" },
+            { title: "為什麼本地化很重要？", topic: "🌐 本地化與多語言", content: "本地化可以讓你的遊戲觸及更廣泛的玩家群體，提高遊戲的全球影響力和收益。" },
+            // 🐛 故障排除
+            { title: "Roblox 無法啟動怎麼辦？", topic: "🐛 故障排除", content: "先確認 Roblox 是否正常安裝。確認裝置符合官方系統要求。必要時重新啟動裝置或重新安裝 Roblox。" },
+            { title: "Roblox 閃退怎麼辦？", topic: "🐛 故障排除", content: "可能與裝置資源不足、App 問題、驅動程式或作業系統有關。嘗試重啟裝置、更新 Roblox 和系統。" },
+            { title: "Roblox FPS 很低怎麼辦？", topic: "🐛 故障排除", content: "可能與 CPU、GPU、RAM、散熱或 Experience 本身的負載有關。可以嘗試降低圖形品質或關閉背景程式。" },
         ];
 
+        // 從 localStorage 讀取資料，如果沒有則使用預設
         let cardsData = JSON.parse(localStorage.getItem('robloxCards'));
         const savedVersion = localStorage.getItem('robloxCardsVersion');
         if (!cardsData || savedVersion !== currentVersion) {
@@ -688,7 +778,7 @@
             localStorage.setItem('robloxCardsVersion', currentVersion);
         }
 
-        // 留言資料庫 (模擬)
+        // 留言資料庫
         let commentsData = JSON.parse(localStorage.getItem('robloxComments')) || {};
         function saveComments() { localStorage.setItem('robloxComments', JSON.stringify(commentsData)); }
 
@@ -696,19 +786,32 @@
         let announcements = JSON.parse(localStorage.getItem('robloxAnnouncements')) || [];
         function saveAnnouncements() { localStorage.setItem('robloxAnnouncements', JSON.stringify(announcements)); }
 
-        // 封禁名單 (模擬)
+        // 封禁名單
         let bannedUsers = JSON.parse(localStorage.getItem('robloxBanned')) || [];
         function saveBanned() { localStorage.setItem('robloxBanned', JSON.stringify(bannedUsers)); }
 
-        // 用戶資料 (模擬)
+        // 用戶資料
         let usersData = JSON.parse(localStorage.getItem('robloxUsers')) || [{ uid: 1001, name: 'leoreoroblox', role: '管理員', status: '在線' }];
         function saveUsers() { localStorage.setItem('robloxUsers', JSON.stringify(usersData)); }
 
-        // 管理員操作日誌
-        let adminLogs = JSON.parse(localStorage.getItem('robloxAdminLogs')) || [];
-        function saveAdminLogs() { localStorage.setItem('robloxAdminLogs', JSON.stringify(adminLogs)); }
+        // ================= 3. Toast 通知系統 =================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'warning') icon = '⚠️';
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.5s ease forwards';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
 
-        // ================= 3. 載入畫面與跳過 =================
+        // ================= 4. 載入畫面與設定 =================
         let loaderEnabled = localStorage.getItem('loaderEnabled') !== 'false';
         let skipRequested = false;
         function skipLoader() { skipRequested = true; }
@@ -734,10 +837,9 @@
         }
         initLoader();
 
-        // ================= 4. 設定頁面功能 =================
         function toggleLoaderSetting(checked) {
             localStorage.setItem('loaderEnabled', checked);
-            alert(checked ? '已開啟載入動畫，下次重新整理會顯示。' : '已關閉載入動畫，下次重新整理將直接進入網站。');
+            showToast(checked ? '已開啟載入動畫，下次重新整理會顯示。' : '已關閉載入動畫，下次重新整理將直接進入網站。', 'success');
         }
 
         function changeBgTheme(color, element) {
@@ -745,6 +847,7 @@
             localStorage.setItem('bgTheme', color);
             document.querySelectorAll('.color-box').forEach(box => box.classList.remove('active'));
             element.classList.add('active');
+            showToast('🎨 背景顏色已更新', 'success');
         }
 
         function loadUserPreferences() {
@@ -758,7 +861,6 @@
             }
             const savedLoader = localStorage.getItem('loaderEnabled');
             document.getElementById('setting-loader').checked = savedLoader !== 'false';
-            // 載入語言
             applyLanguage(currentLang);
         }
         loadUserPreferences();
@@ -780,6 +882,15 @@
                 btn.className = 'clickable';
                 btn.onclick = () => filterByTopic(topic);
                 nav.appendChild(btn);
+            });
+            // 更新進階搜尋下拉選單
+            const select = document.getElementById('adv-topic');
+            select.innerHTML = `<option value="">${currentLang === 'zh' ? '全部主題' : 'All Topics'}</option>`;
+            topics.forEach(topic => {
+                const opt = document.createElement('option');
+                opt.value = topic;
+                opt.innerText = topic;
+                select.appendChild(opt);
             });
         }
 
@@ -817,9 +928,10 @@
             const container = document.getElementById('cards-container');
             container.innerHTML = '';
             cardsData.forEach((card, index) => {
-                let cardClass = 'card-basic';
-                let tagClass = 'tag-basic';
-                if (card.topic.includes('安全')) { cardClass = 'card-security'; tagClass = 'tag-security'; }
+                let cardClass = 'card-misc';
+                let tagClass = 'tag-misc';
+                if (card.topic.includes('基礎')) { cardClass = 'card-basic'; tagClass = 'tag-basic'; }
+                else if (card.topic.includes('安全')) { cardClass = 'card-security'; tagClass = 'tag-security'; }
                 else if (card.topic.includes('Robux')) { cardClass = 'card-robux'; tagClass = 'tag-robux'; }
                 else if (card.topic.includes('開發')) { cardClass = 'card-dev'; tagClass = 'tag-dev'; }
                 else if (card.topic.includes('平台')) { cardClass = 'card-platform'; tagClass = 'tag-platform'; }
@@ -868,7 +980,6 @@
                 `;
                 list.appendChild(item);
             });
-            document.getElementById('stat-comments').innerText = Object.values(commentsData).flat().length;
         }
 
         function toggleComment(index) {
@@ -882,42 +993,41 @@
             if (!text) return;
             if (!commentsData[index]) commentsData[index] = [];
             commentsData[index].push({
-                uid: 1001, // 模擬當前用戶
+                uid: 1001,
                 text: text,
                 time: new Date().toLocaleString()
             });
             saveComments();
             input.value = '';
             renderComments(index);
+            showToast('✅ 留言成功！感謝你的參與。', 'success');
         }
 
         function deleteComment(cardIndex, commentIndex) {
-            // 只有管理員可以刪除，這裡模擬管理員登入後的操作
             if (!commentsData[cardIndex]) return;
             commentsData[cardIndex].splice(commentIndex, 1);
             saveComments();
             renderComments(cardIndex);
+            showToast('🗑️ 留言已刪除', 'warning');
         }
 
-        // 讚與爛 (模擬)
         let likes = JSON.parse(localStorage.getItem('robloxLikes')) || {};
         function likeCard(index) {
             likes[index] = (likes[index] || 0) + 1;
             localStorage.setItem('robloxLikes', JSON.stringify(likes));
-            alert('感謝你的讚！👍');
+            showToast('👍 感謝你的讚！', 'success');
         }
         function dislikeCard(index) {
-            alert('感謝你的反饋！我們會改進。👎');
+            showToast('👎 感謝你的反饋，我們會改進！', 'warning');
         }
 
         // ================= 6. 更新日誌 =================
         const defaultLogs = [
-            { version: 'v0.1.0', date: '2026-10-04', type: 'major', title: '大型更新 - Leo Studio 品牌建立與功能爆發', content: ['新增 Leo Studio 關於我們頁面', '新增多語言切換功能（中/英）', '新增 Roblox 遊戲搜尋功能', '新增模擬評論區與留言管理', '新增管理員終極後台（用戶管理、公告、OP按鈕）', 'Steam 風格更新日誌上線'] },
-            { version: 'v0.0.5', date: '2026-10-04', type: 'feature', title: '新功能 - 最新動態上線', content: ['新增「🆕 最新動態」主題', '收錄 RDC 2026 重大發表、AI 工具 Build、安全政策等 6 張卡片'] },
-            { version: 'v0.0.4', date: '2026-10-04', type: 'feature', title: '新功能 - 關於頁面與品牌建立', content: ['新增「關於我們」頁面', '首頁「開始探索」按鈕改為跳轉至介紹頁面'] },
-            { version: 'v0.0.3', date: '2026-10-04', type: 'minor', title: '小型更新 - 設定與載入優化', content: ['載入畫面新增「跳過」按鈕與「載入成功」提示', '三橫選單新增「⚙️ 設定」頁面', '設定頁面可開關載入動畫與更換背景顏色'] },
-            { version: 'v0.0.2', date: '2026-10-04', type: 'minor', title: '小型更新 - 首頁大改造', content: ['首頁全新改版，加入科技感標題與副標題', '新增超大「開始探索」按鈕與快速導航卡片'] },
-            { version: 'v0.0.1', date: '2026-10-04', type: 'bug', title: 'Bug修復 - 專業導航與內容爆發', content: ['問答卡片擴充至 38 張，涵蓋六大主題', '卡片新增顏色標籤', '修復跳轉過濾功能，點擊後自動平滑滾動至頂部'] }
+            { version: 'v0.2.0', date: '2026-10-04', type: 'major', title: '大型更新 - 20+ 主題與全站互動', content: ['新增 20+ 個主題，60+ 張卡片', '全站 Toast 互動通知上線', 'UI 特效與毛玻璃質感', '多語言修復與完美翻譯', '修復遊戲搜尋功能', '管理員後台自定義封禁與 OP 按鈕'] },
+            { version: 'v0.1.0', date: '2026-10-04', type: 'major', title: '大型更新 - Leo Studio 品牌建立', content: ['新增 Leo Studio 關於我們頁面', '新增多語言切換功能', '新增 Roblox 遊戲搜尋功能', '新增模擬評論區'] },
+            { version: 'v0.0.5', date: '2026-10-04', type: 'feature', title: '新功能 - 最新動態上線', content: ['新增「🆕 最新動態」主題'] },
+            { version: 'v0.0.3', date: '2026-10-04', type: 'minor', title: '小型更新 - 設定與載入優化', content: ['載入畫面新增跳過按鈕', '設定頁面可開關載入動畫與更換背景顏色'] },
+            { version: 'v0.0.1', date: '2026-10-02', type: 'bug', title: 'Bug修復 - 網站誕生', content: ['建立 GitHub 倉庫與基礎架構', '修復排版與跳轉問題'] }
         ];
 
         let logsData = JSON.parse(localStorage.getItem('robloxLogs')) || defaultLogs;
@@ -951,7 +1061,7 @@
             renderLogs(type);
         }
 
-        // ================= 7. 遊戲搜尋 =================
+        // ================= 7. 遊戲搜尋 (修復版) =================
         async function searchGame() {
             const input = document.getElementById('game-search-input').value.trim();
             if (!input) return;
@@ -959,10 +1069,14 @@
             results.innerHTML = '<p style="text-align:center; color:var(--accent);">🔍 搜尋中...</p>';
             
             try {
-                // 使用 CORS Proxy 繞過跨域限制，實際專案可能被 Roblox 限制
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超時
+
+                // 使用更穩定的 CORS Proxy
+                const proxyUrl = 'https://corsproxy.io/?';
                 const apiUrl = `https://games.roblox.com/v1/games/list?model.keyword=${encodeURIComponent(input)}`;
-                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), { signal: controller.signal });
+                clearTimeout(timeoutId);
                 
                 if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
@@ -984,7 +1098,7 @@
                             <p>📅 創作日期：<span class="highlight">${new Date(game.created).toLocaleDateString() || '未知'}</span></p>
                             <p>🔄 最後更新：<span class="highlight">${new Date(game.updated).toLocaleDateString() || '未知'}</span></p>
                             <p>🟢 目前線上：<span class="highlight">${game.playing || 0}</span> 人</p>
-                            <p>⭐ 好評率：<span class="highlight">${game.favoritedCount || 0} 次收藏</span></p>
+                            <p>⭐ 收藏數：<span class="highlight">${game.favoritedCount || 0} 次</span></p>
                         </div>
                     `;
                     results.appendChild(card);
@@ -1004,6 +1118,7 @@
             renderAdminComments();
             renderBannedList();
             renderAnnounceHistory();
+            showToast('👑 管理員已登入後台', 'success');
         }
 
         function closeAdminDashboard() {
@@ -1023,7 +1138,6 @@
             const targetPage = document.getElementById(`admin-page-${page}`);
             if (targetPage) targetPage.style.display = 'block';
 
-            // 高亮
             sidebarItems.forEach(item => {
                 if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(page)) item.classList.add('active');
             });
@@ -1057,7 +1171,7 @@
                     <td>
                         <button class="clickable" onclick="warnUser(${user.uid})" style="background: #ffaa00; border: none; color: #000; padding: 5px 10px; border-radius: 3px; cursor: pointer;">⚠️ 警告</button>
                         <button class="clickable" onclick="muteUser(${user.uid})" style="background: #00aaff; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🔇 禁言</button>
-                        <button class="clickable" onclick="banUser(${user.uid})" style="background: #ff5555; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🚫 封禁</button>
+                        <button class="clickable" onclick="banUserModal(${user.uid})" style="background: #ff5555; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🚫 封禁</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1083,51 +1197,29 @@
         }
 
         function warnUser(uid) {
-            logAdminAction(`警告了用戶 UID: ${uid}`);
-            alert(`已對 UID ${uid} 發出警告！`);
+            showToast(`⚠️ 已對 UID ${uid} 發出警告！`, 'warning');
         }
 
         function muteUser(uid) {
-            logAdminAction(`禁言了用戶 UID: ${uid}`);
-            alert(`已禁言 UID ${uid}！`);
+            showToast(`🔇 已禁言 UID ${uid}！`, 'warning');
         }
 
-        function banUser(uid) {
-            const isSuperAdmin = true; // 假設當前是終極管理員
-            if (isSuperAdmin) {
-                const confirmed = confirm(`確定要永久封禁 UID ${uid} 嗎？此操作不可逆！`);
-                if (confirmed) {
-                    bannedUsers.push({ uid: uid, name: usersData.find(u => u.uid == uid)?.name || 'Unknown', reason: '違反社群規範', type: '永久' });
-                    saveBanned();
-                    logAdminAction(`永久封禁了用戶 UID: ${uid}`);
-                    alert(`已永久封禁 UID ${uid}！`);
-                    renderUserTable();
-                    renderAdminStats();
-                }
-            } else {
-                // 普通管理員 10 秒冷卻邏輯
-                let countdown = 10;
-                const btn = event.target;
-                btn.disabled = true;
-                btn.innerText = `請等待 ${countdown}s...`;
-                const timer = setInterval(() => {
-                    countdown--;
-                    btn.innerText = `請等待 ${countdown}s...`;
-                    if (countdown <= 0) {
-                        clearInterval(timer);
-                        btn.innerText = '再次確認封禁';
-                        btn.style.background = '#ff0000';
-                        btn.onclick = () => {
-                            bannedUsers.push({ uid: uid, name: usersData.find(u => u.uid == uid)?.name || 'Unknown', reason: '違反社群規範', type: '臨時' });
-                            saveBanned();
-                            logAdminAction(`封禁了用戶 UID: ${uid}`);
-                            alert(`已封禁 UID ${uid}！`);
-                            renderUserTable();
-                            renderAdminStats();
-                        };
-                    }
-                }, 1000);
-            }
+        // 自定義封禁彈窗
+        function banUserModal(uid) {
+            const reason = prompt(`請輸入封禁 UID ${uid} 的原因：`, '違反社群規範');
+            if (reason === null) return;
+            const adminName = prompt(`請輸入管理員名稱（留空則顯示系統管理員）：`, '系統管理員');
+            if (adminName === null) return;
+            
+            const hideAdmin = confirm('是否隱藏管理員名稱？');
+            
+            const displayAdmin = hideAdmin || adminName.trim() === '' ? '系統管理員' : adminName;
+            
+            bannedUsers.push({ uid: uid, name: usersData.find(u => u.uid == uid)?.name || 'Unknown', reason: reason, type: '永久', admin: displayAdmin });
+            saveBanned();
+            showToast(`🚫 已封禁 UID ${uid}，原因：${reason}`, 'error');
+            renderUserTable();
+            renderAdminStats();
         }
 
         // 留言管理
@@ -1157,19 +1249,19 @@
         // 公告管理
         function sendAnnouncement() {
             const text = document.getElementById('announce-text').value.trim();
-            if (!text) return;
+            if (!text) { showToast('⚠️ 請輸入公告內容！', 'warning'); return; }
             document.getElementById('announcement-text').innerText = text;
             document.getElementById('announcement-bar').style.display = 'block';
             announcements.push({ text: text, time: new Date().toLocaleString() });
             saveAnnouncements();
-            logAdminAction(`發布了公告：${text}`);
             renderAnnounceHistory();
             document.getElementById('announce-text').value = '';
+            showToast('📢 公告已發布！全站使用者將在頂部看到。', 'success');
         }
 
         function clearAnnouncement() {
             document.getElementById('announcement-bar').style.display = 'none';
-            logAdminAction('清除了公告');
+            showToast('🗑️ 公告已清除。', 'info');
         }
 
         function renderAnnounceHistory() {
@@ -1205,7 +1297,7 @@
             saveBanned();
             renderBannedList();
             renderAdminStats();
-            logAdminAction('解封了一名用戶');
+            showToast('🔓 已成功解除封禁。', 'success');
         }
 
         // OP 按鈕
@@ -1213,9 +1305,8 @@
             const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。';
             document.getElementById('op-message').innerText = msg;
             document.getElementById('op-overlay').style.display = 'flex';
-            logAdminAction(`啟動了全站維護模式：${msg}`);
             
-            let countdown = 600; // 10 分鐘
+            let countdown = 600;
             const timer = setInterval(() => {
                 countdown--;
                 const min = Math.floor(countdown / 60);
@@ -1226,6 +1317,7 @@
                     document.getElementById('op-overlay').style.display = 'none';
                 }
             }, 1000);
+            showToast('🛑 全站維護模式已啟動！', 'error');
         }
 
         // 數據匯出
@@ -1235,8 +1327,7 @@
                 comments: commentsData,
                 users: usersData,
                 announcements: announcements,
-                banned: bannedUsers,
-                logs: adminLogs
+                banned: bannedUsers
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -1245,15 +1336,10 @@
             a.download = `leo_studio_backup_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            logAdminAction('匯出了系統數據備份');
+            showToast('📥 數據備份已開始下載！', 'success');
         }
 
-        function logAdminAction(action) {
-            adminLogs.push({ time: new Date().toLocaleString(), action: action });
-            saveAdminLogs();
-        }
-
-        // 管理問答 (刪除)
+        // 管理問答
         function renderManageCards() {
             const list = document.getElementById('manage-cards-list');
             list.innerHTML = '';
@@ -1279,6 +1365,7 @@
                 renderTopicNav();
                 renderManageCards();
                 renderAdminStats();
+                showToast('🗑️ 卡片已刪除', 'warning');
             }
         }
 
@@ -1286,7 +1373,7 @@
             const title = document.getElementById('new-title').value.trim();
             const topic = document.getElementById('new-topic').value;
             const content = document.getElementById('new-content').value.trim();
-            if (!title || !content) { alert('請填寫標題和內容！'); return; }
+            if (!title || !content) { showToast('⚠️ 請填寫標題和內容！', 'warning'); return; }
             cardsData.push({ title, topic, content });
             localStorage.setItem('robloxCards', JSON.stringify(cardsData));
             document.getElementById('new-title').value = '';
@@ -1295,7 +1382,7 @@
             renderTopicNav();
             renderManageCards();
             renderAdminStats();
-            alert('卡片發布成功！');
+            showToast('📝 問答卡片已成功發布！', 'success');
         }
 
         // ================= 9. 網頁主要互動 =================
@@ -1430,24 +1517,23 @@
             document.getElementById('user-info').style.display = 'none';
         });
 
-        // 管理員觸發：點擊右下角 IP 卡片 5 下
+        // 管理員觸發
         let clickCount = 0;
         document.getElementById('user-info').addEventListener('click', () => {
             clickCount++;
             if (clickCount === 5) {
                 document.getElementById('admin-menu-item').style.display = 'block';
                 clickCount = 0;
-                alert('管理員權限已解鎖！點擊左側選單的「👑 管理後台」進入。');
+                showToast('👑 管理員權限已解鎖！請點擊左側選單的「👑 管理後台」。', 'success');
             }
         });
 
-        // 管理員密碼驗證（偽裝的）
         document.getElementById('admin-menu-item').addEventListener('click', () => {
             const password = prompt('請輸入管理員密碼：');
-            if (atob('YWRtaW4xMjM=') === password) { // admin123
+            if (atob('YWRtaW4xMjM=') === password) {
                 openAdminDashboard();
             } else {
-                alert('密碼錯誤！你以為你是管理員嗎？😎');
+                showToast('❌ 密碼錯誤！你以為你是管理員嗎？😎', 'error');
             }
         });
 
@@ -1458,4 +1544,4 @@
         applyLanguage(currentLang);
     </script>
 </body>
-</html>
+</html>a
