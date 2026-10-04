@@ -36,15 +36,12 @@
         .card-security { border-color: #ffaa00; box-shadow: 0 0 10px rgba(255, 170, 0, 0.2); }
         .card-security h3 { color: #ffaa00; }
         .tag-security { background: rgba(255, 170, 0, 0.2); color: #ffaa00; border: 1px solid #ffaa00; }
-        
         .card-robux { border-color: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.2); }
         .card-robux h3 { color: #00ff88; }
         .tag-robux { background: rgba(0, 255, 136, 0.2); color: #00ff88; border: 1px solid #00ff88; }
-
         .card-dev { border-color: #aa00ff; box-shadow: 0 0 10px rgba(170, 0, 255, 0.2); }
         .card-dev h3 { color: #aa00ff; }
         .tag-dev { background: rgba(170, 0, 255, 0.2); color: #aa00ff; border: 1px solid #aa00ff; }
-
         .card-platform { border-color: #00aaff; box-shadow: 0 0 10px rgba(0, 170, 255, 0.2); }
         .card-platform h3 { color: #00aaff; }
         .tag-platform { background: rgba(0, 170, 255, 0.2); color: #00aaff; border: 1px solid #00aaff; }
@@ -76,12 +73,21 @@
         
         .close-admin-btn { background: #ff5555; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         
-        /* 新增卡片表單 */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; color: #9ca3af; margin-bottom: 5px; font-size: 14px; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px; box-sizing: border-box; }
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #00ffcc; }
         .btn-submit { background: #00ffcc; color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
+
+        /* ================= 更新日誌樣式 ================= */
+        .log-item { background: #111827; border-left: 4px solid #00ffcc; padding: 15px 20px; margin-bottom: 20px; border-radius: 0 10px 10px 0; position: relative; }
+        .log-item::before { content: ''; position: absolute; left: -12px; top: 20px; width: 20px; height: 20px; border-radius: 50%; background: #0b0f19; border: 4px solid #00ffcc; }
+        .log-version { font-size: 18px; font-weight: bold; color: #00ffcc; margin-bottom: 5px; }
+        .log-date { font-size: 12px; color: #9ca3af; margin-bottom: 15px; }
+        .log-content { color: #d1d5db; line-height: 1.6; }
+        .log-content ul { margin: 5px 0 0 0; padding-left: 20px; }
+        .log-content li { margin-bottom: 5px; }
+        .log-tag { display: inline-block; font-size: 11px; background: rgba(0, 255, 204, 0.2); color: #00ffcc; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -101,6 +107,7 @@
         <h2 style="color: #00ffcc; margin-bottom: 20px;">📋 功能選單</h2>
         <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="showPage('home')">🏠 首頁</div>
         <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="showPage('qa')">📚 問答卡片</div>
+        <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="showPage('changelog')">📜 更新日誌</div>
         <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">ℹ️ 關於我們</div>
     </div>
 
@@ -113,13 +120,11 @@
     <div id="qa-page" style="display: none; padding: 20px; max-width: 600px; margin: 0 auto; padding-top: 80px;">
         <h2 style="color: #00ffcc; text-align: center;">📚 Roblox 知識庫</h2>
         
-        <!-- 搜尋列 -->
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="🔍 快速搜尋標題或主題..." oninput="searchCards()">
             <button onclick="toggleAdvancedSearch()" style="background: #0b0f19; border: 1px solid #00ffcc; color: #00ffcc; padding: 0 15px; border-radius: 8px; cursor: pointer; white-space: nowrap;">⚙️ 進階搜尋</button>
         </div>
 
-        <!-- 進階搜尋面板 -->
         <div id="advanced-search-panel" style="display: none; background: #0b0f19; border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
             <h4 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px;">🔍 進階搜尋</h4>
             <div style="margin-bottom: 10px;">
@@ -151,9 +156,55 @@
             </div>
         </div>
 
-        <!-- 卡片區 (由 JavaScript 動態生成) -->
-        <div id="cards-container">
-            <!-- 卡片會由 JavaScript 插入這裡 -->
+        <div id="cards-container"></div>
+    </div>
+
+    <!-- 箱子 3：更新日誌 -->
+    <div id="changelog-page" style="display: none; padding: 20px; max-width: 600px; margin: 0 auto; padding-top: 80px;">
+        <h2 style="color: #00ffcc; text-align: center;">📜 網站更新日誌</h2>
+        <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">記錄著這個網站一路以來的成長</p>
+
+        <!-- 更新紀錄 v1.0 -->
+        <div class="log-item">
+            <div class="log-version">v1.0 - 網站誕生 <span class="log-tag">最初版本</span></div>
+            <div class="log-date">📅 2026-10-02</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 建立 GitHub 倉庫與網站基礎架構</li>
+                    <li>✅ 加入科技感載入畫面（進度條與百分比）</li>
+                    <li>✅ 建立第一個「歡迎來到 Roblox 問答網」標題</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 更新紀錄 v2.0 -->
+        <div class="log-item">
+            <div class="log-version">v2.0 - 功能大躍進 <span class="log-tag">重要更新</span></div>
+            <div class="log-date">📅 2026-10-03</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 新增「漢堡選單」側邊欄，網站更像 App</li>
+                    <li>✅ 新增問答卡片系統，並加入 7 張基礎知識卡片</li>
+                    <li>✅ 新增管理員專屬後台（點擊 IP 卡片 5 下解鎖）</li>
+                    <li>✅ 修復 IP 與地區顯示功能（改用 ipwho.is 服務）</li>
+                    <li>✅ 新增快速搜尋與進階搜尋功能</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 更新紀錄 v3.0 -->
+        <div class="log-item">
+            <div class="log-version">v3.0 - 內容爆發與管理升級 <span class="log-tag">最新版本</span></div>
+            <div class="log-date">📅 2026-10-04</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 問答卡片大幅擴充至 31 張，涵蓋五大主題（基礎、安全、Robux、開發、平台）</li>
+                    <li>✅ 卡片新增顏色標籤，用顏色區分不同主題</li>
+                    <li>✅ 管理員後台升級：新增「新增問答」與「管理問答」功能</li>
+                    <li>✅ 利用瀏覽器內建資料庫（localStorage），管理員新增的卡片會自動儲存</li>
+                    <li>✅ 新增「更新日誌」頁面，記錄網站的成長歷程</li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -174,7 +225,6 @@
                 <div onclick="switchAdminPage('manage-cards')">📝 管理問答</div>
             </div>
             <div class="admin-content">
-                <!-- 儀表板頁面 -->
                 <div id="admin-page-dashboard">
                     <h3 style="color: #00ffcc; margin-top: 0;">📊 數據總覽</h3>
                     <div class="stats-grid">
@@ -184,8 +234,6 @@
                         <div class="stat-card"><div class="label">📁 附件數</div><div class="number">5,692</div></div>
                     </div>
                 </div>
-
-                <!-- 用戶管理頁面 -->
                 <div id="admin-page-users" style="display: none;">
                     <h3 style="color: #00ffcc; margin-top: 0;">👥 用戶列表</h3>
                     <table class="admin-table">
@@ -196,8 +244,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                <!-- 新增問答頁面 -->
                 <div id="admin-page-add-card" style="display: none;">
                     <h3 style="color: #00ffcc; margin-top: 0;">➕ 新增問答卡片</h3>
                     <div class="form-group">
@@ -220,8 +266,6 @@
                     </div>
                     <button class="btn-submit" onclick="addNewCard()">發布卡片</button>
                 </div>
-
-                <!-- 管理問答頁面 -->
                 <div id="admin-page-manage-cards" style="display: none;">
                     <h3 style="color: #00ffcc; margin-top: 0;">📝 管理問答</h3>
                     <div id="manage-cards-list"></div>
@@ -240,12 +284,9 @@
 
     <!-- 所有魔法 -->
     <script>
-        // ================= 資料庫 (LocalStorage) =================
-        // 版本控制：如果版本不同，就自動更新卡片
-        const currentVersion = 'v3.0';
-        
+        // ================= 資料庫 =================
+        const currentVersion = 'v3.1';
         const defaultCards = [
-            // 📘 基礎知識
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
             { title: "玩家、開發者和創作者的區別？", topic: "📘 基礎知識", content: "玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。玩家也可以同時成為創作者！" },
@@ -253,8 +294,6 @@
             { title: "什麼是 Avatar？", topic: "📘 基礎知識", content: "Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。玩家可以透過 Avatar Editor 調整外觀。" },
             { title: "什麼是 Robux？", topic: "📘 基礎知識", content: "Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買符合條件的 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。" },
             { title: "什麼是 Roblox Premium？", topic: "📘 基礎知識", content: "Roblox Premium 是 Roblox 的訂閱會員服務。官方已宣布在 2026 年出現重大變更，2026-04-30 起不再提供新的購買；既有訂閱者可能維持訂閱，福利也有所調整。舊版福利不可視為目前福利。" },
-            
-            // 🔒 帳號與安全
             { title: "如何建立 Roblox 帳號？", topic: "🔒 帳號與安全", content: "建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊，按照官方要求輸入資料，完成後按需要驗證電子郵件。" },
             { title: "忘記 Roblox 密碼怎麼辦？", topic: "🔒 帳號與安全", content: "可以使用 Roblox 官方 Account Recovery 功能重設密碼。使用帳號關聯的電子郵件進行恢復，某些帳號也可以使用已關聯的電話號碼。如果沒有可用的恢復方式，需要聯絡 Roblox Customer Support。不要把重設連結或驗證碼提供給其他人。" },
             { title: "Roblox 帳號被盜怎麼辦？", topic: "🔒 帳號與安全", content: "如果其他人未經授權取得帳號控制權，應優先清除可能的惡意軟體，使用官方帳號恢復流程。立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。" },
@@ -262,22 +301,16 @@
             { title: "Roblox 常見詐騙手法？", topic: "🔒 帳號與安全", content: "常見詐騙通常利用虛假的 Robux、物品、交易、贈品或帳號服務，誘導玩家提供帳號資訊或付款。「免費大量 Robux」是常見手法。可疑網站可能偽裝成 Roblox 登入頁面。官方不會要求玩家把密碼或驗證碼交給其他玩家。" },
             { title: "免費 Robux 網站是否可信？", topic: "🔒 帳號與安全", content: "聲稱可以透過第三方網站免費產生大量 Robux 的服務通常不應被視為 Roblox 官方 Robux 取得方式。不存在應由官方宣稱的「Robux Generator」。不應輸入 Roblox 密碼、驗證碼或帳號 Cookie，也不應下載聲稱可以產生 Robux 的不明程式。" },
             { title: "如何舉報 Roblox 違規玩家？", topic: "🔒 帳號與安全", content: "最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。" },
-            
-            // 🪙 Robux 與變現
             { title: "Robux 可以做什麼？", topic: "🪙 Robux 與變現", content: "可用於購買符合條件的 Avatar 物品。可用於 Experience 內的部分付費內容。可用於部分 Pass、Developer Product、Private Server 等。具體價格由 Roblox 或創作者設定，可能改變。" },
             { title: "Robux 的合法取得方式？", topic: "🪙 Robux 與變現", content: "玩家可以透過 Roblox 官方支援的購買方式取得 Robux。Roblox Gift Card 可以兌換 Roblox Credit 或符合卡片規則的內容。創作者可以透過符合條件的創作活動取得 Earned Robux。不應把第三方交易視為 Roblox 官方方式，也不應聲稱存在「秘密免費 Robux 方法」。" },
             { title: "Roblox Gift Card 是什麼？", topic: "🪙 Robux 與變現", content: "Roblox Gift Card 是 Roblox 官方支援的禮品卡。可以透過 Roblox 官方兌換頁面兌換。多數裝置需要使用網頁瀏覽器兌換。Gift Card 並不等同於免費 Robux。前往官方兌換頁面，登入帳號，輸入卡片代碼，選擇 Redeem，確認兌換結果。" },
             { title: "Experience Pass 是什麼？", topic: "🪙 Robux 與變現", content: "Pass 是 Experience 的一次性付費產品，可以提供永久性或特殊權限。例如特殊區域、永久能力或其他 Experience 內福利。Pass 通常與 Developer Product 不同，一般設計為一次購買。" },
             { title: "Developer Product 是什麼？", topic: "🪙 Robux 與變現", content: "Developer Product 是 Experience 內可以重複購買的產品。常見用途包括遊戲貨幣、消耗品和可重複購買能力。與一次性 Pass 不同。開發者必須正確處理購買收據。" },
-            
-            // 🎮 開發與技術
             { title: "玩家資料保存的基本概念？", topic: "🎮 開發與技術", content: "Roblox Experience 可以使用 DataStoreService 保存跨伺服器、跨遊戲工作階段的玩家資料。可保存玩家背包、技能點等持久資料。DataStore 由伺服器端 Script 使用。LocalScript 不能直接存取 DataStore。Studio 測試 DataStore 時需要特別注意不要操作正式資料。" },
             { title: "Script、LocalScript、ModuleScript 的區別？", topic: "🎮 開發與技術", content: "三者都是 Roblox 中的程式腳本類型，但執行方式和用途不同。Script 通常用於伺服器端邏輯。LocalScript 用於客戶端邏輯。ModuleScript 用於建立可重用的程式模組。ModuleScript 的同一側 require() 可以共享其返回結果。" },
             { title: "RemoteEvent 是什麼？", topic: "🎮 開發與技術", content: "RemoteEvent 用於客戶端與伺服器之間進行非同步、單向事件通訊。Client 可以傳送事件給 Server。Server 可以傳送事件給 Client。常放在 ReplicatedStorage，讓兩端都可以存取。Server 不應盲目信任 Client 傳來的資料。" },
             { title: "RemoteFunction 是什麼？", topic: "🎮 開發與技術", content: "RemoteFunction 用於客戶端和伺服器之間進行同步、雙向請求和回應。呼叫端會等待對方返回結果。Client 可以 InvokeServer。Server 可以 InvokeClient。如果不需要等待返回值，通常可以考慮使用 RemoteEvent。" },
             { title: "Roblox Client / Server 模型？", topic: "🎮 開發與技術", content: "Roblox Experience 使用客戶端和伺服器共同運作的架構。Client 負責玩家裝置上的部分顯示和輸入。Server 負責多人遊戲中的權威遊戲狀態。Client 與 Server 可以透過 RemoteEvent 和 RemoteFunction 通訊。不應把重要安全判斷完全交給 Client。" },
-            
-            // 📱 平台支援
             { title: "Roblox 支援 Windows 嗎？", topic: "📱 平台支援", content: "Windows 是 Roblox 支援的桌面平台之一。官方目前列出的要求包括 64-bit Windows 10 或 Windows 11。PC 網站支援 Chrome、Firefox 和 Microsoft Edge。Roblox PC App 的具體要求可能更新。" },
             { title: "Roblox 支援 macOS 嗎？", topic: "📱 平台支援", content: "macOS 是 Roblox 支援的桌面平台。官方目前資料列出 macOS 10.13 High Sierra 或更高版本。Mac 網站支援 Chrome、Firefox 和 Safari。新版本 macOS 的支援狀態可能更新。" },
             { title: "Roblox 支援手機嗎？", topic: "📱 平台支援", content: "Roblox 可以在支援的 iOS 和 Android 行動裝置上使用。行動裝置的效能和可用功能取決於裝置及 Roblox 當時的要求。行動版介面與電腦版不同。某些功能可能因裝置或地區而不同。" },
@@ -286,10 +319,8 @@
             { title: "Roblox 支援 ChromeOS 嗎？", topic: "📱 平台支援", content: "ChromeOS 裝置可以在符合 Roblox 官方要求的情況下使用 Roblox。官方目前資料要求 ChromeOS 53 或更高版本。需要先啟用 Google Play Store。ChromeOS 的功能與 Windows/macOS 不完全相同。" }
         ];
 
-        // 檢查版本並更新資料
         let cardsData = JSON.parse(localStorage.getItem('robloxCards'));
         const savedVersion = localStorage.getItem('robloxCardsVersion');
-        
         if (!cardsData || savedVersion !== currentVersion) {
             cardsData = defaultCards;
             localStorage.setItem('robloxCards', JSON.stringify(cardsData));
@@ -321,7 +352,7 @@
 
         renderCards();
 
-        // ================= 管理員後台魔法 =================
+        // ================= 管理員後台 =================
         function openAdminDashboard() {
             document.getElementById('admin-dashboard').style.display = 'flex';
             switchAdminPage('dashboard');
@@ -395,7 +426,7 @@
             }
         }
 
-        // ================= 其他原有魔法 =================
+        // ================= 其他魔法 =================
         let progress = 0;
         const interval = setInterval(() => {
             progress += 1;
@@ -412,16 +443,21 @@
             menu.style.left = menu.style.left === '0px' ? '-300px' : '0px';
         });
 
+        // 頁面切換（包含更新日誌）
         function showPage(pageName) {
             document.getElementById('side-menu').style.left = '-300px';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('qa-page').style.display = 'none';
+            document.getElementById('changelog-page').style.display = 'none';
+
             if (pageName === 'home') {
                 document.getElementById('home-page').style.display = 'block';
-                document.getElementById('qa-page').style.display = 'none';
             } else if (pageName === 'qa') {
-                document.getElementById('home-page').style.display = 'none';
                 document.getElementById('qa-page').style.display = 'block';
                 document.getElementById('search-input').value = '';
                 clearAdvancedSearch();
+            } else if (pageName === 'changelog') {
+                document.getElementById('changelog-page').style.display = 'block';
             }
         }
 
