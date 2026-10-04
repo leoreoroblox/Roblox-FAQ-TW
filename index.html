@@ -56,7 +56,7 @@
         .adv-input:focus, #adv-topic:focus { border-color: #00ffcc; }
 
         /* 管理員後台樣式 */
-        #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 20000; color: #fff; display: flex; flex-direction: column; }
+        #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 20000; color: #fff; flex-direction: column; }
         .admin-header { height: 60px; background: #111827; border-bottom: 1px solid #1f2937; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .admin-header h2 { margin: 0; font-size: 18px; color: #00ffcc; }
         .admin-body { display: flex; flex: 1; overflow: hidden; }
@@ -82,7 +82,7 @@
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #00ffcc; }
         .btn-submit { background: #00ffcc; color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
 
-        /* ================= 更新日誌樣式 ================= */
+        /* 更新日誌樣式 */
         .log-item { background: #111827; border-left: 4px solid #00ffcc; padding: 15px 20px; margin-bottom: 20px; border-radius: 0 10px 10px 0; position: relative; }
         .log-item::before { content: ''; position: absolute; left: -12px; top: 20px; width: 20px; height: 20px; border-radius: 50%; background: #0b0f19; border: 4px solid #00ffcc; }
         .log-version { font-size: 18px; font-weight: bold; color: #00ffcc; margin-bottom: 5px; }
@@ -91,8 +91,9 @@
         .log-content ul { margin: 5px 0 0 0; padding-left: 20px; }
         .log-content li { margin-bottom: 5px; }
         .log-tag { display: inline-block; font-size: 11px; background: rgba(0, 255, 204, 0.2); color: #00ffcc; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
+        .log-btn { background: #00ffcc; color: #0b0f19; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 10px; display: inline-block; }
 
-        /* ================= 問答卡片版面佈局與側邊欄 ================= */
+        /* 問答卡片版面佈局與側邊欄 */
         .qa-container { display: flex; gap: 20px; max-width: 900px; margin: 0 auto; padding: 0 20px; padding-top: 80px; }
         .qa-main-content { flex: 1; min-width: 0; }
         .qa-sidebar { width: 140px; position: sticky; top: 100px; height: fit-content; display: flex; flex-direction: column; gap: 8px; }
@@ -134,6 +135,549 @@
         <div id="qa-submenu" class="submenu">
             <div onclick="showPage('qa', '📘 基礎知識')">📘 基礎知識</div>
             <div onclick="showPage('qa', '🔒 帳號與安全')">🔒 帳號與安全</div>
+            <div onclick="showPage('qa', '🪙 Robux 與變現')">🪙 Robux 與變現</div>
+            <div onclick="showPage('qa', '🎮 開發與技術')">🎮 開發與技術</div>
+            <div onclick="showPage('qa', '📱 平台支援')">📱 平台支援</div>
+            <div onclick="showPage('qa', '💬 社群與設定')">💬 社群與設定</div>
+        </div>
+
+        <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="showPage('changelog')">📜 更新日誌</div>
+        <div style="color: #fff; font-size: 18px; cursor: pointer; margin-bottom: 15px;" onclick="alert('這頁面還在施工中 🚧')">ℹ️ 關於我們</div>
+    </div>
+
+    <!-- 箱子 1：首頁 -->
+    <div id="home-page">
+        <h1 style="color: #0055ff; text-align: center; margin-top: 100px;">歡迎使用roblox問答網</h1>
+    </div>
+
+    <!-- 箱子 2：問答卡片區 -->
+    <div id="qa-page" style="display: none;">
+        <div class="qa-container">
+            <!-- 左側主要內容區 -->
+            <div class="qa-main-content">
+                <h2 style="color: #00ffcc; text-align: center;">📚 Roblox 知識庫</h2>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <input type="text" id="search-input" placeholder="🔍 快速搜尋標題或主題..." oninput="searchCards()">
+                    <button onclick="toggleAdvancedSearch()" style="background: #0b0f19; border: 1px solid #00ffcc; color: #00ffcc; padding: 0 15px; border-radius: 8px; cursor: pointer; white-space: nowrap;">⚙️ 進階搜尋</button>
+                </div>
+
+                <div id="advanced-search-panel" style="display: none; background: #0b0f19; border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                    <h4 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px;">🔍 進階搜尋</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">選擇主題：</label>
+                        <select id="adv-topic" onchange="advancedSearch()">
+                            <option value="">全部主題</option>
+                            <option value="📘 基礎知識">📘 基礎知識</option>
+                            <option value="🔒 帳號與安全">🔒 帳號與安全</option>
+                            <option value="🪙 Robux 與變現">🪙 Robux 與變現</option>
+                            <option value="🎮 開發與技術">🎮 開發與技術</option>
+                            <option value="📱 平台支援">📱 平台支援</option>
+                            <option value="💬 社群與設定">💬 社群與設定</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">包含所有字詞 (用空格分隔)：</label>
+                        <input type="text" id="adv-all" class="adv-input" placeholder="例如：帳號 安全" oninput="advancedSearch()">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">與以下字詞或語句完全相符：</label>
+                        <input type="text" id="adv-exact" class="adv-input" placeholder="例如：什麼是 Robux" oninput="advancedSearch()">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">不包含以下字詞：</label>
+                        <input type="text" id="adv-none" class="adv-input" placeholder="例如：Premium" oninput="advancedSearch()">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="advancedSearch()" style="background: #00ffcc; color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">搜尋</button>
+                        <button onclick="clearAdvancedSearch()" style="background: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">清除</button>
+                    </div>
+                </div>
+
+                <div id="cards-container"></div>
+            </div>
+
+            <!-- 右側快速主題導航 -->
+            <div class="qa-sidebar" id="topic-nav"></div>
+        </div>
+    </div>
+
+    <!-- 箱子 3：更新日誌 -->
+    <div id="changelog-page" style="display: none; padding: 20px; max-width: 600px; margin: 0 auto; padding-top: 80px;">
+        <h2 style="color: #00ffcc; text-align: center;">📜 網站更新日誌</h2>
+        <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">記錄著這個網站一路以來的成長</p>
+
+        <!-- v5.0 大版本合併 -->
+        <div class="log-item">
+            <div class="log-version">v5.0 - 專業導航與內容爆發 <span class="log-tag">最新版本</span></div>
+            <div class="log-date">📅 2026-10-04</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 問答卡片大幅擴充至 38 張，涵蓋六大主題（基礎、安全、Robux、開發、平台、社群）</li>
+                    <li>✅ 卡片新增顏色標籤，用顏色區分不同主題，視覺更直觀</li>
+                    <li>✅ 管理員後台升級：新增「新增問答」與「管理問答」功能，並利用瀏覽器內建資料庫儲存</li>
+                    <li>✅ 問答卡片介面新增「右側快速主題導航欄」（手機版自動變為橫向滑動）</li>
+                    <li>✅ 側邊選單加入「問答卡片」主題子選單，可直接跳轉對應分類</li>
+                    <li>✅ 修復側邊選單與右側導航的跳轉過濾功能，點擊主題後自動平滑滾動至頂部</li>
+                    <li>✅ 新增「更新日誌」頁面，記錄網站的成長歷程</li>
+                    <li>✅ 整體排版優化，電腦版與手機版閱讀更舒適</li>
+                </ul>
+                <button class="log-btn" onclick="showPage('qa')">🚀 前往知識庫</button>
+                <button class="log-btn" onclick="showPage('changelog')">📜 回到日誌</button>
+            </div>
+        </div>
+
+        <!-- v1.0 大版本合併 -->
+        <div class="log-item">
+            <div class="log-version">v1.0 - 網站誕生與基礎建設 <span class="log-tag">最初版本</span></div>
+            <div class="log-date">📅 2026-10-02 ~ 2026-10-03</div>
+            <div class="log-content">
+                <ul>
+                    <li>✅ 建立 GitHub 倉庫與網站基礎架構</li>
+                    <li>✅ 加入科技感載入畫面（進度條與百分比）</li>
+                    <li>✅ 建立第一個「歡迎來到 Roblox 問答網」標題</li>
+                    <li>✅ 新增「漢堡選單」側邊欄，網站更像 App</li>
+                    <li>✅ 新增問答卡片系統，並加入基礎知識卡片</li>
+                    <li>✅ 新增管理員專屬後台（點擊 IP 卡片 5 下解鎖）</li>
+                    <li>✅ 修復 IP 與地區顯示功能（改用 ipwho.is 服務）</li>
+                    <li>✅ 新增快速搜尋與進階搜尋功能</li>
+                </ul>
+                <button class="log-btn" onclick="showPage('home')">🚀 前往首頁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理員觸發按鈕 -->
+    <div id="admin-btn" style="position: fixed; bottom: 20px; right: 20px; font-size: 30px; cursor: pointer; z-index: 10001; display: none;">⚙️</div>
+
+    <!-- ================= 管理員後台 ================= -->
+    <div id="admin-dashboard" style="display: none;">
+        <div class="admin-header">
+            <h2>👑 Roblox 問答網 - 管理後台</h2>
+            <button class="close-admin-btn" onclick="closeAdminDashboard()">退出後台</button>
+        </div>
+        <div class="admin-body">
+            <div class="admin-sidebar">
+                <div class="active" onclick="switchAdminPage('dashboard')">📊 儀表板</div>
+                <div onclick="switchAdminPage('users')">👥 用戶管理</div>
+                <div onclick="switchAdminPage('add-card')">➕ 新增問答</div>
+                <div onclick="switchAdminPage('manage-cards')">📝 管理問答</div>
+            </div>
+            <div class="admin-content">
+                <div id="admin-page-dashboard">
+                    <h3 style="color: #00ffcc; margin-top: 0;">📊 數據總覽</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="label">📝 帖子數</div><div class="number" id="stat-posts">0</div></div>
+                        <div class="stat-card"><div class="label">🟢 在線人數</div><div class="number">32</div></div>
+                        <div class="stat-card"><div class="label">👥 會員數</div><div class="number">8,520</div></div>
+                        <div class="stat-card"><div class="label">📁 附件數</div><div class="number">5,692</div></div>
+                    </div>
+                </div>
+                <div id="admin-page-users" style="display: none;">
+                    <h3 style="color: #00ffcc; margin-top: 0;">👥 用戶列表</h3>
+                    <table class="admin-table">
+                        <thead><tr><th>用戶名</th><th>用戶組</th><th>狀態</th><th>操作</th></tr></thead>
+                        <tbody>
+                            <tr><td>leoreoroblox</td><td style="color: #ff5555;">管理員</td><td>🟢 在線</td><td><button style="background: #ff5555; border: none; color: white; padding: 5px 10px; border-radius: 3px; cursor: pointer;">封禁</button></td></tr>
+                            <tr><td>RobloxFan123</td><td style="color: #00ffcc;">版主</td><td>🟢 在線</td><td><button style="background: #ff5555; border: none; color: white; padding: 5px 10px; border-radius: 3px; cursor: pointer;">封禁</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="admin-page-add-card" style="display: none;">
+                    <h3 style="color: #00ffcc; margin-top: 0;">➕ 新增問答卡片</h3>
+                    <div class="form-group">
+                        <label>標題</label>
+                        <input type="text" id="new-title" placeholder="例如：什麼是 Robux？">
+                    </div>
+                    <div class="form-group">
+                        <label>主題分類</label>
+                        <select id="new-topic">
+                            <option value="📘 基礎知識">📘 基礎知識</option>
+                            <option value="🔒 帳號與安全">🔒 帳號與安全</option>
+                            <option value="🪙 Robux 與變現">🪙 Robux 與變現</option>
+                            <option value="🎮 開發與技術">🎮 開發與技術</option>
+                            <option value="📱 平台支援">📱 平台支援</option>
+                            <option value="💬 社群與設定">💬 社群與設定</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>內容</label>
+                        <textarea id="new-content" rows="5" placeholder="輸入問答內容..."></textarea>
+                    </div>
+                    <button class="btn-submit" onclick="addNewCard()">發布卡片</button>
+                </div>
+                <div id="admin-page-manage-cards" style="display: none;">
+                    <h3 style="color: #00ffcc; margin-top: 0;">📝 管理問答</h3>
+                    <div id="manage-cards-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右下角用戶資訊卡片 -->
+    <div id="user-info" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: #00ffcc; padding: 15px; border-radius: 10px; border: 1px solid #00ffcc; font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5;">
+        <span id="close-btn" style="position: absolute; top: 5px; right: 10px; cursor: pointer; color: #ff5555; font-weight: bold;">✖</span>
+        <div style="margin-bottom: 5px;">📱 設備：<span id="device-type">偵測中...</span></div>
+        <div style="margin-bottom: 5px;">🌍 地區：<span id="user-region">偵測中...</span></div>
+        <div>🌐 IP：<span id="user-ip">偵測中...</span></div>
+    </div>
+
+    <!-- 所有魔法 -->
+    <script>
+        // ================= 資料庫 =================
+        const currentVersion = 'v5.0';
+        const defaultCards = [
+            { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
+            { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
+            { title: "玩家、開發者和創作者的區別？", topic: "📘 基礎知識", content: "玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。玩家也可以同時成為創作者！" },
+            { title: "什麼是 Roblox Studio？", topic: "📘 基礎知識", content: "Roblox Studio 是用於建立 3D 世界、寫 Luau 程式、進行本機測試，並將 Experience 發布到 Roblox 的官方開發工具。主要用於電腦開發。" },
+            { title: "什麼是 Avatar？", topic: "📘 基礎知識", content: "Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。玩家可以透過 Avatar Editor 調整外觀。" },
+            { title: "什麼是 Robux？", topic: "📘 基礎知識", content: "Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買符合條件的 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。" },
+            { title: "什麼是 Roblox Premium？", topic: "📘 基礎知識", content: "Roblox Premium 是 Roblox 的訂閱會員服務。官方已宣布在 2026 年出現重大變更，2026-04-30 起不再提供新的購買；既有訂閱者可能維持訂閱，福利也有所調整。舊版福利不可視為目前福利。" },
+            { title: "如何建立 Roblox 帳號？", topic: "🔒 帳號與安全", content: "建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊，按照官方要求輸入資料，完成後按需要驗證電子郵件。" },
+            { title: "忘記 Roblox 密碼怎麼辦？", topic: "🔒 帳號與安全", content: "可以使用 Roblox 官方 Account Recovery 功能重設密碼。使用帳號關聯的電子郵件進行恢復，某些帳號也可以使用已關聯的電話號碼。如果沒有可用的恢復方式，需要聯絡 Roblox Customer Support。不要把重設連結或驗證碼提供給其他人。" },
+            { title: "Roblox 帳號被盜怎麼辦？", topic: "🔒 帳號與安全", content: "如果其他人未經授權取得帳號控制權，應優先清除可能的惡意軟體，使用官方帳號恢復流程。立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。" },
+            { title: "Roblox 兩步驗證 (2SV) 是什麼？", topic: "🔒 帳號與安全", content: "2-Step Verification 是 Roblox 提供的額外帳號安全層，可降低單純密碼洩露造成帳號被登入的風險。登入 Roblox 後，開啟 Settings，進入 Security，選擇可用的 2SV 方法並按畫面完成設定。不要把驗證碼交給其他人。" },
+            { title: "Roblox 常見詐騙手法？", topic: "🔒 帳號與安全", content: "常見詐騙通常利用虛假的 Robux、物品、交易、贈品或帳號服務，誘導玩家提供帳號資訊或付款。「免費大量 Robux」是常見手法。可疑網站可能偽裝成 Roblox 登入頁面。官方不會要求玩家把密碼或驗證碼交給其他玩家。" },
+            { title: "免費 Robux 網站是否可信？", topic: "🔒 帳號與安全", content: "聲稱可以透過第三方網站免費產生大量 Robux 的服務通常不應被視為 Roblox 官方 Robux 取得方式。不存在應由官方宣稱的「Robux Generator」。不應輸入 Roblox 密碼、驗證碼或帳號 Cookie，也不應下載聲稱可以產生 Robux 的不明程式。" },
+            { title: "如何舉報 Roblox 違規玩家？", topic: "🔒 帳號與安全", content: "最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。" },
+            { title: "Robux 可以做什麼？", topic: "🪙 Robux 與變現", content: "可用於購買符合條件的 Avatar 物品。可用於 Experience 內的部分付費內容。可用於部分 Pass、Developer Product、Private Server 等。具體價格由 Roblox 或創作者設定，可能改變。" },
+            { title: "Robux 的合法取得方式？", topic: "🪙 Robux 與變現", content: "玩家可以透過 Roblox 官方支援的購買方式取得 Robux。Roblox Gift Card 可以兌換 Roblox Credit 或符合卡片規則的內容。創作者可以透過符合條件的創作活動取得 Earned Robux。不應把第三方交易視為 Roblox 官方方式，也不應聲稱存在「秘密免費 Robux 方法」。" },
+            { title: "Roblox Gift Card 是什麼？", topic: "🪙 Robux 與變現", content: "Roblox Gift Card 是 Roblox 官方支援的禮品卡。可以透過 Roblox 官方兌換頁面兌換。多數裝置需要使用網頁瀏覽器兌換。Gift Card 並不等同於免費 Robux。前往官方兌換頁面，登入帳號，輸入卡片代碼，選擇 Redeem，確認兌換結果。" },
+            { title: "Experience Pass 是什麼？", topic: "🪙 Robux 與變現", content: "Pass 是 Experience 的一次性付費產品，可以提供永久性或特殊權限。例如特殊區域、永久能力或其他 Experience 內福利。Pass 通常與 Developer Product 不同，一般設計為一次購買。" },
+            { title: "Developer Product 是什麼？", topic: "🪙 Robux 與變現", content: "Developer Product 是 Experience 內可以重複購買的產品。常見用途包括遊戲貨幣、消耗品和可重複購買能力。與一次性 Pass 不同。開發者必須正確處理購買收據。" },
+            { title: "玩家資料保存的基本概念？", topic: "🎮 開發與技術", content: "Roblox Experience 可以使用 DataStoreService 保存跨伺服器、跨遊戲工作階段的玩家資料。可保存玩家背包、技能點等持久資料。DataStore 由伺服器端 Script 使用。LocalScript 不能直接存取 DataStore。Studio 測試 DataStore 時需要特別注意不要操作正式資料。" },
+            { title: "Script、LocalScript、ModuleScript 的區別？", topic: "🎮 開發與技術", content: "三者都是 Roblox 中的程式腳本類型，但執行方式和用途不同。Script 通常用於伺服器端邏輯。LocalScript 用於客戶端邏輯。ModuleScript 用於建立可重用的程式模組。ModuleScript 的同一側 require() 可以共享其返回結果。" },
+            { title: "RemoteEvent 是什麼？", topic: "🎮 開發與技術", content: "RemoteEvent 用於客戶端與伺服器之間進行非同步、單向事件通訊。Client 可以傳送事件給 Server。Server 可以傳送事件給 Client。常放在 ReplicatedStorage，讓兩端都可以存取。Server 不應盲目信任 Client 傳來的資料。" },
+            { title: "RemoteFunction 是什麼？", topic: "🎮 開發與技術", content: "RemoteFunction 用於客戶端和伺服器之間進行同步、雙向請求和回應。呼叫端會等待對方返回結果。Client 可以 InvokeServer。Server 可以 InvokeClient。如果不需要等待返回值，通常可以考慮使用 RemoteEvent。" },
+            { title: "Roblox Client / Server 模型？", topic: "🎮 開發與技術", content: "Roblox Experience 使用客戶端和伺服器共同運作的架構。Client 負責玩家裝置上的部分顯示和輸入。Server 負責多人遊戲中的權威遊戲狀態。Client 與 Server 可以透過 RemoteEvent 和 RemoteFunction 通訊。不應把重要安全判斷完全交給 Client。" },
+            { title: "Roblox 支援 Windows 嗎？", topic: "📱 平台支援", content: "Windows 是 Roblox 支援的桌面平台之一。官方目前列出的要求包括 64-bit Windows 10 或 Windows 11。PC 網站支援 Chrome、Firefox 和 Microsoft Edge。Roblox PC App 的具體要求可能更新。" },
+            { title: "Roblox 支援 macOS 嗎？", topic: "📱 平台支援", content: "macOS 是 Roblox 支援的桌面平台。官方目前資料列出 macOS 10.13 High Sierra 或更高版本。Mac 網站支援 Chrome、Firefox 和 Safari。新版本 macOS 的支援狀態可能更新。" },
+            { title: "Roblox 支援手機嗎？", topic: "📱 平台支援", content: "Roblox 可以在支援的 iOS 和 Android 行動裝置上使用。行動裝置的效能和可用功能取決於裝置及 Roblox 當時的要求。行動版介面與電腦版不同。某些功能可能因裝置或地區而不同。" },
+            { title: "Roblox 支援 Xbox 嗎？", topic: "📱 平台支援", content: "Xbox 是 Roblox 支援的平台之一。Xbox 上的 Roblox 介面和輸入方式與 PC、手機不同。功能支援可能因 Roblox 更新而變化。不應假設 PC 的所有功能都能在 Xbox 使用。" },
+            { title: "Roblox 支援 PlayStation 嗎？", topic: "📱 平台支援", content: "PlayStation 是 Roblox 支援的平台之一。PlayStation 使用主機控制器操作。某些 Roblox 功能可能與 PC/手機存在差異。Experience 必須支援相應平台才能正常遊玩。" },
+            { title: "Roblox 支援 ChromeOS 嗎？", topic: "📱 平台支援", content: "ChromeOS 裝置可以在符合 Roblox 官方要求的情況下使用 Roblox。官方目前資料要求 ChromeOS 53 或更高版本。需要先啟用 Google Play Store。ChromeOS 的功能與 Windows/macOS 不完全相同。" },
+            { title: "什麼是 Roblox Friends？", topic: "💬 社群與設定", content: "Friends 是 Roblox 中玩家建立的社交連結。屬於 Roblox 社交系統。社交和聊天功能受到年齡、安全及地區政策影響。不能假設所有帳號都具有完全相同的社交功能。" },
+            { title: "什麼是 Roblox Groups/Communities？", topic: "💬 社群與設定", content: "Roblox 的群組或社群功能可以讓玩家圍繞共同主題建立組織及管理角色。可以有不同角色和權限。管理權限取決於 Roblox 的權限系統及群組設定。不應假設所有角色都有發布、編輯或管理 Experience 的權限。" },
+            { title: "Roblox Voice Chat 是什麼？", topic: "💬 社群與設定", content: "Voice Chat 是 Roblox 的語音通訊功能。官方目前要求符合條件的 13+ 使用者完成 age check，必須位於支援地區，且 Voice Chat 必須由 Experience 支援。Voice Chat 非所有帳號預設啟用。Phone verification 已不是取得 Voice Chat 的有效方法。" },
+            { title: "Roblox Chat 是什麼？", topic: "💬 社群與設定", content: "Roblox Chat 是平台提供的文字通訊功能。Roblox 目前要求使用者完成 age check 才能使用部分 Communication features。Chat 功能會根據年齡群組進行限制。地區和產品可能造成額外差異。某些玩家需要家長同意才能啟用特定聊天功能。" },
+            { title: "什麼是 Roblox 家長監護？", topic: "💬 社群與設定", content: "Roblox Parental Controls 是家長管理兒童帳號使用方式的官方功能。可以管理內容成熟度、部分聊天和通訊設定、遊戲存取限制、每月消費限制。家長帳號可以與兒童帳號建立連結。" },
+            { title: "Roblox 的社群規範是什麼？", topic: "💬 社群與設定", content: "Community Standards 是 Roblox 對平台內容和使用者行為制定的官方規範。涉及安全、欺詐、騷擾、個人資料等多個領域。玩家和創作者都需要遵守。社群習慣不能取代官方 Community Standards。" },
+            { title: "Roblox 的帳號處罰有哪些？", topic: "💬 社群與設定", content: "這些詞通常指 Roblox 對帳號或內容採取的不同程度處分。Warning 是一種平台處置。Timeout、Suspension 等可能限制帳號使用。更嚴重的帳號處分可能導致較長時間或其他限制。實際處分名稱、期限及適用情況應以 Roblox 當時的官方通知為準。" },
+            { title: "如何申訴 Roblox Moderation？", topic: "💬 社群與設定", content: "如果 Roblox 對帳號或內容作出 Moderation Decision，符合條件的使用者可以透過官方申訴流程要求重新審核。Roblox 的 Appeals team 可以重新查看部分處分。申訴不保證處分一定會被取消。官方資料指出部分申訴有 30 天限制。" }
+        ];
+
+        let cardsData = JSON.parse(localStorage.getItem('robloxCards'));
+        const savedVersion = localStorage.getItem('robloxCardsVersion');
+        if (!cardsData || savedVersion !== currentVersion) {
+            cardsData = defaultCards;
+            localStorage.setItem('robloxCards', JSON.stringify(cardsData));
+            localStorage.setItem('robloxCardsVersion', currentVersion);
+        }
+
+        function renderTopicNav() {
+            const nav = document.getElementById('topic-nav');
+            nav.innerHTML = '';
+            const topics = [...new Set(cardsData.map(card => card.topic))];
+            const allBtn = document.createElement('button');
+            allBtn.innerText = '📂 全部';
+            allBtn.className = 'active';
+            allBtn.onclick = () => filterByTopic('');
+            nav.appendChild(allBtn);
+
+            topics.forEach(topic => {
+                const btn = document.createElement('button');
+                btn.innerText = topic;
+                btn.onclick = () => filterByTopic(topic);
+                nav.appendChild(btn);
+            });
+        }
+
+        // 過濾卡片的核心功能
+        function filterByTopic(topic) {
+            // 1. 更新側邊欄按鈕的 active 狀態
+            const buttons = document.querySelectorAll('.qa-sidebar button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            buttons.forEach(btn => {
+                if (btn.innerText === '📂 全部' && topic === '') btn.classList.add('active');
+                else if (btn.innerText === topic) btn.classList.add('active');
+            });
+
+            // 2. 清空所有搜尋框
+            document.getElementById('search-input').value = '';
+            document.getElementById('adv-topic').value = '';
+            document.getElementById('adv-all').value = '';
+            document.getElementById('adv-exact').value = '';
+            document.getElementById('adv-none').value = '';
+
+            // 3. 執行過濾
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const tagEl = card.querySelector('.tag');
+                const cardTopic = tagEl ? tagEl.innerText : '';
+                if (topic === '' || cardTopic.includes(topic)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // 4. 平滑滾動到頂部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            cardsData.forEach((card) => {
+                let cardClass = 'card-basic';
+                let tagClass = 'tag-basic';
+                if (card.topic.includes('安全')) { cardClass = 'card-security'; tagClass = 'tag-security'; }
+                else if (card.topic.includes('Robux')) { cardClass = 'card-robux'; tagClass = 'tag-robux'; }
+                else if (card.topic.includes('開發')) { cardClass = 'card-dev'; tagClass = 'tag-dev'; }
+                else if (card.topic.includes('平台')) { cardClass = 'card-platform'; tagClass = 'tag-platform'; }
+                else if (card.topic.includes('社群')) { cardClass = 'card-community'; tagClass = 'tag-community'; }
+
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card ${cardClass}`;
+                cardDiv.innerHTML = `
+                    <span class="tag ${tagClass}">${card.topic}</span>
+                    <h3>❓ ${card.title}</h3>
+                    <p>${card.content}</p>
+                `;
+                container.appendChild(cardDiv);
+            });
+            document.getElementById('stat-posts').innerText = cardsData.length;
+        }
+
+        renderCards();
+        renderTopicNav();
+
+        // ================= 管理員後台 =================
+        function openAdminDashboard() {
+            document.getElementById('admin-dashboard').style.display = 'flex';
+            switchAdminPage('dashboard');
+            renderManageCards();
+        }
+
+        function closeAdminDashboard() {
+            document.getElementById('admin-dashboard').style.display = 'none';
+        }
+
+        function switchAdminPage(page) {
+            const sidebarItems = document.querySelectorAll('.admin-sidebar div');
+            sidebarItems.forEach(item => item.classList.remove('active'));
+            document.getElementById('admin-page-dashboard').style.display = 'none';
+            document.getElementById('admin-page-users').style.display = 'none';
+            document.getElementById('admin-page-add-card').style.display = 'none';
+            document.getElementById('admin-page-manage-cards').style.display = 'none';
+
+            if (page === 'dashboard') {
+                sidebarItems[0].classList.add('active');
+                document.getElementById('admin-page-dashboard').style.display = 'block';
+            } else if (page === 'users') {
+                sidebarItems[1].classList.add('active');
+                document.getElementById('admin-page-users').style.display = 'block';
+            } else if (page === 'add-card') {
+                sidebarItems[2].classList.add('active');
+                document.getElementById('admin-page-add-card').style.display = 'block';
+            } else if (page === 'manage-cards') {
+                sidebarItems[3].classList.add('active');
+                document.getElementById('admin-page-manage-cards').style.display = 'block';
+            }
+        }
+
+        function addNewCard() {
+            const title = document.getElementById('new-title').value.trim();
+            const topic = document.getElementById('new-topic').value;
+            const content = document.getElementById('new-content').value.trim();
+            if (!title || !content) { alert('請填寫標題和內容！'); return; }
+            cardsData.push({ title, topic, content });
+            localStorage.setItem('robloxCards', JSON.stringify(cardsData));
+            document.getElementById('new-title').value = '';
+            document.getElementById('new-content').value = '';
+            renderCards();
+            renderTopicNav();
+            renderManageCards();
+            alert('卡片發布成功！');
+        }
+
+        function renderManageCards() {
+            const list = document.getElementById('manage-cards-list');
+            list.innerHTML = '';
+            cardsData.forEach((card, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'background: #1f2937; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;';
+                div.innerHTML = `
+                    <div>
+                        <strong style="color: #00ffcc;">${card.title}</strong>
+                        <div style="font-size: 12px; color: #9ca3af;">${card.topic}</div>
+                    </div>
+                    <button onclick="deleteCard(${index})" style="background: #ff5555; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">刪除</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function deleteCard(index) {
+            if (confirm('確定要刪除這張卡片嗎？')) {
+                cardsData.splice(index, 1);
+                localStorage.setItem('robloxCards', JSON.stringify(cardsData));
+                renderCards();
+                renderTopicNav();
+                renderManageCards();
+            }
+        }
+
+        // ================= 其他魔法 =================
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 1;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('percent-text').innerText = progress + '%';
+            if (progress >= 100) {
+                clearInterval(interval);
+                setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
+            }
+        }, 30);
+
+        document.getElementById('menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('side-menu');
+            const submenu = document.getElementById('qa-submenu');
+            menu.style.left = menu.style.left === '0px' ? '-300px' : '0px';
+            if (menu.style.left === '0px') {
+                submenu.style.display = 'block';
+            } else {
+                submenu.style.display = 'none';
+            }
+        });
+
+        // 頁面切換（支援傳入主題）
+        function showPage(pageName, topic = '') {
+            document.getElementById('side-menu').style.left = '-300px';
+            document.getElementById('qa-submenu').style.display = 'none';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('qa-page').style.display = 'none';
+            document.getElementById('changelog-page').style.display = 'none';
+
+            if (pageName === 'home') {
+                document.getElementById('home-page').style.display = 'block';
+            } else if (pageName === 'qa') {
+                document.getElementById('qa-page').style.display = 'block';
+                filterByTopic(topic);
+            } else if (pageName === 'changelog') {
+                document.getElementById('changelog-page').style.display = 'block';
+            }
+        }
+
+        function searchCards() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                const tagEl = card.querySelector('.tag');
+                const tag = tagEl ? tagEl.innerText.toLowerCase() : '';
+                card.style.display = (input === '' || title.includes(input) || tag.includes(input)) ? 'block' : 'none';
+            });
+            document.querySelectorAll('.qa-sidebar button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('adv-all').value = '';
+            document.getElementById('adv-exact').value = '';
+            document.getElementById('adv-none').value = '';
+            document.getElementById('adv-topic').value = '';
+        }
+
+        function toggleAdvancedSearch() {
+            const panel = document.getElementById('advanced-search-panel');
+            panel.style.display = (panel.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function advancedSearch() {
+            const topic = document.getElementById('adv-topic').value;
+            const allWords = document.getElementById('adv-all').value.toLowerCase().split(' ').filter(w => w.trim() !== '');
+            const exactPhrase = document.getElementById('adv-exact').value.toLowerCase().trim();
+            const noneWords = document.getElementById('adv-none').value.toLowerCase().split(' ').filter(w => w.trim() !== '');
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const content = card.innerText.toLowerCase();
+                const tagEl = card.querySelector('.tag');
+                const tag = tagEl ? tagEl.innerText : '';
+                let show = true;
+                if (topic !== '' && !tag.includes(topic)) show = false;
+                if (allWords.length > 0) {
+                    const hasAllWords = allWords.every(word => content.includes(word));
+                    if (!hasAllWords) show = false;
+                }
+                if (exactPhrase !== '') {
+                    if (!content.includes(exactPhrase)) show = false;
+                }
+                if (noneWords.length > 0) {
+                    const hasNoneWords = noneWords.some(word => content.includes(word));
+                    if (hasNoneWords) show = false;
+                }
+                card.style.display = show ? 'block' : 'none';
+            });
+            document.getElementById('search-input').value = '';
+            document.querySelectorAll('.qa-sidebar button').forEach(btn => btn.classList.remove('active'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearAdvancedSearch() {
+            document.getElementById('adv-topic').value = '';
+            document.getElementById('adv-all').value = '';
+            document.getElementById('adv-exact').value = '';
+            document.getElementById('adv-none').value = '';
+            document.querySelectorAll('.card').forEach(card => card.style.display = 'block');
+            document.querySelectorAll('.qa-sidebar button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.qa-sidebar button').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
+
+        fetch('https://ipwho.is/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('user-ip').innerText = data.ip || '無法取得';
+                    document.getElementById('user-region').innerText = (data.city || '未知') + ', ' + (data.country || '未知');
+                } else {
+                    document.getElementById('user-ip').innerText = '讀取失敗';
+                    document.getElementById('user-region').innerText = '讀取失敗';
+                }
+                document.getElementById('user-info').style.display = 'block';
+            })
+            .catch(() => {
+                document.getElementById('user-ip').innerText = '讀取失敗';
+                document.getElementById('user-region').innerText = '讀取失敗';
+                document.getElementById('user-info').style.display = 'block';
+            });
+
+        document.getElementById('close-btn').addEventListener('click', () => {
+            document.getElementById('user-info').style.display = 'none';
+        });
+
+        document.getElementById('admin-btn').addEventListener('click', () => {
+            const password = prompt('請輸入管理員密碼：');
+            if (password === 'admin123') {
+                openAdminDashboard();
+            } else {
+                alert('密碼錯誤！你以為你是管理員嗎？😎');
+            }
+        });
+
+        let clickCount = 0;
+        document.getElementById('user-info').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 5) {
+                document.getElementById('admin-btn').style.display = 'block';
+                clickCount = 0;
+                alert('管理員權限已解鎖！點擊右下角齒輪進入。');
+            }
+        });
+    </script>
+</body>
+</html>� 帳號與安全</div>
             <div onclick="showPage('qa', '🪙 Robux 與變現')">🪙 Robux 與變現</div>
             <div onclick="showPage('qa', '🎮 開發與技術')">🎮 開發與技術</div>
             <div onclick="showPage('qa', '📱 平台支援')">📱 平台支援</div>
