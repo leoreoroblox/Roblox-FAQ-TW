@@ -3,161 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox 問答網 v0.0.4</title>
+    <title>Leo Studio - Roblox 知識庫</title>
     <style>
-        body { margin: 0; font-family: sans-serif; background: #0b0f19; color: #fff; transition: background 0.3s ease; }
+        /* ================= 全局樣式與主題 ================= */
+        :root {
+            --bg-color: #0b0f19;
+            --bg-card: #111827;
+            --text-main: #ffffff;
+            --text-sub: #9ca3af;
+            --accent: #00ffcc;
+            --accent-blue: #0055ff;
+            --border-color: #1f2937;
+        }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-main); transition: background 0.3s ease; overflow-x: hidden; }
+        h1, h2, h3 { margin-top: 0; }
+        .clickable { transition: transform 0.1s ease, opacity 0.2s; cursor: pointer; }
+        .clickable:active { transform: scale(0.95); }
         
-        /* 互動與動畫魔法 */
+        /* 頁面切換動畫 */
         .page-section { display: none; opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
         .page-section.active { display: block; opacity: 1; transform: translateY(0); }
-        .clickable { transition: transform 0.1s ease; cursor: pointer; }
-        .clickable:active { transform: scale(0.95); }
-        .card.clickable:active { transform: scale(0.98); }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; padding-top: 100px; }
 
-        /* 載入畫面 */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; color: #00ffcc; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; transition: opacity 0.5s ease; }
+        /* ================= 跑馬燈公告 ================= */
+        #announcement-bar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(0, 255, 204, 0.15); border-bottom: 1px solid var(--accent); color: var(--accent); padding: 8px 0; z-index: 10003; overflow: hidden; display: none; }
+        #announcement-text { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; font-weight: bold; font-size: 14px; }
+        @keyframes marquee { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+
+        /* ================= 載入畫面 ================= */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; color: var(--accent); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; transition: opacity 0.5s ease; }
         .dot { animation: blink 1.4s infinite both; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
-        .progress-container { width: 80%; background: #1a2332; border: 1px solid #00ffcc; border-radius: 5px; height: 30px; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #00ffcc, #0055ff); transition: width 0.1s; }
+        .progress-container { width: 80%; background: #1a2332; border: 1px solid var(--accent); border-radius: 5px; height: 30px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-blue)); transition: width 0.1s; }
         #percent-text { margin-top: 15px; font-size: 24px; font-family: monospace; }
         .skip-btn { margin-top: 20px; background: transparent; color: #9ca3af; border: 1px solid #9ca3af; padding: 8px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: 0.2s; }
-        .skip-btn:hover { color: #00ffcc; border-color: #00ffcc; }
-        #loader-success { margin-top: 15px; font-size: 18px; color: #00ffcc; display: none; }
+        .skip-btn:hover { color: var(--accent); border-color: var(--accent); }
+        #loader-success { margin-top: 15px; font-size: 18px; color: var(--accent); display: none; }
 
-        /* 全局排版 */
-        h1, h2, h3 { margin-top: 0; }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; padding-top: 80px; }
-        
-        /* 漢堡選單 */
-        #menu-btn { position: fixed; top: 20px; left: 20px; font-size: 30px; color: #00ffcc; z-index: 10005; background: #0b0f19; padding: 5px 15px; border-radius: 5px; border: 1px solid #00ffcc; }
-        #side-menu { position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: #0b0f19; border-right: 2px solid #00ffcc; z-index: 10004; transition: left 0.3s ease; padding-top: 80px; padding-left: 20px; box-sizing: border-box; overflow-y: auto; }
+        /* ================= 漢堡選單 ================= */
+        #menu-btn { position: fixed; top: 20px; left: 20px; font-size: 30px; color: var(--accent); z-index: 10005; background: var(--bg-color); padding: 5px 15px; border-radius: 5px; border: 1px solid var(--accent); }
+        #side-menu { position: fixed; top: 0; left: -300px; width: 250px; height: 100%; background: var(--bg-color); border-right: 2px solid var(--accent); z-index: 10004; transition: left 0.3s ease; padding-top: 80px; padding-left: 20px; box-sizing: border-box; overflow-y: auto; }
         .menu-item { color: #fff; font-size: 18px; margin-bottom: 15px; }
         .submenu { padding-left: 15px; display: none; }
-        .submenu div { font-size: 15px !important; color: #9ca3af !important; margin-bottom: 10px !important; }
-        .submenu div:hover { color: #00ffcc !important; }
+        .submenu div { font-size: 15px !important; color: var(--text-sub) !important; margin-bottom: 10px !important; }
+        .submenu div:hover { color: var(--accent) !important; }
 
-        /* 首頁專屬魔法 */
+        /* ================= 首頁 ================= */
         #home-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
         #home-page::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0, 255, 204, 0.05) 0%, transparent 70%); z-index: 0; }
         .hero-content { position: relative; z-index: 1; text-align: center; padding: 20px; width: 100%; max-width: 800px; }
-        .hero-title { font-size: 48px; font-weight: bold; margin-bottom: 15px; background: linear-gradient(90deg, #00ffcc, #0055ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 255, 204, 0.3); }
-        .hero-subtitle { font-size: 18px; color: #9ca3af; margin-bottom: 40px; line-height: 1.6; }
-        .hero-btn { background: linear-gradient(90deg, #00ffcc, #0055ff); color: #0b0f19; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 50px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4); margin-bottom: 60px; }
+        .hero-title { font-size: 48px; font-weight: bold; margin-bottom: 15px; background: linear-gradient(90deg, var(--accent), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 255, 204, 0.3); }
+        .hero-subtitle { font-size: 18px; color: var(--text-sub); margin-bottom: 40px; line-height: 1.6; }
+        .hero-btn { background: linear-gradient(90deg, var(--accent), var(--accent-blue)); color: #0b0f19; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 50px; box-shadow: 0 0 20px rgba(0, 255, 204, 0.4); margin-bottom: 60px; }
         .hero-btn:hover { box-shadow: 0 0 30px rgba(0, 255, 204, 0.8); transform: scale(1.05); }
         .quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 600px; margin: 0 auto; }
-        .quick-card { background: rgba(11, 15, 25, 0.8); border: 1px solid #1f2937; border-radius: 12px; padding: 20px; text-align: left; transition: 0.3s; }
-        .quick-card:hover { border-color: #00ffcc; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); transform: translateY(-5px); }
+        .quick-card { background: rgba(11, 15, 25, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: left; transition: 0.3s; }
+        .quick-card:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); transform: translateY(-5px); }
         .quick-card .emoji { font-size: 28px; margin-bottom: 10px; display: block; }
-        .quick-card .title { font-size: 16px; font-weight: bold; color: #00ffcc; margin-bottom: 5px; }
-        .quick-card .desc { font-size: 12px; color: #9ca3af; line-height: 1.4; }
+        .quick-card .title { font-size: 16px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
+        .quick-card .desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; }
         .hero-version { position: absolute; bottom: 30px; font-size: 14px; color: #4b5563; }
 
-        /* 問答卡片區 */
+        /* ================= 問答卡片區 ================= */
         .qa-container { display: flex; gap: 20px; }
         .qa-main-content { flex: 1; min-width: 0; }
         .qa-sidebar { width: 140px; position: sticky; top: 100px; height: fit-content; display: flex; flex-direction: column; gap: 8px; }
-        .qa-sidebar button { background: #0b0f19; border: 1px solid #557788; color: #9ca3af; padding: 10px; border-radius: 8px; text-align: left; font-size: 14px; }
-        .qa-sidebar button:hover, .qa-sidebar button.active { border-color: #00ffcc; color: #00ffcc; background: #1a2332; }
-        #search-input { flex: 1; padding: 12px; background: #0b0f19; border: 1px solid #00ffcc; color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
+        .qa-sidebar button { background: var(--bg-color); border: 1px solid #557788; color: var(--text-sub); padding: 10px; border-radius: 8px; text-align: left; font-size: 14px; }
+        .qa-sidebar button:hover, .qa-sidebar button.active { border-color: var(--accent); color: var(--accent); background: #1a2332; }
+        #search-input { flex: 1; padding: 12px; background: var(--bg-color); border: 1px solid var(--accent); color: #fff; border-radius: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
         #search-input::placeholder { color: #557788; }
         .adv-input, #adv-topic { width: 100%; padding: 8px; background: #1a2332; border: 1px solid #557788; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
-        .adv-input:focus, #adv-topic:focus { border-color: #00ffcc; }
-        #advanced-search-panel { display: none; background: #0b0f19; border: 1px solid #00ffcc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        .adv-input:focus, #adv-topic:focus { border-color: var(--accent); }
+        #advanced-search-panel { display: none; background: var(--bg-color); border: 1px solid var(--accent); padding: 15px; margin-bottom: 20px; border-radius: 8px; }
 
-        /* 問答卡片樣式 */
-        .card { background: #0b0f19; border: 1px solid #00ffcc; border-radius: 10px; padding: 20px; margin-bottom: 20px; color: #fff; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
+        /* 卡片樣式 */
+        .card { background: var(--bg-color); border: 1px solid var(--accent); border-radius: 10px; padding: 20px; margin-bottom: 20px; color: #fff; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); position: relative; }
         .tag { font-size: 12px; padding: 4px 10px; border-radius: 5px; margin-bottom: 12px; display: inline-block; font-weight: bold; }
-        .card-basic { border-color: #00ffcc; box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
-        .card-basic h3 { color: #00ffcc; }
+        .card-basic { border-color: #00ffcc; } .card-basic h3 { color: #00ffcc; }
         .tag-basic { background: rgba(0, 255, 204, 0.2); color: #00ffcc; border: 1px solid #00ffcc; }
-        .card-security { border-color: #ffaa00; box-shadow: 0 0 10px rgba(255, 170, 0, 0.2); }
-        .card-security h3 { color: #ffaa00; }
+        .card-security { border-color: #ffaa00; } .card-security h3 { color: #ffaa00; }
         .tag-security { background: rgba(255, 170, 0, 0.2); color: #ffaa00; border: 1px solid #ffaa00; }
-        .card-robux { border-color: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.2); }
-        .card-robux h3 { color: #00ff88; }
+        .card-robux { border-color: #00ff88; } .card-robux h3 { color: #00ff88; }
         .tag-robux { background: rgba(0, 255, 136, 0.2); color: #00ff88; border: 1px solid #00ff88; }
-        .card-dev { border-color: #aa00ff; box-shadow: 0 0 10px rgba(170, 0, 255, 0.2); }
-        .card-dev h3 { color: #aa00ff; }
+        .card-dev { border-color: #aa00ff; } .card-dev h3 { color: #aa00ff; }
         .tag-dev { background: rgba(170, 0, 255, 0.2); color: #aa00ff; border: 1px solid #aa00ff; }
-        .card-platform { border-color: #00aaff; box-shadow: 0 0 10px rgba(0, 170, 255, 0.2); }
-        .card-platform h3 { color: #00aaff; }
+        .card-platform { border-color: #00aaff; } .card-platform h3 { color: #00aaff; }
         .tag-platform { background: rgba(0, 170, 255, 0.2); color: #00aaff; border: 1px solid #00aaff; }
-        .card-community { border-color: #ff66aa; box-shadow: 0 0 10px rgba(255, 102, 170, 0.2); }
-        .card-community h3 { color: #ff66aa; }
+        .card-community { border-color: #ff66aa; } .card-community h3 { color: #ff66aa; }
         .tag-community { background: rgba(255, 102, 170, 0.2); color: #ff66aa; border: 1px solid #ff66aa; }
+        .card-latest { border-color: #ff00cc; } .card-latest h3 { color: #ff00cc; }
+        .tag-latest { background: rgba(255, 0, 204, 0.2); color: #ff00cc; border: 1px solid #ff00cc; }
+        .card-actions { display: flex; gap: 15px; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 10px; font-size: 14px; color: var(--text-sub); }
+        .card-actions span { cursor: pointer; transition: 0.2s; }
+        .card-actions span:hover { color: var(--accent); }
 
-        /* 更新日誌 */
-        .log-item { background: #111827; border-left: 4px solid #00ffcc; padding: 15px 20px; margin-bottom: 20px; border-radius: 0 10px 10px 0; position: relative; }
-        .log-item::before { content: ''; position: absolute; left: -12px; top: 20px; width: 20px; height: 20px; border-radius: 50%; background: #0b0f19; border: 4px solid #00ffcc; }
-        .log-version { font-size: 18px; font-weight: bold; color: #00ffcc; margin-bottom: 5px; }
-        .log-date { font-size: 12px; color: #9ca3af; margin-bottom: 15px; }
-        .log-content { color: #d1d5db; line-height: 1.6; }
-        .log-content ul { margin: 5px 0 0 0; padding-left: 20px; }
-        .log-content li { margin-bottom: 5px; }
-        .log-tag { display: inline-block; font-size: 11px; background: rgba(0, 255, 204, 0.2); color: #00ffcc; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
-        .log-btn { background: #00ffcc; color: #0b0f19; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; margin-top: 10px; display: inline-block; }
+        /* 評論區 */
+        .comment-section { display: none; margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 15px; }
+        .comment-input-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        .comment-input-box input { flex: 1; padding: 8px; background: #1a2332; border: 1px solid var(--border-color); color: #fff; border-radius: 5px; outline: none; }
+        .comment-input-box button { padding: 8px 15px; background: var(--accent); border: none; color: #0b0f19; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .comment-item { background: #1a2332; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; position: relative; }
+        .comment-item .comment-user { color: var(--accent); font-weight: bold; margin-bottom: 5px; display: block; font-size: 12px; }
+        .comment-item .comment-text { color: #d1d5db; }
+        .comment-item .delete-comment { position: absolute; top: 10px; right: 10px; color: #ff5555; cursor: pointer; font-size: 12px; display: none; }
+        .comment-item:hover .delete-comment { display: block; }
 
-        /* 設定頁面 */
-        .settings-card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .settings-card h3 { color: #00ffcc; margin-bottom: 15px; }
-        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1f2937; }
+        /* ================= 更新日誌 ================= */
+        .log-filter { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center; }
+        .log-filter button { background: var(--bg-color); border: 1px solid var(--text-sub); color: var(--text-sub); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .log-filter button.active { border-color: var(--accent); color: var(--accent); background: #1a2332; }
+        .log-item { background: var(--bg-card); border-left: 4px solid var(--accent); padding: 15px 20px; margin-bottom: 20px; border-radius: 0 10px 10px 0; position: relative; }
+        .log-item::before { content: ''; position: absolute; left: -12px; top: 20px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg-color); border: 4px solid var(--accent); }
+        .log-tag { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
+        .tag-major { background: rgba(255, 0, 204, 0.2); color: #ff00cc; border: 1px solid #ff00cc; }
+        .tag-feature { background: rgba(0, 255, 204, 0.2); color: #00ffcc; border: 1px solid #00ffcc; }
+        .tag-minor { background: rgba(0, 170, 255, 0.2); color: #00aaff; border: 1px solid #00aaff; }
+        .tag-bug { background: rgba(255, 85, 85, 0.2); color: #ff5555; border: 1px solid #ff5555; }
+
+        /* ================= 遊戲搜尋 ================= */
+        #game-search-page { padding-top: 100px; }
+        .search-box-lg { display: flex; gap: 10px; max-width: 600px; margin: 0 auto 30px; }
+        .search-box-lg input { flex: 1; padding: 15px; background: var(--bg-color); border: 2px solid var(--accent); color: #fff; border-radius: 10px; font-size: 18px; outline: none; }
+        .search-box-lg button { padding: 15px 30px; background: linear-gradient(90deg, var(--accent), var(--accent-blue)); border: none; color: #0b0f19; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .game-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; display: flex; gap: 20px; margin-bottom: 20px; }
+        .game-icon { width: 100px; height: 100px; border-radius: 15px; background: #1a2332; object-fit: cover; }
+        .game-info h3 { color: var(--accent); margin-bottom: 10px; }
+        .game-info p { color: var(--text-sub); font-size: 14px; margin: 5px 0; }
+        .game-info .highlight { color: #fff; font-weight: bold; }
+
+        /* ================= 設定頁面 ================= */
+        .settings-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .settings-card h3 { color: var(--accent); margin-bottom: 15px; }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
         .settings-row:last-child { border-bottom: none; }
-        .settings-row label { color: #d1d5db; font-size: 16px; }
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4b5563; transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #00ffcc; }
+        input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(24px); }
         .color-options { display: flex; gap: 15px; flex-wrap: wrap; }
         .color-box { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .color-box:hover { transform: scale(1.1); }
-        .color-box.active { border-color: #00ffcc; box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
+        .color-box.active { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
 
-        /* 管理員後台 */
-        #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 20000; flex-direction: column; }
-        .admin-header { height: 60px; background: #111827; border-bottom: 1px solid #1f2937; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .admin-header h2 { margin: 0; font-size: 18px; color: #00ffcc; }
+        /* ================= 管理員後台 ================= */
+        #admin-dashboard { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 20000; flex-direction: column; }
+        .admin-header { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .admin-header h2 { margin: 0; font-size: 18px; color: var(--accent); }
         .admin-body { display: flex; flex: 1; overflow: hidden; }
-        .admin-sidebar { width: 200px; background: #0f172a; border-right: 1px solid #1f2937; padding: 20px 0; display: flex; flex-direction: column; }
-        .admin-sidebar div { padding: 15px 20px; color: #9ca3af; transition: 0.2s; border-left: 3px solid transparent; }
-        .admin-sidebar div:hover, .admin-sidebar div.active { background: #1e293b; color: #00ffcc; border-left-color: #00ffcc; }
+        .admin-sidebar { width: 200px; background: #0f172a; border-right: 1px solid var(--border-color); padding: 20px 0; display: flex; flex-direction: column; }
+        .admin-sidebar div { padding: 15px 20px; color: var(--text-sub); transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; }
+        .admin-sidebar div:hover, .admin-sidebar div.active { background: #1e293b; color: var(--accent); border-left-color: var(--accent); }
         .admin-content { flex: 1; padding: 20px; overflow-y: auto; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 20px; text-align: center; }
-        .stat-card .number { font-size: 28px; color: #00ffcc; font-weight: bold; margin: 10px 0; }
-        .stat-card .label { font-size: 14px; color: #9ca3af; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .stat-card .number { font-size: 28px; color: var(--accent); font-weight: bold; margin: 10px 0; }
+        .stat-card .label { font-size: 14px; color: var(--text-sub); }
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid #1f2937; }
-        .admin-table th { color: #00ffcc; font-weight: normal; }
-        .close-admin-btn { background: #ff5555; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; }
+        .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .admin-table th { color: var(--accent); font-weight: normal; }
+        .close-admin-btn { background: #ff5555; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; color: #9ca3af; margin-bottom: 5px; font-size: 14px; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #00ffcc; }
-        .btn-submit { background: #00ffcc; color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 16px; }
+        .form-group label { display: block; color: var(--text-sub); margin-bottom: 5px; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+        .btn-submit { background: var(--accent); color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        
+        /* 管理員專用 OP 按鈕 */
+        #op-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 30000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        #op-message { font-size: 36px; color: #ff5555; margin-bottom: 20px; font-weight: bold; }
+        #op-countdown { font-size: 60px; color: var(--accent); font-family: monospace; }
 
-        /* 右下角用戶資訊 */
-        #user-info { position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: #00ffcc; padding: 15px; border-radius: 10px; border: 1px solid #00ffcc; font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5; }
-        #close-btn { position: absolute; top: 5px; right: 10px; color: #ff5555; font-weight: bold; }
+        /* ================= 右下角用戶資訊 ================= */
+        #user-info { position: fixed; bottom: 20px; right: 20px; background: rgba(0, 0, 0, 0.8); color: var(--accent); padding: 15px; border-radius: 10px; border: 1px solid var(--accent); font-family: monospace; font-size: 14px; z-index: 10000; display: none; max-width: 250px; line-height: 1.5; }
+        #close-btn { position: absolute; top: 5px; right: 10px; color: #ff5555; font-weight: bold; cursor: pointer; }
 
         /* 手機排版 */
         @media (max-width: 768px) {
             .qa-container { flex-direction: column; }
-            .qa-sidebar { width: 100%; position: static; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid #1f2937; }
+            .qa-sidebar { width: 100%; position: static; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
             .qa-sidebar button { flex-shrink: 0; font-size: 13px; padding: 8px 12px; }
-            #loader div:first-child { font-size: 24px !important; }
-            .admin-sidebar { width: 120px; font-size: 14px; }
             .hero-title { font-size: 32px; }
-            .hero-subtitle { font-size: 16px; }
             .quick-links { grid-template-columns: 1fr; }
+            .admin-sidebar { width: 120px; font-size: 14px; }
+            .game-card { flex-direction: column; align-items: center; text-align: center; }
         }
     </style>
 </head>
 <body data-theme="dark">
+
+    <!-- 跑馬燈公告 -->
+    <div id="announcement-bar"><div id="announcement-text">歡迎來到 Leo Studio 的 Roblox 知識庫！</div></div>
 
     <!-- 加載畫面 -->
     <div id="loader">
@@ -173,78 +213,104 @@
 
     <!-- 側邊選單 -->
     <div id="side-menu">
-        <h2 style="color: #00ffcc; margin-bottom: 20px;">📋 功能選單</h2>
-        <div class="menu-item clickable" onclick="showPage('home')">🏠 首頁</div>
-        <div class="menu-item clickable" onclick="showPage('qa')">📚 問答卡片（全部）</div>
+        <h2 style="color: var(--accent); margin-bottom: 20px;" data-i18n="menu_title">📋 功能選單</h2>
+        <div class="menu-item clickable" onclick="showPage('home')" data-i18n="menu_home">🏠 首頁</div>
+        <div class="menu-item clickable" onclick="showPage('qa')" data-i18n="menu_qa">📚 問答卡片</div>
         
         <div id="qa-submenu" class="submenu">
-            <div class="clickable" onclick="showPage('qa', '📘 基礎知識')">📘 基礎知識</div>
-            <div class="clickable" onclick="showPage('qa', '🔒 帳號與安全')">🔒 帳號與安全</div>
-            <div class="clickable" onclick="showPage('qa', '🪙 Robux 與變現')">🪙 Robux 與變現</div>
-            <div class="clickable" onclick="showPage('qa', '🎮 開發與技術')">🎮 開發與技術</div>
-            <div class="clickable" onclick="showPage('qa', '📱 平台支援')">📱 平台支援</div>
-            <div class="clickable" onclick="showPage('qa', '💬 社群與設定')">💬 社群與設定</div>
+            <div class="clickable" onclick="showPage('qa', '📘 基礎知識')" data-i18n="topic_basic">📘 基礎知識</div>
+            <div class="clickable" onclick="showPage('qa', '🔒 帳號與安全')" data-i18n="topic_security">🔒 帳號與安全</div>
+            <div class="clickable" onclick="showPage('qa', '🪙 Robux 與變現')" data-i18n="topic_robux">🪙 Robux 與變現</div>
+            <div class="clickable" onclick="showPage('qa', '🎮 開發與技術')" data-i18n="topic_dev">🎮 開發與技術</div>
+            <div class="clickable" onclick="showPage('qa', '📱 平台支援')" data-i18n="topic_platform">📱 平台支援</div>
+            <div class="clickable" onclick="showPage('qa', '💬 社群與設定')" data-i18n="topic_community">💬 社群與設定</div>
+            <div class="clickable" onclick="showPage('qa', '🆕 最新動態')" data-i18n="topic_latest">🆕 最新動態</div>
         </div>
 
-        <div class="menu-item clickable" onclick="showPage('changelog')">📜 更新日誌</div>
-        <div class="menu-item clickable" onclick="showPage('settings')">⚙️ 設定</div>
-        <div class="menu-item clickable" onclick="showPage('intro')">ℹ️ 關於我們</div>
+        <div class="menu-item clickable" onclick="showPage('game-search')" data-i18n="menu_game_search">🎮 遊戲搜尋</div>
+        <div class="menu-item clickable" onclick="showPage('changelog')" data-i18n="menu_changelog">📜 更新日誌</div>
+        <div class="menu-item clickable" onclick="showPage('settings')" data-i18n="menu_settings">⚙️ 設定</div>
+        <div class="menu-item clickable" onclick="showPage('intro')" data-i18n="menu_intro">ℹ️ 關於我們</div>
+        
+        <!-- 語言切換 -->
+        <div class="menu-item" style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+            <span data-i18n="menu_lang">🌐 語言：</span>
+            <select id="lang-select" style="background: #1a2332; color: #fff; border: 1px solid var(--accent); padding: 5px; border-radius: 5px; margin-left: 10px; outline: none;" onchange="changeLanguage(this.value)">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        
+        <!-- 管理員按鈕 (隱藏) -->
+        <div id="admin-menu-item" class="menu-item clickable" style="color: #ff5555; display: none;" onclick="openAdminDashboard()" data-i18n="menu_admin">👑 管理後台</div>
     </div>
 
     <!-- 箱子 1：首頁 -->
     <div id="home-page" class="page-section active">
         <div class="hero-content">
-            <h1 class="hero-title">Roblox 知識庫</h1>
-            <p class="hero-subtitle">你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。</p>
+            <h1 class="hero-title" data-i18n="home_title">Roblox 知識庫</h1>
+            <p class="hero-subtitle" data-i18n="home_subtitle">你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。</p>
             
-            <button class="hero-btn clickable" onclick="showPage('intro')">🚀 開始探索</button>
+            <button class="hero-btn clickable" onclick="showPage('intro')" data-i18n="home_btn">🚀 開始探索</button>
             
             <div class="quick-links">
                 <div class="quick-card clickable" onclick="showPage('qa', '📘 基礎知識')">
                     <span class="emoji">📘</span>
-                    <div class="title">基礎知識</div>
-                    <div class="desc">Roblox 是什麼？Experience 和 Game 差在哪？</div>
+                    <div class="title" data-i18n="topic_basic">基礎知識</div>
+                    <div class="desc" data-i18n="desc_basic">Roblox 是什麼？Experience 和 Game 差在哪？</div>
                 </div>
                 <div class="quick-card clickable" onclick="showPage('qa', '🔒 帳號與安全')">
                     <span class="emoji">🔒</span>
-                    <div class="title">帳號與安全</div>
-                    <div class="desc">被盜怎麼辦？教你如何保護自己的帳號。</div>
+                    <div class="title" data-i18n="topic_security">帳號與安全</div>
+                    <div class="desc" data-i18n="desc_security">被盜怎麼辦？教你如何保護自己的帳號。</div>
                 </div>
                 <div class="quick-card clickable" onclick="showPage('qa', '🪙 Robux 與變現')">
                     <span class="emoji">🪙</span>
-                    <div class="title">Robux 與變現</div>
-                    <div class="desc">合法的 Robux 獲取方式與創作者收益解析。</div>
+                    <div class="title" data-i18n="topic_robux">Robux 與變現</div>
+                    <div class="desc" data-i18n="desc_robux">合法的 Robux 獲取方式與創作者收益解析。</div>
                 </div>
                 <div class="quick-card clickable" onclick="showPage('qa', '💬 社群與設定')">
                     <span class="emoji">💬</span>
-                    <div class="title">社群與設定</div>
-                    <div class="desc">聊天功能限制、家長監護與社群規範。</div>
+                    <div class="title" data-i18n="topic_community">社群與設定</div>
+                    <div class="desc" data-i18n="desc_community">聊天功能限制、家長監護與社群規範。</div>
+                </div>
+                <div class="quick-card clickable" onclick="showPage('qa', '🆕 最新動態')">
+                    <span class="emoji">🆕</span>
+                    <div class="title" data-i18n="topic_latest">最新動態</div>
+                    <div class="desc" data-i18n="desc_latest">掌握 Roblox 最新的功能與平台更新。</div>
                 </div>
             </div>
         </div>
-        <div class="hero-version">v0.0.4 版本</div>
+        <div class="hero-version" data-i18n="version_text">v0.1.0 版本</div>
     </div>
 
-    <!-- 箱子 2：關於我們 (新頁面) -->
+    <!-- 箱子 2：關於我們 -->
     <div id="intro-page" class="page-section container">
-        <h2 style="color: #00ffcc; text-align: center;">關於 Leo Studio</h2>
-        <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">了解我們的故事與使命</p>
+        <h2 style="color: var(--accent); text-align: center;" data-i18n="intro_title">關於 Leo Studio</h2>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;" data-i18n="intro_subtitle">了解我們的故事與使命</p>
 
-        <div style="background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
-            <h3 style="color: #00ffcc; margin-bottom: 15px;">👋 哈囉！我們是 Leo Studio</h3>
-            <p style="line-height: 1.8; color: #d1d5db; margin-bottom: 15px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+            <h3 style="color: var(--accent); margin-bottom: 15px;" data-i18n="intro_h3">👋 哈囉！我們是 Leo Studio</h3>
+            <p style="line-height: 1.8; color: #d1d5db; margin-bottom: 15px;" data-i18n="intro_p1">
                 歡迎來到 Roblox 問答網！我們是一群熱愛 Roblox 的玩家與開發者，致力於整理最完整、最正確的 Roblox 知識庫。
             </p>
-            <p style="line-height: 1.8; color: #d1d5db; margin-bottom: 15px;">
+            <p style="line-height: 1.8; color: #d1d5db; margin-bottom: 15px;" data-i18n="intro_p2">
                 這裡包含了從基礎知識、帳號安全、Robux 變現、到開發技術的所有常見問題。我們的目標是讓每一位玩家都能輕鬆找到解答，不再為疑難雜症煩惱！
             </p>
-            <p style="line-height: 1.8; color: #d1d5db;">
+            <p style="line-height: 1.8; color: #d1d5db; margin-bottom: 20px;" data-i18n="intro_p3">
                 如果你喜歡這個網站，歡迎分享給你的朋友，一起加入 Roblox 的大家庭 🎉
             </p>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <p style="margin: 5px 0; color: var(--text-sub); font-size: 14px;" data-i18n="intro_contact_title">📬 聯絡我們：</p>
+                <p style="margin: 5px 0; color: #fff; font-size: 14px;">📧 作者 Gmail：<a href="mailto:cyc123456mo@gmail.com" style="color: var(--accent); text-decoration: none;">cyc123456mo@gmail.com</a></p>
+                <p style="margin: 5px 0; color: #fff; font-size: 14px;">🏢 工作室：Leo Studio</p>
+                <p style="margin: 5px 0; color: #fff; font-size: 14px;">📸 Instagram：<a href="https://www.instagram.com/roblox_leo_135" target="_blank" style="color: var(--accent); text-decoration: none;">@ROBLOX_LEO_135</a></p>
+                <p style="margin: 5px 0; color: #fff; font-size: 14px;">🎥 YouTube：<a href="https://youtube.com/@leo_roblox_en" target="_blank" style="color: var(--accent); text-decoration: none;">@Leo_Roblox_EN</a></p>
+            </div>
         </div>
 
         <div style="text-align: center;">
-            <button class="hero-btn clickable" onclick="showPage('qa')" style="font-size: 16px; padding: 12px 30px;">進入知識庫 🚀</button>
+            <button class="hero-btn clickable" onclick="showPage('qa')" style="font-size: 16px; padding: 12px 30px;" data-i18n="intro_btn">進入知識庫 🚀</button>
         </div>
     </div>
 
@@ -252,42 +318,43 @@
     <div id="qa-page" class="page-section container">
         <div class="qa-container">
             <div class="qa-main-content">
-                <h2 style="color: #00ffcc; text-align: center;">📚 Roblox 知識庫</h2>
+                <h2 style="color: var(--accent); text-align: center;" data-i18n="qa_title">📚 Roblox 知識庫</h2>
                 
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <input type="text" id="search-input" class="clickable" placeholder="🔍 快速搜尋標題或主題..." oninput="searchCards()">
-                    <button onclick="toggleAdvancedSearch()" class="clickable" style="background: #0b0f19; border: 1px solid #00ffcc; color: #00ffcc; padding: 0 15px; border-radius: 8px; white-space: nowrap;">⚙️ 進階搜尋</button>
+                    <button onclick="toggleAdvancedSearch()" class="clickable" style="background: var(--bg-color); border: 1px solid var(--accent); color: var(--accent); padding: 0 15px; border-radius: 8px; white-space: nowrap;" data-i18n="qa_adv_search">⚙️ 進階搜尋</button>
                 </div>
 
                 <div id="advanced-search-panel">
-                    <h4 style="color: #00ffcc; margin-top: 0; margin-bottom: 15px;">🔍 進階搜尋</h4>
+                    <h4 style="color: var(--accent); margin-top: 0; margin-bottom: 15px;" data-i18n="adv_title">🔍 進階搜尋</h4>
                     <div style="margin-bottom: 10px;">
-                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">選擇主題：</label>
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;" data-i18n="adv_topic_label">選擇主題：</label>
                         <select id="adv-topic" class="clickable" onchange="advancedSearch()">
-                            <option value="">全部主題</option>
-                            <option value="📘 基礎知識">📘 基礎知識</option>
-                            <option value="🔒 帳號與安全">🔒 帳號與安全</option>
-                            <option value="🪙 Robux 與變現">🪙 Robux 與變現</option>
-                            <option value="🎮 開發與技術">🎮 開發與技術</option>
-                            <option value="📱 平台支援">📱 平台支援</option>
-                            <option value="💬 社群與設定">💬 社群與設定</option>
+                            <option value="" data-i18n="topic_all">全部主題</option>
+                            <option value="📘 基礎知識" data-i18n="topic_basic">📘 基礎知識</option>
+                            <option value="🔒 帳號與安全" data-i18n="topic_security">🔒 帳號與安全</option>
+                            <option value="🪙 Robux 與變現" data-i18n="topic_robux">🪙 Robux 與變現</option>
+                            <option value="🎮 開發與技術" data-i18n="topic_dev">🎮 開發與技術</option>
+                            <option value="📱 平台支援" data-i18n="topic_platform">📱 平台支援</option>
+                            <option value="💬 社群與設定" data-i18n="topic_community">💬 社群與設定</option>
+                            <option value="🆕 最新動態" data-i18n="topic_latest">🆕 最新動態</option>
                         </select>
                     </div>
                     <div style="margin-bottom: 10px;">
-                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">包含所有字詞 (用空格分隔)：</label>
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;" data-i18n="adv_all_label">包含所有字詞 (用空格分隔)：</label>
                         <input type="text" id="adv-all" class="adv-input clickable" placeholder="例如：帳號 安全" oninput="advancedSearch()">
                     </div>
                     <div style="margin-bottom: 10px;">
-                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">與以下字詞或語句完全相符：</label>
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;" data-i18n="adv_exact_label">與以下字詞或語句完全相符：</label>
                         <input type="text" id="adv-exact" class="adv-input clickable" placeholder="例如：什麼是 Robux" oninput="advancedSearch()">
                     </div>
                     <div style="margin-bottom: 15px;">
-                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;">不包含以下字詞：</label>
+                        <label style="color: #aaa; font-size: 14px; display: block; margin-bottom: 5px;" data-i18n="adv_none_label">不包含以下字詞：</label>
                         <input type="text" id="adv-none" class="adv-input clickable" placeholder="例如：Premium" oninput="advancedSearch()">
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="advancedSearch()" class="clickable" style="background: #00ffcc; color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">搜尋</button>
-                        <button onclick="clearAdvancedSearch()" class="clickable" style="background: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px;">清除</button>
+                        <button onclick="advancedSearch()" class="clickable" style="background: var(--accent); color: #0b0f19; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;" data-i18n="adv_btn_search">搜尋</button>
+                        <button onclick="clearAdvancedSearch()" class="clickable" style="background: #ff5555; color: white; border: none; padding: 10px 20px; border-radius: 5px;" data-i18n="adv_btn_clear">清除</button>
                     </div>
                 </div>
 
@@ -297,69 +364,65 @@
         </div>
     </div>
 
-    <!-- 箱子 4：更新日誌 -->
-    <div id="changelog-page" class="page-section container">
-        <h2 style="color: #00ffcc; text-align: center;">📜 網站更新日誌</h2>
-        <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">記錄著這個網站一路以來的成長</p>
+    <!-- 箱子 4：遊戲搜尋 -->
+    <div id="game-search-page" class="page-section container">
+        <h2 style="color: var(--accent); text-align: center;" data-i18n="game_title">🎮 Roblox 遊戲搜尋</h2>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;" data-i18n="game_subtitle">輸入遊戲名稱，查看最新數據</p>
+        
+        <div class="search-box-lg">
+            <input type="text" id="game-search-input" placeholder="輸入遊戲名稱 (例如：Adopt Me)" class="clickable">
+            <button onclick="searchGame()" class="clickable" data-i18n="game_btn">搜尋</button>
+        </div>
+        
+        <div id="game-results"></div>
+    </div>
 
-        <div class="log-item">
-            <div class="log-version">v0.0.4 - 關於頁面與品牌建立 <span class="log-tag">當前版本</span></div>
-            <div class="log-date">📅 2026-10-04</div>
-            <div class="log-content">
-                <ul>
-                    <li>✅ 新增「關於我們」頁面，介紹 Leo Studio 與網站使命</li>
-                    <li>✅ 首頁「開始探索」按鈕改為跳轉至介紹頁面</li>
-                    <li>✅ 側邊選單「關於我們」正式啟用，不再彈出施工中視窗</li>
-                </ul>
-                <button class="log-btn clickable" onclick="showPage('home')">🚀 回首頁看看</button>
-            </div>
+    <!-- 箱子 5：更新日誌 -->
+    <div id="changelog-page" class="page-section container">
+        <h2 style="color: var(--accent); text-align: center;" data-i18n="log_title">📜 網站更新日誌</h2>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;" data-i18n="log_subtitle">記錄著這個網站一路以來的成長</p>
+
+        <div class="log-filter">
+            <button class="clickable active" onclick="filterLog('all', this)" data-i18n="log_filter_all">全部</button>
+            <button class="clickable" onclick="filterLog('major', this)" data-i18n="log_filter_major">🚀 大型更新</button>
+            <button class="clickable" onclick="filterLog('feature', this)" data-i18n="log_filter_feature">✨ 新功能</button>
+            <button class="clickable" onclick="filterLog('minor', this)" data-i18n="log_filter_minor">🔧 小型更新</button>
+            <button class="clickable" onclick="filterLog('bug', this)" data-i18n="log_filter_bug">🐛 Bug修復</button>
         </div>
 
-        <div class="log-item">
-            <div class="log-version">v0.0.3 - 設定與載入優化 <span class="log-tag">重要更新</span></div>
-            <div class="log-date">📅 2026-10-04</div>
-            <div class="log-content">
-                <ul>
-                    <li>✅ 載入畫面新增「跳過」按鈕與「載入成功」提示</li>
-                    <li>✅ 三橫選單新增「⚙️ 設定」頁面</li>
-                    <li>✅ 設定頁面可開關載入動畫</li>
-                    <li>✅ 設定頁面可更換背景顏色，並自動儲存偏好</li>
-                </ul>
-            </div>
+        <div id="log-list">
+            <!-- 由 JS 動態生成 -->
         </div>
     </div>
 
-    <!-- 箱子 5：設定頁面 -->
+    <!-- 箱子 6：設定頁面 -->
     <div id="settings-page" class="page-section container">
-        <h2 style="color: #00ffcc; text-align: center;">⚙️ 網站設定</h2>
-        <p style="text-align: center; color: #9ca3af; margin-bottom: 30px;">調整你的個人化偏好</p>
+        <h2 style="color: var(--accent); text-align: center;" data-i18n="settings_title">⚙️ 網站設定</h2>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;" data-i18n="settings_subtitle">調整你的個人化偏好</p>
 
         <div class="settings-card">
-            <h3>🎬 載入動畫</h3>
+            <h3 data-i18n="settings_loader_title">🎬 載入動畫</h3>
             <div class="settings-row">
-                <label>開啟載入動畫</label>
+                <label data-i18n="settings_loader_label">開啟載入動畫</label>
                 <label class="switch">
                     <input type="checkbox" id="setting-loader" onchange="toggleLoaderSetting(this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
-            <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">關閉後，重新整理網頁將直接進入網站，不再顯示載入畫面。</p>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 10px;" data-i18n="settings_loader_desc">關閉後，重新整理網頁將直接進入網站，不再顯示載入畫面。</p>
         </div>
 
         <div class="settings-card">
-            <h3>🎨 背景顏色</h3>
+            <h3 data-i18n="settings_bg_title">🎨 背景顏色</h3>
             <div class="color-options">
                 <div class="color-box clickable active" style="background: #0b0f19;" onclick="changeBgTheme('#0b0f19', this)"></div>
                 <div class="color-box clickable" style="background: #1a0b19;" onclick="changeBgTheme('#1a0b19', this)"></div>
                 <div class="color-box clickable" style="background: #0b191a;" onclick="changeBgTheme('#0b191a', this)"></div>
                 <div class="color-box clickable" style="background: #191a0b;" onclick="changeBgTheme('#191a0b', this)"></div>
             </div>
-            <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">選擇一個你喜歡的背景顏色，設定會自動儲存。</p>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 10px;" data-i18n="settings_bg_desc">選擇一個你喜歡的背景顏色，設定會自動儲存。</p>
         </div>
     </div>
-
-    <!-- 管理員觸發按鈕 -->
-    <div id="admin-btn" class="clickable" style="position: fixed; bottom: 20px; right: 20px; font-size: 30px; z-index: 10001; display: none;">⚙️</div>
 
     <!-- ================= 管理員後台 ================= -->
     <div id="admin-dashboard">
@@ -369,63 +432,127 @@
         </div>
         <div class="admin-body">
             <div class="admin-sidebar">
-                <div class="clickable active" onclick="switchAdminPage('dashboard')">📊 儀表板</div>
-                <div class="clickable" onclick="switchAdminPage('users')">👥 用戶管理</div>
-                <div class="clickable" onclick="switchAdminPage('add-card')">➕ 新增問答</div>
-                <div class="clickable" onclick="switchAdminPage('manage-cards')">📝 管理問答</div>
+                <div class="clickable active" onclick="switchAdminPage('dashboard')" data-i18n="admin_sidebar_dash">📊 儀表板</div>
+                <div class="clickable" onclick="switchAdminPage('users')" data-i18n="admin_sidebar_users">👥 用戶管理</div>
+                <div class="clickable" onclick="switchAdminPage('comments')" data-i18n="admin_sidebar_comments">💬 留言管理</div>
+                <div class="clickable" onclick="switchAdminPage('announce')" data-i18n="admin_sidebar_announce">📢 公告管理</div>
+                <div class="clickable" onclick="switchAdminPage('add-card')" data-i18n="admin_sidebar_addcard">➕ 新增問答</div>
+                <div class="clickable" onclick="switchAdminPage('manage-cards')" data-i18n="admin_sidebar_manage">📝 管理問答</div>
+                <div class="clickable" onclick="switchAdminPage('banned')" data-i18n="admin_sidebar_banned">🚫 封禁名單</div>
+                <div class="clickable" onclick="switchAdminPage('settings')" data-i18n="admin_sidebar_settings">⚙️ 系統設置</div>
             </div>
             <div class="admin-content">
+                <!-- 儀表板 -->
                 <div id="admin-page-dashboard">
-                    <h3 style="color: #00ffcc; margin-top: 0;">📊 數據總覽</h3>
+                    <h3 style="color: var(--accent); margin-top: 0;">📊 數據總覽</h3>
                     <div class="stats-grid">
                         <div class="stat-card"><div class="label">📝 帖子數</div><div class="number" id="stat-posts">0</div></div>
-                        <div class="stat-card"><div class="label">🟢 在線人數</div><div class="number">32</div></div>
-                        <div class="stat-card"><div class="label">👥 會員數</div><div class="number">8,520</div></div>
-                        <div class="stat-card"><div class="label">📁 附件數</div><div class="number">5,692</div></div>
+                        <div class="stat-card"><div class="label">🟢 在線人數</div><div class="number" id="stat-online">1</div></div>
+                        <div class="stat-card"><div class="label">👥 會員數</div><div class="number" id="stat-users">1</div></div>
+                        <div class="stat-card"><div class="label">💬 總留言數</div><div class="number" id="stat-comments">0</div></div>
+                        <div class="stat-card"><div class="label">🚫 封禁數</div><div class="number" id="stat-bans">0</div></div>
                     </div>
                 </div>
+
+                <!-- 用戶管理 -->
                 <div id="admin-page-users" style="display: none;">
-                    <h3 style="color: #00ffcc; margin-top: 0;">👥 用戶列表</h3>
-                    <table class="admin-table">
-                        <thead><tr><th>用戶名</th><th>用戶組</th><th>狀態</th><th>操作</th></tr></thead>
-                        <tbody>
-                            <tr><td>leoreoroblox</td><td style="color: #ff5555;">管理員</td><td>🟢 在線</td><td><button class="clickable" style="background: #ff5555; border: none; color: white; padding: 5px 10px; border-radius: 3px;">封禁</button></td></tr>
-                            <tr><td>RobloxFan123</td><td style="color: #00ffcc;">版主</td><td>🟢 在線</td><td><button class="clickable" style="background: #ff5555; border: none; color: white; padding: 5px 10px; border-radius: 3px;">封禁</button></td></tr>
-                        </tbody>
+                    <h3 style="color: var(--accent); margin-top: 0;">👥 用戶管理</h3>
+                    <div class="form-group" style="display: flex; gap: 10px;">
+                        <input type="text" id="search-uid" placeholder="輸入 UID 或用戶名搜尋..." style="flex: 1;">
+                        <button class="btn-submit clickable" onclick="searchUser()">🔍 搜尋</button>
+                    </div>
+                    <div id="user-search-result"></div>
+                    <table class="admin-table" id="user-table">
+                        <thead><tr><th>UID</th><th>用戶名</th><th>用戶組</th><th>狀態</th><th>操作</th></tr></thead>
+                        <tbody id="user-table-body"></tbody>
                     </table>
                 </div>
+
+                <!-- 留言管理 -->
+                <div id="admin-page-comments" style="display: none;">
+                    <h3 style="color: var(--accent); margin-top: 0;">💬 留言管理</h3>
+                    <div id="admin-comment-list"></div>
+                </div>
+
+                <!-- 公告管理 -->
+                <div id="admin-page-announce" style="display: none;">
+                    <h3 style="color: var(--accent); margin-top: 0;">📢 全站公告管理</h3>
+                    <div class="form-group">
+                        <label>公告內容</label>
+                        <input type="text" id="announce-text" placeholder="輸入要發送的公告...">
+                    </div>
+                    <button class="btn-submit clickable" onclick="sendAnnouncement()">🚀 發布公告</button>
+                    <button class="btn-submit clickable" style="background: #ff5555; margin-left: 10px;" onclick="clearAnnouncement()">🗑️ 清除公告</button>
+                    
+                    <h4 style="color: var(--accent); margin-top: 30px;">📜 歷史公告記錄</h4>
+                    <div id="announce-history"></div>
+                </div>
+
+                <!-- 新增問答 -->
                 <div id="admin-page-add-card" style="display: none;">
-                    <h3 style="color: #00ffcc; margin-top: 0;">➕ 新增問答卡片</h3>
+                    <h3 style="color: var(--accent); margin-top: 0;">➕ 新增問答卡片</h3>
                     <div class="form-group">
                         <label>標題</label>
-                        <input type="text" id="new-title" class="clickable" placeholder="例如：什麼是 Robux？">
+                        <input type="text" id="new-title" placeholder="例如：什麼是 Robux？">
                     </div>
                     <div class="form-group">
                         <label>主題分類</label>
-                        <select id="new-topic" class="clickable">
+                        <select id="new-topic">
                             <option value="📘 基礎知識">📘 基礎知識</option>
                             <option value="🔒 帳號與安全">🔒 帳號與安全</option>
                             <option value="🪙 Robux 與變現">🪙 Robux 與變現</option>
                             <option value="🎮 開發與技術">🎮 開發與技術</option>
                             <option value="📱 平台支援">📱 平台支援</option>
                             <option value="💬 社群與設定">💬 社群與設定</option>
+                            <option value="🆕 最新動態">🆕 最新動態</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>內容</label>
-                        <textarea id="new-content" class="clickable" rows="5" placeholder="輸入問答內容..."></textarea>
+                        <textarea id="new-content" rows="5" placeholder="輸入問答內容..."></textarea>
                     </div>
                     <button class="btn-submit clickable" onclick="addNewCard()">發布卡片</button>
                 </div>
+
+                <!-- 管理問答 -->
                 <div id="admin-page-manage-cards" style="display: none;">
-                    <h3 style="color: #00ffcc; margin-top: 0;">📝 管理問答</h3>
+                    <h3 style="color: var(--accent); margin-top: 0;">📝 管理問答</h3>
                     <div id="manage-cards-list"></div>
+                </div>
+
+                <!-- 封禁名單 -->
+                <div id="admin-page-banned" style="display: none;">
+                    <h3 style="color: var(--accent); margin-top: 0;">🚫 封禁名單</h3>
+                    <table class="admin-table">
+                        <thead><tr><th>UID</th><th>用戶名</th><th>原因</th><th>類型</th><th>操作</th></tr></thead>
+                        <tbody id="banned-table-body"></tbody>
+                    </table>
+                </div>
+
+                <!-- 系統設置 -->
+                <div id="admin-page-settings" style="display: none;">
+                    <h3 style="color: var(--accent); margin-top: 0;">⚙️ 系統設置</h3>
+                    <div class="form-group">
+                        <label>終極管理員 OP 按鈕（全站維護模式）</label>
+                        <input type="text" id="op-message-input" placeholder="例如：網站維護中，預計 10 分鐘後回來">
+                        <button class="btn-submit clickable" style="background: #ff5555; margin-top: 10px;" onclick="triggerOP()">🛑 啟動全站維護</button>
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>數據備份與匯出</label>
+                        <button class="btn-submit clickable" onclick="exportData()">📥 匯出所有數據 (JSON)</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 右下角用戶資訊卡片 -->
+    <!-- OP 維護遮罩 -->
+    <div id="op-overlay">
+        <div id="op-message">網站維護中...</div>
+        <div id="op-countdown">10:00</div>
+    </div>
+
+    <!-- 右下角用戶資訊 -->
     <div id="user-info">
         <span id="close-btn" class="clickable">✖</span>
         <div style="margin-bottom: 5px;">📱 設備：<span id="device-type">偵測中...</span></div>
@@ -433,11 +560,74 @@
         <div>🌐 IP：<span id="user-ip">偵測中...</span></div>
     </div>
 
-    <!-- 所有魔法 -->
+    <!-- ================= 核心 JavaScript ================= -->
     <script>
-        // ================= 資料庫 =================
-        const currentVersion = 'v0.0.4';
+        // ================= 1. 多語言資料庫 =================
+        const translations = {
+            zh: {
+                menu_title: "📋 功能選單", menu_home: "🏠 首頁", menu_qa: "📚 問答卡片", 
+                menu_game_search: "🎮 遊戲搜尋", menu_changelog: "📜 更新日誌", menu_settings: "⚙️ 設定", menu_intro: "ℹ️ 關於我們", menu_lang: "🌐 語言：", menu_admin: "👑 管理後台",
+                topic_basic: "📘 基礎知識", topic_security: "🔒 帳號與安全", topic_robux: "🪙 Robux 與變現", topic_dev: "🎮 開發與技術", topic_platform: "📱 平台支援", topic_community: "💬 社群與設定", topic_latest: "🆕 最新動態", topic_all: "全部主題",
+                desc_basic: "Roblox 是什麼？Experience 和 Game 差在哪？", desc_security: "被盜怎麼辦？教你如何保護自己的帳號。", desc_robux: "合法的 Robux 獲取方式與創作者收益解析。", desc_community: "聊天功能限制、家長監護與社群規範。", desc_latest: "掌握 Roblox 最新的功能與平台更新。",
+                home_title: "Roblox 知識庫", home_subtitle: "你在 Roblox 遇到的疑難雜症，這裡通通有答案！<br>無論是帳號安全、Robux 變現，還是開發技術，我們都幫你整理好了。", home_btn: "🚀 開始探索", version_text: "v0.1.0 版本",
+                intro_title: "關於 Leo Studio", intro_subtitle: "了解我們的故事與使命", intro_h3: "👋 哈囉！我們是 Leo Studio",
+                intro_p1: "歡迎來到 Roblox 問答網！我們是一群熱愛 Roblox 的玩家與開發者，致力於整理最完整、最正確的 Roblox 知識庫。",
+                intro_p2: "這裡包含了從基礎知識、帳號安全、Robux 變現、到開發技術的所有常見問題。我們的目標是讓每一位玩家都能輕鬆找到解答，不再為疑難雜症煩惱！",
+                intro_p3: "如果你喜歡這個網站，歡迎分享給你的朋友，一起加入 Roblox 的大家庭 🎉",
+                intro_contact_title: "📬 聯絡我們：", intro_btn: "進入知識庫 🚀",
+                qa_title: "📚 Roblox 知識庫", qa_adv_search: "⚙️ 進階搜尋", adv_title: "🔍 進階搜尋", adv_topic_label: "選擇主題：", adv_all_label: "包含所有字詞 (用空格分隔)：", adv_exact_label: "與以下字詞或語句完全相符：", adv_none_label: "不包含以下字詞：", adv_btn_search: "搜尋", adv_btn_clear: "清除",
+                game_title: "🎮 Roblox 遊戲搜尋", game_subtitle: "輸入遊戲名稱，查看最新數據", game_btn: "搜尋",
+                log_title: "📜 網站更新日誌", log_subtitle: "記錄著這個網站一路以來的成長", log_filter_all: "全部", log_filter_major: "🚀 大型更新", log_filter_feature: "✨ 新功能", log_filter_minor: "🔧 小型更新", log_filter_bug: "🐛 Bug修復",
+                settings_title: "⚙️ 網站設定", settings_subtitle: "調整你的個人化偏好", settings_loader_title: "🎬 載入動畫", settings_loader_label: "開啟載入動畫", settings_loader_desc: "關閉後，重新整理網頁將直接進入網站，不再顯示載入畫面。", settings_bg_title: "🎨 背景顏色", settings_bg_desc: "選擇一個你喜歡的背景顏色，設定會自動儲存。",
+                admin_sidebar_dash: "📊 儀表板", admin_sidebar_users: "👥 用戶管理", admin_sidebar_comments: "💬 留言管理", admin_sidebar_announce: "📢 公告管理", admin_sidebar_addcard: "➕ 新增問答", admin_sidebar_manage: "📝 管理問答", admin_sidebar_banned: "🚫 封禁名單", admin_sidebar_settings: "⚙️ 系統設置"
+            },
+            en: {
+                menu_title: "📋 Menu", menu_home: "🏠 Home", menu_qa: "📚 Q&A Cards", 
+                menu_game_search: "🎮 Game Search", menu_changelog: "📜 Changelog", menu_settings: "⚙️ Settings", menu_intro: "ℹ️ About Us", menu_lang: "🌐 Language:", menu_admin: "👑 Admin Panel",
+                topic_basic: "📘 Basics", topic_security: "🔒 Account & Security", topic_robux: "🪙 Robux & Monetization", topic_dev: "🎮 Development", topic_platform: "📱 Platforms", topic_community: "💬 Community & Settings", topic_latest: "🆕 Latest News", topic_all: "All Topics",
+                desc_basic: "What is Roblox? Experience vs Game?", desc_security: "How to protect your account from being hacked.", desc_robux: "Legal ways to get Robux and creator earnings.", desc_community: "Chat restrictions, parental controls, and rules.", desc_latest: "Latest Roblox features and platform updates.",
+                home_title: "Roblox Knowledge Base", home_subtitle: "Find answers to all your Roblox questions!<br>From account security to Robux and development.", home_btn: "🚀 Explore Now", version_text: "v0.1.0 Version",
+                intro_title: "About Leo Studio", intro_subtitle: "Our Story and Mission", intro_h3: "👋 Hello! We are Leo Studio",
+                intro_p1: "Welcome to Roblox FAQ! We are a group of passionate Roblox players and developers.",
+                intro_p2: "This site covers basics, account security, Robux, and development. Our goal is to help every player find answers easily.",
+                intro_p3: "If you like this site, share it with your friends! 🎉",
+                intro_contact_title: "📬 Contact Us:", intro_btn: "Enter Knowledge Base 🚀",
+                qa_title: "📚 Roblox Knowledge Base", qa_adv_search: "⚙️ Advanced Search", adv_title: "🔍 Advanced Search", adv_topic_label: "Select Topic:", adv_all_label: "Containing all words:", adv_exact_label: "Exact phrase:", adv_none_label: "Not containing:", adv_btn_search: "Search", adv_btn_clear: "Clear",
+                game_title: "🎮 Roblox Game Search", game_subtitle: "Enter a game name to see stats", game_btn: "Search",
+                log_title: "📜 Changelog", log_subtitle: "The growth of this website", log_filter_all: "All", log_filter_major: "🚀 Major", log_filter_feature: "✨ Feature", log_filter_minor: "🔧 Minor", log_filter_bug: "🐛 Bugfix",
+                settings_title: "⚙️ Settings", settings_subtitle: "Personalize your experience", settings_loader_title: "🎬 Loading Animation", settings_loader_label: "Enable Loading Animation", settings_loader_desc: "If disabled, the site loads immediately on refresh.", settings_bg_title: "🎨 Background Color", settings_bg_desc: "Choose a background color, it saves automatically.",
+                admin_sidebar_dash: "📊 Dashboard", admin_sidebar_users: "👥 User Management", admin_sidebar_comments: "💬 Comment Management", admin_sidebar_announce: "📢 Announcements", admin_sidebar_addcard: "➕ Add Q&A", admin_sidebar_manage: "📝 Manage Q&A", admin_sidebar_banned: "🚫 Banned List", admin_sidebar_settings: "⚙️ System Settings"
+            }
+        };
+
+        let currentLang = localStorage.getItem('siteLang') || 'zh';
+        
+        function applyLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            document.getElementById('lang-select').value = lang;
+            // 更新公告欄文字
+            const announceBar = document.getElementById('announcement-bar');
+            if (announceBar.style.display === 'block') {
+                // 保持公告內容不變，但這裡可以根據語言切換預設公告
+            }
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('siteLang', lang);
+            applyLanguage(lang);
+            // 重新渲染卡片以更新分類標籤（如果需要的話）
+        }
+
+        // ================= 2. 資料庫與卡片資料 =================
+        const currentVersion = 'v0.1.0';
         const defaultCards = [
+            // 📘 基礎知識
             { title: "什麼是 Roblox？", topic: "📘 基礎知識", content: "Roblox 是一個提供使用者遊玩、建立和發布互動式 3D Experience 的線上平台。使用者可以是玩家，也可以建立 Experience、Avatar 物品等內容。" },
             { title: "什麼是 Experience？", topic: "📘 基礎知識", content: "Experience 是 Roblox 平台上的可遊玩互動內容，玩家可以加入並進行遊戲活動。一個 Experience 可以包含一個或多個 Place（具體的 3D 世界）。" },
             { title: "玩家、開發者和創作者的區別？", topic: "📘 基礎知識", content: "玩家主要遊玩內容；開發者主要使用 Roblox Studio、Luau 等工具建立技術內容；創作者是更廣泛的內容製作者，包含開發者、Avatar 物品創作者等。玩家也可以同時成為創作者！" },
@@ -445,6 +635,7 @@
             { title: "什麼是 Avatar？", topic: "📘 基礎知識", content: "Avatar 是玩家在 Roblox 中使用的虛擬角色外觀，可以使用身體、衣服、配件、動畫等內容。玩家可以透過 Avatar Editor 調整外觀。" },
             { title: "什麼是 Robux？", topic: "📘 基礎知識", content: "Robux 是 Roblox 平台使用的虛擬貨幣。可以用於購買符合條件的 Avatar 物品、Experience 內的付費內容等。合法的獲取方式包括官方購買、Gift Card，以及符合條件的創作者收益。" },
             { title: "什麼是 Roblox Premium？", topic: "📘 基礎知識", content: "Roblox Premium 是 Roblox 的訂閱會員服務。官方已宣布在 2026 年出現重大變更，2026-04-30 起不再提供新的購買；既有訂閱者可能維持訂閱，福利也有所調整。舊版福利不可視為目前福利。" },
+            // 🔒 帳號與安全
             { title: "如何建立 Roblox 帳號？", topic: "🔒 帳號與安全", content: "建立帳號時需要提供 Roblox 要求的基本資料。建議使用本人可控制的電子郵件及安全的密碼。開啟 Roblox 官方網站或 App，選擇註冊，按照官方要求輸入資料，完成後按需要驗證電子郵件。" },
             { title: "忘記 Roblox 密碼怎麼辦？", topic: "🔒 帳號與安全", content: "可以使用 Roblox 官方 Account Recovery 功能重設密碼。使用帳號關聯的電子郵件進行恢復，某些帳號也可以使用已關聯的電話號碼。如果沒有可用的恢復方式，需要聯絡 Roblox Customer Support。不要把重設連結或驗證碼提供給其他人。" },
             { title: "Roblox 帳號被盜怎麼辦？", topic: "🔒 帳號與安全", content: "如果其他人未經授權取得帳號控制權，應優先清除可能的惡意軟體，使用官方帳號恢復流程。立即重設密碼，啟用 2-Step Verification (2SV)，如果無法自行恢復，應聯絡 Roblox Support。Roblox 不保證所有被盜物品都能恢復。" },
@@ -452,22 +643,26 @@
             { title: "Roblox 常見詐騙手法？", topic: "🔒 帳號與安全", content: "常見詐騙通常利用虛假的 Robux、物品、交易、贈品或帳號服務，誘導玩家提供帳號資訊或付款。「免費大量 Robux」是常見手法。可疑網站可能偽裝成 Roblox 登入頁面。官方不會要求玩家把密碼或驗證碼交給其他玩家。" },
             { title: "免費 Robux 網站是否可信？", topic: "🔒 帳號與安全", content: "聲稱可以透過第三方網站免費產生大量 Robux 的服務通常不應被視為 Roblox 官方 Robux 取得方式。不存在應由官方宣稱的「Robux Generator」。不應輸入 Roblox 密碼、驗證碼或帳號 Cookie，也不應下載聲稱可以產生 Robux 的不明程式。" },
             { title: "如何舉報 Roblox 違規玩家？", topic: "🔒 帳號與安全", content: "最好直接舉報具體違規的 Chat、Private Message、Experience 或其他內容。單純舉報玩家 Profile 可能無法讓審核人員看到具體違規行為。開啟 Roblox 的 Report Abuse 功能，選擇具體違規內容或玩家，選擇適當原因，提供必要的簡短說明，提交舉報。" },
+            // 🪙 Robux 與變現
             { title: "Robux 可以做什麼？", topic: "🪙 Robux 與變現", content: "可用於購買符合條件的 Avatar 物品。可用於 Experience 內的部分付費內容。可用於部分 Pass、Developer Product、Private Server 等。具體價格由 Roblox 或創作者設定，可能改變。" },
             { title: "Robux 的合法取得方式？", topic: "🪙 Robux 與變現", content: "玩家可以透過 Roblox 官方支援的購買方式取得 Robux。Roblox Gift Card 可以兌換 Roblox Credit 或符合卡片規則的內容。創作者可以透過符合條件的創作活動取得 Earned Robux。不應把第三方交易視為 Roblox 官方方式，也不應聲稱存在「秘密免費 Robux 方法」。" },
             { title: "Roblox Gift Card 是什麼？", topic: "🪙 Robux 與變現", content: "Roblox Gift Card 是 Roblox 官方支援的禮品卡。可以透過 Roblox 官方兌換頁面兌換。多數裝置需要使用網頁瀏覽器兌換。Gift Card 並不等同於免費 Robux。前往官方兌換頁面，登入帳號，輸入卡片代碼，選擇 Redeem，確認兌換結果。" },
             { title: "Experience Pass 是什麼？", topic: "🪙 Robux 與變現", content: "Pass 是 Experience 的一次性付費產品，可以提供永久性或特殊權限。例如特殊區域、永久能力或其他 Experience 內福利。Pass 通常與 Developer Product 不同，一般設計為一次購買。" },
             { title: "Developer Product 是什麼？", topic: "🪙 Robux 與變現", content: "Developer Product 是 Experience 內可以重複購買的產品。常見用途包括遊戲貨幣、消耗品和可重複購買能力。與一次性 Pass 不同。開發者必須正確處理購買收據。" },
+            // 🎮 開發與技術
             { title: "玩家資料保存的基本概念？", topic: "🎮 開發與技術", content: "Roblox Experience 可以使用 DataStoreService 保存跨伺服器、跨遊戲工作階段的玩家資料。可保存玩家背包、技能點等持久資料。DataStore 由伺服器端 Script 使用。LocalScript 不能直接存取 DataStore。Studio 測試 DataStore 時需要特別注意不要操作正式資料。" },
             { title: "Script、LocalScript、ModuleScript 的區別？", topic: "🎮 開發與技術", content: "三者都是 Roblox 中的程式腳本類型，但執行方式和用途不同。Script 通常用於伺服器端邏輯。LocalScript 用於客戶端邏輯。ModuleScript 用於建立可重用的程式模組。ModuleScript 的同一側 require() 可以共享其返回結果。" },
             { title: "RemoteEvent 是什麼？", topic: "🎮 開發與技術", content: "RemoteEvent 用於客戶端與伺服器之間進行非同步、單向事件通訊。Client 可以傳送事件給 Server。Server 可以傳送事件給 Client。常放在 ReplicatedStorage，讓兩端都可以存取。Server 不應盲目信任 Client 傳來的資料。" },
             { title: "RemoteFunction 是什麼？", topic: "🎮 開發與技術", content: "RemoteFunction 用於客戶端和伺服器之間進行同步、雙向請求和回應。呼叫端會等待對方返回結果。Client 可以 InvokeServer。Server 可以 InvokeClient。如果不需要等待返回值，通常可以考慮使用 RemoteEvent。" },
             { title: "Roblox Client / Server 模型？", topic: "🎮 開發與技術", content: "Roblox Experience 使用客戶端和伺服器共同運作的架構。Client 負責玩家裝置上的部分顯示和輸入。Server 負責多人遊戲中的權威遊戲狀態。Client 與 Server 可以透過 RemoteEvent 和 RemoteFunction 通訊。不應把重要安全判斷完全交給 Client。" },
+            // 📱 平台支援
             { title: "Roblox 支援 Windows 嗎？", topic: "📱 平台支援", content: "Windows 是 Roblox 支援的桌面平台之一。官方目前列出的要求包括 64-bit Windows 10 或 Windows 11。PC 網站支援 Chrome、Firefox 和 Microsoft Edge。Roblox PC App 的具體要求可能更新。" },
             { title: "Roblox 支援 macOS 嗎？", topic: "📱 平台支援", content: "macOS 是 Roblox 支援的桌面平台。官方目前資料列出 macOS 10.13 High Sierra 或更高版本。Mac 網站支援 Chrome、Firefox 和 Safari。新版本 macOS 的支援狀態可能更新。" },
             { title: "Roblox 支援手機嗎？", topic: "📱 平台支援", content: "Roblox 可以在支援的 iOS 和 Android 行動裝置上使用。行動裝置的效能和可用功能取決於裝置及 Roblox 當時的要求。行動版介面與電腦版不同。某些功能可能因裝置或地區而不同。" },
             { title: "Roblox 支援 Xbox 嗎？", topic: "📱 平台支援", content: "Xbox 是 Roblox 支援的平台之一。Xbox 上的 Roblox 介面和輸入方式與 PC、手機不同。功能支援可能因 Roblox 更新而變化。不應假設 PC 的所有功能都能在 Xbox 使用。" },
             { title: "Roblox 支援 PlayStation 嗎？", topic: "📱 平台支援", content: "PlayStation 是 Roblox 支援的平台之一。PlayStation 使用主機控制器操作。某些 Roblox 功能可能與 PC/手機存在差異。Experience 必須支援相應平台才能正常遊玩。" },
             { title: "Roblox 支援 ChromeOS 嗎？", topic: "📱 平台支援", content: "ChromeOS 裝置可以在符合 Roblox 官方要求的情況下使用 Roblox。官方目前資料要求 ChromeOS 53 或更高版本。需要先啟用 Google Play Store。ChromeOS 的功能與 Windows/macOS 不完全相同。" },
+            // 💬 社群與設定
             { title: "什麼是 Roblox Friends？", topic: "💬 社群與設定", content: "Friends 是 Roblox 中玩家建立的社交連結。屬於 Roblox 社交系統。社交和聊天功能受到年齡、安全及地區政策影響。不能假設所有帳號都具有完全相同的社交功能。" },
             { title: "什麼是 Roblox Groups/Communities？", topic: "💬 社群與設定", content: "Roblox 的群組或社群功能可以讓玩家圍繞共同主題建立組織及管理角色。可以有不同角色和權限。管理權限取決於 Roblox 的權限系統及群組設定。不應假設所有角色都有發布、編輯或管理 Experience 的權限。" },
             { title: "Roblox Voice Chat 是什麼？", topic: "💬 社群與設定", content: "Voice Chat 是 Roblox 的語音通訊功能。官方目前要求符合條件的 13+ 使用者完成 age check，必須位於支援地區，且 Voice Chat 必須由 Experience 支援。Voice Chat 非所有帳號預設啟用。Phone verification 已不是取得 Voice Chat 的有效方法。" },
@@ -475,7 +670,14 @@
             { title: "什麼是 Roblox 家長監護？", topic: "💬 社群與設定", content: "Roblox Parental Controls 是家長管理兒童帳號使用方式的官方功能。可以管理內容成熟度、部分聊天和通訊設定、遊戲存取限制、每月消費限制。家長帳號可以與兒童帳號建立連結。" },
             { title: "Roblox 的社群規範是什麼？", topic: "💬 社群與設定", content: "Community Standards 是 Roblox 對平台內容和使用者行為制定的官方規範。涉及安全、欺詐、騷擾、個人資料等多個領域。玩家和創作者都需要遵守。社群習慣不能取代官方 Community Standards。" },
             { title: "Roblox 的帳號處罰有哪些？", topic: "💬 社群與設定", content: "這些詞通常指 Roblox 對帳號或內容採取的不同程度處分。Warning 是一種平台處置。Timeout、Suspension 等可能限制帳號使用。更嚴重的帳號處分可能導致較長時間或其他限制。實際處分名稱、期限及適用情況應以 Roblox 當時的官方通知為準。" },
-            { title: "如何申訴 Roblox Moderation？", topic: "💬 社群與設定", content: "如果 Roblox 對帳號或內容作出 Moderation Decision，符合條件的使用者可以透過官方申訴流程要求重新審核。Roblox 的 Appeals team 可以重新查看部分處分。申訴不保證處分一定會被取消。官方資料指出部分申訴有 30 天限制。" }
+            { title: "如何申訴 Roblox Moderation？", topic: "💬 社群與設定", content: "如果 Roblox 對帳號或內容作出 Moderation Decision，符合條件的使用者可以透過官方申訴流程要求重新審核。Roblox 的 Appeals team 可以重新查看部分處分。申訴不保證處分一定會被取消。官方資料指出部分申訴有 30 天限制。" },
+            // 🆕 最新動態 (2026 更新)
+            { title: "RDC 2026 重大發表", topic: "🆕 最新動態", content: "Roblox 在 RDC 2026 宣布了多項重大更新，包括「Play Roblox Everywhere」讓遊戲可發布為獨立應用、網頁直接遊玩、離線模式、2D 遊戲支援、Roblox Reality 影片世界模型，以及 Roblox Wallet 支付系統。" },
+            { title: "AI 遊戲創作工具 Build", topic: "🆕 最新動態", content: "Roblox 推出 AI 遊戲創作工具 Build，用戶可用自然語言描述來生成遊戲。從紐西蘭擴展至塞爾維亞和新加坡，並增加桌面端支持。今年晚些時候將加入基於提示詞的場景生成功能。" },
+            { title: "2026 春季創作者路線圖", topic: "🆕 最新動態", content: "Roblox 發布 2026 春季路線圖，完成 52 項功能上線，新增 21 項開發規劃。重點聚焦引擎能力（4K 紋理渲染、實時聲學模擬）、AI 創作助手、虛擬形象（R15 全身動畫）。同時加碼克隆遊戲治理。" },
+            { title: "安全政策與年齡驗證更新", topic: "🆕 最新動態", content: "Roblox 推出 Roblox Kids 和 Roblox Select 年齡專屬賬號。聊天功能需通過年齡檢查，且僅限同年齡段用戶交流。家長控制功能增強，可阻止遊戲和管理私信直到孩子年滿 16 歲。" },
+            { title: "開發者 API 與 Luau 更新", topic: "🆕 最新動態", content: "Luau 語言新增 pcall 和 xpcall 在用戶定義類型函數中的使用。新增 ViewportCamera 實例類型。NPC 能力增強：今年晚些時候將加入可自動進行遊戲測試的 NPC，幫助創作者發現問題。" },
+            { title: "Roblox 2026 使用條款更新", topic: "🆕 最新動態", content: "2026 年 4 月 30 日起生效的新使用條款，簡化了 AI 工具及數據使用的說明，並更新了創作者收益與平台規範的相關細則。" }
         ];
 
         let cardsData = JSON.parse(localStorage.getItem('robloxCards'));
@@ -486,29 +688,38 @@
             localStorage.setItem('robloxCardsVersion', currentVersion);
         }
 
-        // ================= 載入動畫與跳過功能 =================
+        // 留言資料庫 (模擬)
+        let commentsData = JSON.parse(localStorage.getItem('robloxComments')) || {};
+        function saveComments() { localStorage.setItem('robloxComments', JSON.stringify(commentsData)); }
+
+        // 公告資料庫
+        let announcements = JSON.parse(localStorage.getItem('robloxAnnouncements')) || [];
+        function saveAnnouncements() { localStorage.setItem('robloxAnnouncements', JSON.stringify(announcements)); }
+
+        // 封禁名單 (模擬)
+        let bannedUsers = JSON.parse(localStorage.getItem('robloxBanned')) || [];
+        function saveBanned() { localStorage.setItem('robloxBanned', JSON.stringify(bannedUsers)); }
+
+        // 用戶資料 (模擬)
+        let usersData = JSON.parse(localStorage.getItem('robloxUsers')) || [{ uid: 1001, name: 'leoreoroblox', role: '管理員', status: '在線' }];
+        function saveUsers() { localStorage.setItem('robloxUsers', JSON.stringify(usersData)); }
+
+        // 管理員操作日誌
+        let adminLogs = JSON.parse(localStorage.getItem('robloxAdminLogs')) || [];
+        function saveAdminLogs() { localStorage.setItem('robloxAdminLogs', JSON.stringify(adminLogs)); }
+
+        // ================= 3. 載入畫面與跳過 =================
         let loaderEnabled = localStorage.getItem('loaderEnabled') !== 'false';
         let skipRequested = false;
-
-        function skipLoader() {
-            skipRequested = true;
-        }
+        function skipLoader() { skipRequested = true; }
 
         function initLoader() {
-            if (!loaderEnabled) {
-                document.getElementById('loader').style.display = 'none';
-                return;
-            }
+            if (!loaderEnabled) { document.getElementById('loader').style.display = 'none'; return; }
             let progress = 0;
             const interval = setInterval(() => {
-                if (skipRequested) {
-                    progress = 100;
-                } else {
-                    progress += 1;
-                }
+                if (skipRequested) { progress = 100; } else { progress += 1; }
                 document.getElementById('progress-bar').style.width = progress + '%';
                 document.getElementById('percent-text').innerText = progress + '%';
-                
                 if (progress >= 100) {
                     clearInterval(interval);
                     document.getElementById('loader-success').style.display = 'block';
@@ -523,7 +734,7 @@
         }
         initLoader();
 
-        // ================= 設定頁面功能 =================
+        // ================= 4. 設定頁面功能 =================
         function toggleLoaderSetting(checked) {
             localStorage.setItem('loaderEnabled', checked);
             alert(checked ? '已開啟載入動畫，下次重新整理會顯示。' : '已關閉載入動畫，下次重新整理將直接進入網站。');
@@ -536,37 +747,29 @@
             element.classList.add('active');
         }
 
-        // 載入使用者偏好
         function loadUserPreferences() {
-            // 載入背景顏色
             const savedBg = localStorage.getItem('bgTheme');
             if (savedBg) {
                 document.body.style.backgroundColor = savedBg;
                 document.querySelectorAll('.color-box').forEach(box => {
-                    if (box.style.backgroundColor === savedBg || box.style.background === savedBg) {
-                        box.classList.add('active');
-                    } else {
-                        box.classList.remove('active');
-                    }
+                    if (box.style.backgroundColor === savedBg || box.style.background === savedBg) box.classList.add('active');
+                    else box.classList.remove('active');
                 });
             }
-            // 載入動畫開關狀態
             const savedLoader = localStorage.getItem('loaderEnabled');
-            if (savedLoader !== null) {
-                document.getElementById('setting-loader').checked = savedLoader === 'true';
-            } else {
-                document.getElementById('setting-loader').checked = true; // 預設開啟
-            }
+            document.getElementById('setting-loader').checked = savedLoader !== 'false';
+            // 載入語言
+            applyLanguage(currentLang);
         }
         loadUserPreferences();
 
-        // ================= 頁面切換動畫與資料渲染 =================
+        // ================= 5. 核心渲染與頁面切換 =================
         function renderTopicNav() {
             const nav = document.getElementById('topic-nav');
             nav.innerHTML = '';
             const topics = [...new Set(cardsData.map(card => card.topic))];
             const allBtn = document.createElement('button');
-            allBtn.innerText = '📂 全部';
+            allBtn.innerText = currentLang === 'zh' ? '📂 全部' : '📂 All';
             allBtn.className = 'clickable active';
             allBtn.onclick = () => filterByTopic('');
             nav.appendChild(allBtn);
@@ -584,8 +787,11 @@
             const buttons = document.querySelectorAll('.qa-sidebar button');
             buttons.forEach(btn => btn.classList.remove('active'));
             buttons.forEach(btn => {
-                if (btn.innerText === '📂 全部' && topic === '') btn.classList.add('active');
-                else if (btn.innerText === topic) btn.classList.add('active');
+                if (btn.innerText.includes('全部') || btn.innerText.includes('All')) {
+                    if (topic === '') btn.classList.add('active');
+                } else if (btn.innerText === topic) {
+                    btn.classList.add('active');
+                }
             });
 
             document.getElementById('search-input').value = '';
@@ -610,7 +816,7 @@
         function renderCards() {
             const container = document.getElementById('cards-container');
             container.innerHTML = '';
-            cardsData.forEach((card) => {
+            cardsData.forEach((card, index) => {
                 let cardClass = 'card-basic';
                 let tagClass = 'tag-basic';
                 if (card.topic.includes('安全')) { cardClass = 'card-security'; tagClass = 'tag-security'; }
@@ -618,27 +824,186 @@
                 else if (card.topic.includes('開發')) { cardClass = 'card-dev'; tagClass = 'tag-dev'; }
                 else if (card.topic.includes('平台')) { cardClass = 'card-platform'; tagClass = 'tag-platform'; }
                 else if (card.topic.includes('社群')) { cardClass = 'card-community'; tagClass = 'tag-community'; }
+                else if (card.topic.includes('最新')) { cardClass = 'card-latest'; tagClass = 'tag-latest'; }
 
                 const cardDiv = document.createElement('div');
-                cardDiv.className = `card clickable ${cardClass}`;
+                cardDiv.className = `card ${cardClass}`;
+                cardDiv.id = `card-${index}`;
                 cardDiv.innerHTML = `
                     <span class="tag ${tagClass}">${card.topic}</span>
                     <h3>❓ ${card.title}</h3>
                     <p>${card.content}</p>
+                    <div class="card-actions">
+                        <span onclick="toggleComment(${index})">💬 留言區</span>
+                        <span onclick="likeCard(${index})">👍 讚</span>
+                        <span onclick="dislikeCard(${index})">👎 爛</span>
+                        <span style="margin-left: auto; font-size: 12px; color: #4b5563;">UID: 1001</span>
+                    </div>
+                    <div class="comment-section" id="comment-section-${index}">
+                        <div class="comment-input-box">
+                            <input type="text" id="comment-input-${index}" placeholder="留下你的評論...">
+                            <button onclick="addComment(${index})">送出</button>
+                        </div>
+                        <div id="comment-list-${index}"></div>
+                    </div>
                 `;
                 container.appendChild(cardDiv);
+                renderComments(index);
             });
             document.getElementById('stat-posts').innerText = cardsData.length;
         }
 
-        renderCards();
-        renderTopicNav();
+        function renderComments(cardIndex) {
+            const list = document.getElementById(`comment-list-${cardIndex}`);
+            if (!list) return;
+            list.innerHTML = '';
+            const cardComments = commentsData[cardIndex] || [];
+            cardComments.forEach((comment, cIndex) => {
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = `
+                    <span class="comment-user">UID: ${comment.uid} | ${comment.time}</span>
+                    <div class="comment-text">${comment.text}</div>
+                    <span class="delete-comment" onclick="deleteComment(${cardIndex}, ${cIndex})">🗑️ 刪除</span>
+                `;
+                list.appendChild(item);
+            });
+            document.getElementById('stat-comments').innerText = Object.values(commentsData).flat().length;
+        }
 
-        // ================= 管理員後台 =================
+        function toggleComment(index) {
+            const section = document.getElementById(`comment-section-${index}`);
+            section.style.display = section.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function addComment(index) {
+            const input = document.getElementById(`comment-input-${index}`);
+            const text = input.value.trim();
+            if (!text) return;
+            if (!commentsData[index]) commentsData[index] = [];
+            commentsData[index].push({
+                uid: 1001, // 模擬當前用戶
+                text: text,
+                time: new Date().toLocaleString()
+            });
+            saveComments();
+            input.value = '';
+            renderComments(index);
+        }
+
+        function deleteComment(cardIndex, commentIndex) {
+            // 只有管理員可以刪除，這裡模擬管理員登入後的操作
+            if (!commentsData[cardIndex]) return;
+            commentsData[cardIndex].splice(commentIndex, 1);
+            saveComments();
+            renderComments(cardIndex);
+        }
+
+        // 讚與爛 (模擬)
+        let likes = JSON.parse(localStorage.getItem('robloxLikes')) || {};
+        function likeCard(index) {
+            likes[index] = (likes[index] || 0) + 1;
+            localStorage.setItem('robloxLikes', JSON.stringify(likes));
+            alert('感謝你的讚！👍');
+        }
+        function dislikeCard(index) {
+            alert('感謝你的反饋！我們會改進。👎');
+        }
+
+        // ================= 6. 更新日誌 =================
+        const defaultLogs = [
+            { version: 'v0.1.0', date: '2026-10-04', type: 'major', title: '大型更新 - Leo Studio 品牌建立與功能爆發', content: ['新增 Leo Studio 關於我們頁面', '新增多語言切換功能（中/英）', '新增 Roblox 遊戲搜尋功能', '新增模擬評論區與留言管理', '新增管理員終極後台（用戶管理、公告、OP按鈕）', 'Steam 風格更新日誌上線'] },
+            { version: 'v0.0.5', date: '2026-10-04', type: 'feature', title: '新功能 - 最新動態上線', content: ['新增「🆕 最新動態」主題', '收錄 RDC 2026 重大發表、AI 工具 Build、安全政策等 6 張卡片'] },
+            { version: 'v0.0.4', date: '2026-10-04', type: 'feature', title: '新功能 - 關於頁面與品牌建立', content: ['新增「關於我們」頁面', '首頁「開始探索」按鈕改為跳轉至介紹頁面'] },
+            { version: 'v0.0.3', date: '2026-10-04', type: 'minor', title: '小型更新 - 設定與載入優化', content: ['載入畫面新增「跳過」按鈕與「載入成功」提示', '三橫選單新增「⚙️ 設定」頁面', '設定頁面可開關載入動畫與更換背景顏色'] },
+            { version: 'v0.0.2', date: '2026-10-04', type: 'minor', title: '小型更新 - 首頁大改造', content: ['首頁全新改版，加入科技感標題與副標題', '新增超大「開始探索」按鈕與快速導航卡片'] },
+            { version: 'v0.0.1', date: '2026-10-04', type: 'bug', title: 'Bug修復 - 專業導航與內容爆發', content: ['問答卡片擴充至 38 張，涵蓋六大主題', '卡片新增顏色標籤', '修復跳轉過濾功能，點擊後自動平滑滾動至頂部'] }
+        ];
+
+        let logsData = JSON.parse(localStorage.getItem('robloxLogs')) || defaultLogs;
+        function saveLogs() { localStorage.setItem('robloxLogs', JSON.stringify(logsData)); }
+
+        function renderLogs(filter = 'all') {
+            const list = document.getElementById('log-list');
+            list.innerHTML = '';
+            logsData.forEach(log => {
+                if (filter !== 'all' && log.type !== filter) return;
+                const item = document.createElement('div');
+                item.className = 'log-item';
+                let tagText = '';
+                if (log.type === 'major') tagText = '🚀 大型更新';
+                else if (log.type === 'feature') tagText = '✨ 新功能';
+                else if (log.type === 'minor') tagText = '🔧 小型更新';
+                else if (log.type === 'bug') tagText = '🐛 Bug修復';
+                
+                item.innerHTML = `
+                    <div class="log-version">${log.version} - ${log.title} <span class="log-tag tag-${log.type}">${tagText}</span></div>
+                    <div class="log-date">📅 ${log.date}</div>
+                    <div class="log-content"><ul>${log.content.map(c => `<li>✅ ${c}</li>`).join('')}</ul></div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function filterLog(type, btn) {
+            document.querySelectorAll('.log-filter button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderLogs(type);
+        }
+
+        // ================= 7. 遊戲搜尋 =================
+        async function searchGame() {
+            const input = document.getElementById('game-search-input').value.trim();
+            if (!input) return;
+            const results = document.getElementById('game-results');
+            results.innerHTML = '<p style="text-align:center; color:var(--accent);">🔍 搜尋中...</p>';
+            
+            try {
+                // 使用 CORS Proxy 繞過跨域限制，實際專案可能被 Roblox 限制
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const apiUrl = `https://games.roblox.com/v1/games/list?model.keyword=${encodeURIComponent(input)}`;
+                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
+                if (!data.games || data.games.length === 0) {
+                    results.innerHTML = '<p style="text-align:center; color:#ff5555;">找不到相關遊戲，請嘗試其他關鍵字。</p>';
+                    return;
+                }
+
+                results.innerHTML = '';
+                data.games.slice(0, 5).forEach(game => {
+                    const card = document.createElement('div');
+                    card.className = 'game-card';
+                    card.innerHTML = `
+                        <img src="${game.thumbnailUrl || 'https://via.placeholder.com/100'}" class="game-icon" alt="Icon">
+                        <div class="game-info">
+                            <h3>${game.name}</h3>
+                            <p>👤 創作者：<span class="highlight">${game.creatorName || '未知'}</span></p>
+                            <p>📅 創作日期：<span class="highlight">${new Date(game.created).toLocaleDateString() || '未知'}</span></p>
+                            <p>🔄 最後更新：<span class="highlight">${new Date(game.updated).toLocaleDateString() || '未知'}</span></p>
+                            <p>🟢 目前線上：<span class="highlight">${game.playing || 0}</span> 人</p>
+                            <p>⭐ 好評率：<span class="highlight">${game.favoritedCount || 0} 次收藏</span></p>
+                        </div>
+                    `;
+                    results.appendChild(card);
+                });
+            } catch (error) {
+                console.error(error);
+                results.innerHTML = '<p style="text-align:center; color:#ff5555;">讀取失敗！可能是 API 限制或網路問題，請稍後再試。</p>';
+            }
+        }
+
+        // ================= 8. 管理員後台邏輯 =================
         function openAdminDashboard() {
             document.getElementById('admin-dashboard').style.display = 'flex';
             switchAdminPage('dashboard');
+            renderAdminStats();
             renderManageCards();
+            renderAdminComments();
+            renderBannedList();
+            renderAnnounceHistory();
         }
 
         function closeAdminDashboard() {
@@ -648,41 +1013,247 @@
         function switchAdminPage(page) {
             const sidebarItems = document.querySelectorAll('.admin-sidebar div');
             sidebarItems.forEach(item => item.classList.remove('active'));
-            document.getElementById('admin-page-dashboard').style.display = 'none';
-            document.getElementById('admin-page-users').style.display = 'none';
-            document.getElementById('admin-page-add-card').style.display = 'none';
-            document.getElementById('admin-page-manage-cards').style.display = 'none';
+            
+            const pages = ['dashboard', 'users', 'comments', 'announce', 'add-card', 'manage-cards', 'banned', 'settings'];
+            pages.forEach(p => {
+                const el = document.getElementById(`admin-page-${p}`);
+                if (el) el.style.display = 'none';
+            });
 
-            if (page === 'dashboard') {
-                sidebarItems[0].classList.add('active');
-                document.getElementById('admin-page-dashboard').style.display = 'block';
-            } else if (page === 'users') {
-                sidebarItems[1].classList.add('active');
-                document.getElementById('admin-page-users').style.display = 'block';
-            } else if (page === 'add-card') {
-                sidebarItems[2].classList.add('active');
-                document.getElementById('admin-page-add-card').style.display = 'block';
-            } else if (page === 'manage-cards') {
-                sidebarItems[3].classList.add('active');
-                document.getElementById('admin-page-manage-cards').style.display = 'block';
+            const targetPage = document.getElementById(`admin-page-${page}`);
+            if (targetPage) targetPage.style.display = 'block';
+
+            // 高亮
+            sidebarItems.forEach(item => {
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(page)) item.classList.add('active');
+            });
+
+            if (page === 'users') renderUserTable();
+            if (page === 'comments') renderAdminComments();
+            if (page === 'manage-cards') renderManageCards();
+            if (page === 'banned') renderBannedList();
+            if (page === 'announce') renderAnnounceHistory();
+        }
+
+        function renderAdminStats() {
+            document.getElementById('stat-posts').innerText = cardsData.length;
+            document.getElementById('stat-online').innerText = usersData.filter(u => u.status === '在線').length;
+            document.getElementById('stat-users').innerText = usersData.length;
+            document.getElementById('stat-comments').innerText = Object.values(commentsData).flat().length;
+            document.getElementById('stat-bans').innerText = bannedUsers.length;
+        }
+
+        // 用戶管理
+        function renderUserTable() {
+            const tbody = document.getElementById('user-table-body');
+            tbody.innerHTML = '';
+            usersData.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.uid}</td>
+                    <td>${user.name}</td>
+                    <td><span style="color: ${user.role === '管理員' ? '#ff5555' : '#00ffcc'};">${user.role}</span></td>
+                    <td>${user.status}</td>
+                    <td>
+                        <button class="clickable" onclick="warnUser(${user.uid})" style="background: #ffaa00; border: none; color: #000; padding: 5px 10px; border-radius: 3px; cursor: pointer;">⚠️ 警告</button>
+                        <button class="clickable" onclick="muteUser(${user.uid})" style="background: #00aaff; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🔇 禁言</button>
+                        <button class="clickable" onclick="banUser(${user.uid})" style="background: #ff5555; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🚫 封禁</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function searchUser() {
+            const query = document.getElementById('search-uid').value.trim();
+            if (!query) return;
+            const user = usersData.find(u => u.uid == query || u.name.includes(query));
+            const resultDiv = document.getElementById('user-search-result');
+            if (user) {
+                resultDiv.innerHTML = `
+                    <div class="stat-card" style="text-align: left; margin-bottom: 15px;">
+                        <p>🔍 找到用戶：<strong>${user.name}</strong> (UID: ${user.uid})</p>
+                        <p>狀態：${user.status} | 角色：${user.role}</p>
+                        <p>當前位置：正在查看「問答卡片」頁面</p>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = '<p style="color: #ff5555;">找不到該用戶。</p>';
             }
         }
 
-        function addNewCard() {
-            const title = document.getElementById('new-title').value.trim();
-            const topic = document.getElementById('new-topic').value;
-            const content = document.getElementById('new-content').value.trim();
-            if (!title || !content) { alert('請填寫標題和內容！'); return; }
-            cardsData.push({ title, topic, content });
-            localStorage.setItem('robloxCards', JSON.stringify(cardsData));
-            document.getElementById('new-title').value = '';
-            document.getElementById('new-content').value = '';
-            renderCards();
-            renderTopicNav();
-            renderManageCards();
-            alert('卡片發布成功！');
+        function warnUser(uid) {
+            logAdminAction(`警告了用戶 UID: ${uid}`);
+            alert(`已對 UID ${uid} 發出警告！`);
         }
 
+        function muteUser(uid) {
+            logAdminAction(`禁言了用戶 UID: ${uid}`);
+            alert(`已禁言 UID ${uid}！`);
+        }
+
+        function banUser(uid) {
+            const isSuperAdmin = true; // 假設當前是終極管理員
+            if (isSuperAdmin) {
+                const confirmed = confirm(`確定要永久封禁 UID ${uid} 嗎？此操作不可逆！`);
+                if (confirmed) {
+                    bannedUsers.push({ uid: uid, name: usersData.find(u => u.uid == uid)?.name || 'Unknown', reason: '違反社群規範', type: '永久' });
+                    saveBanned();
+                    logAdminAction(`永久封禁了用戶 UID: ${uid}`);
+                    alert(`已永久封禁 UID ${uid}！`);
+                    renderUserTable();
+                    renderAdminStats();
+                }
+            } else {
+                // 普通管理員 10 秒冷卻邏輯
+                let countdown = 10;
+                const btn = event.target;
+                btn.disabled = true;
+                btn.innerText = `請等待 ${countdown}s...`;
+                const timer = setInterval(() => {
+                    countdown--;
+                    btn.innerText = `請等待 ${countdown}s...`;
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        btn.innerText = '再次確認封禁';
+                        btn.style.background = '#ff0000';
+                        btn.onclick = () => {
+                            bannedUsers.push({ uid: uid, name: usersData.find(u => u.uid == uid)?.name || 'Unknown', reason: '違反社群規範', type: '臨時' });
+                            saveBanned();
+                            logAdminAction(`封禁了用戶 UID: ${uid}`);
+                            alert(`已封禁 UID ${uid}！`);
+                            renderUserTable();
+                            renderAdminStats();
+                        };
+                    }
+                }, 1000);
+            }
+        }
+
+        // 留言管理
+        function renderAdminComments() {
+            const list = document.getElementById('admin-comment-list');
+            list.innerHTML = '';
+            let hasComments = false;
+            Object.keys(commentsData).forEach(cardIndex => {
+                commentsData[cardIndex].forEach((comment, cIndex) => {
+                    hasComments = true;
+                    const div = document.createElement('div');
+                    div.style.cssText = 'background: #1f2937; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;';
+                    div.innerHTML = `
+                        <div>
+                            <strong style="color: #00ffcc;">UID: ${comment.uid}</strong>
+                            <p style="margin: 5px 0; color: #d1d5db;">${comment.text}</p>
+                            <span style="font-size: 12px; color: #9ca3af;">${comment.time}</span>
+                        </div>
+                        <button class="clickable" onclick="deleteComment(${cardIndex}, ${cIndex}); renderAdminComments();" style="background: #ff5555; color: white; border: none; padding: 5px 10px; border-radius: 5px;">刪除</button>
+                    `;
+                    list.appendChild(div);
+                });
+            });
+            if (!hasComments) list.innerHTML = '<p style="color: #9ca3af;">目前沒有留言。</p>';
+        }
+
+        // 公告管理
+        function sendAnnouncement() {
+            const text = document.getElementById('announce-text').value.trim();
+            if (!text) return;
+            document.getElementById('announcement-text').innerText = text;
+            document.getElementById('announcement-bar').style.display = 'block';
+            announcements.push({ text: text, time: new Date().toLocaleString() });
+            saveAnnouncements();
+            logAdminAction(`發布了公告：${text}`);
+            renderAnnounceHistory();
+            document.getElementById('announce-text').value = '';
+        }
+
+        function clearAnnouncement() {
+            document.getElementById('announcement-bar').style.display = 'none';
+            logAdminAction('清除了公告');
+        }
+
+        function renderAnnounceHistory() {
+            const list = document.getElementById('announce-history');
+            list.innerHTML = '';
+            announcements.slice().reverse().forEach(a => {
+                const div = document.createElement('div');
+                div.style.cssText = 'background: #1f2937; padding: 10px; border-radius: 5px; margin-bottom: 8px; font-size: 14px;';
+                div.innerHTML = `<span style="color: #9ca3af;">[${a.time}]</span> ${a.text}`;
+                list.appendChild(div);
+            });
+        }
+
+        // 封禁名單
+        function renderBannedList() {
+            const tbody = document.getElementById('banned-table-body');
+            tbody.innerHTML = '';
+            bannedUsers.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.uid}</td>
+                    <td>${user.name}</td>
+                    <td>${user.reason}</td>
+                    <td style="color: #ff5555;">${user.type}</td>
+                    <td><button class="clickable" onclick="unbanUser(${index})" style="background: #00ffcc; border: none; color: #000; padding: 5px 10px; border-radius: 3px;">解封</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function unbanUser(index) {
+            bannedUsers.splice(index, 1);
+            saveBanned();
+            renderBannedList();
+            renderAdminStats();
+            logAdminAction('解封了一名用戶');
+        }
+
+        // OP 按鈕
+        function triggerOP() {
+            const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。';
+            document.getElementById('op-message').innerText = msg;
+            document.getElementById('op-overlay').style.display = 'flex';
+            logAdminAction(`啟動了全站維護模式：${msg}`);
+            
+            let countdown = 600; // 10 分鐘
+            const timer = setInterval(() => {
+                countdown--;
+                const min = Math.floor(countdown / 60);
+                const sec = countdown % 60;
+                document.getElementById('op-countdown').innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('op-overlay').style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        // 數據匯出
+        function exportData() {
+            const data = {
+                cards: cardsData,
+                comments: commentsData,
+                users: usersData,
+                announcements: announcements,
+                banned: bannedUsers,
+                logs: adminLogs
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `leo_studio_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            logAdminAction('匯出了系統數據備份');
+        }
+
+        function logAdminAction(action) {
+            adminLogs.push({ time: new Date().toLocaleString(), action: action });
+            saveAdminLogs();
+        }
+
+        // 管理問答 (刪除)
         function renderManageCards() {
             const list = document.getElementById('manage-cards-list');
             list.innerHTML = '';
@@ -707,10 +1278,27 @@
                 renderCards();
                 renderTopicNav();
                 renderManageCards();
+                renderAdminStats();
             }
         }
 
-        // ================= 網頁主要互動 =================
+        function addNewCard() {
+            const title = document.getElementById('new-title').value.trim();
+            const topic = document.getElementById('new-topic').value;
+            const content = document.getElementById('new-content').value.trim();
+            if (!title || !content) { alert('請填寫標題和內容！'); return; }
+            cardsData.push({ title, topic, content });
+            localStorage.setItem('robloxCards', JSON.stringify(cardsData));
+            document.getElementById('new-title').value = '';
+            document.getElementById('new-content').value = '';
+            renderCards();
+            renderTopicNav();
+            renderManageCards();
+            renderAdminStats();
+            alert('卡片發布成功！');
+        }
+
+        // ================= 9. 網頁主要互動 =================
         document.getElementById('menu-btn').addEventListener('click', () => {
             const menu = document.getElementById('side-menu');
             const submenu = document.getElementById('qa-submenu');
@@ -735,6 +1323,7 @@
             if (pageName === 'home') targetPage = document.getElementById('home-page');
             else if (pageName === 'intro') targetPage = document.getElementById('intro-page');
             else if (pageName === 'qa') targetPage = document.getElementById('qa-page');
+            else if (pageName === 'game-search') targetPage = document.getElementById('game-search-page');
             else if (pageName === 'changelog') targetPage = document.getElementById('changelog-page');
             else if (pageName === 'settings') targetPage = document.getElementById('settings-page');
 
@@ -744,6 +1333,8 @@
                     targetPage.classList.add('active');
                     if (pageName === 'qa') {
                         filterByTopic(topic);
+                    } else if (pageName === 'changelog') {
+                        renderLogs();
                     } else {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
@@ -813,6 +1404,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // ================= 10. 用戶資訊與管理員觸發 =================
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         document.getElementById('device-type').innerText = isMobile ? '手機 (Mobile)' : '電腦 (PC)';
 
@@ -838,24 +1430,32 @@
             document.getElementById('user-info').style.display = 'none';
         });
 
-        document.getElementById('admin-btn').addEventListener('click', () => {
+        // 管理員觸發：點擊右下角 IP 卡片 5 下
+        let clickCount = 0;
+        document.getElementById('user-info').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 5) {
+                document.getElementById('admin-menu-item').style.display = 'block';
+                clickCount = 0;
+                alert('管理員權限已解鎖！點擊左側選單的「👑 管理後台」進入。');
+            }
+        });
+
+        // 管理員密碼驗證（偽裝的）
+        document.getElementById('admin-menu-item').addEventListener('click', () => {
             const password = prompt('請輸入管理員密碼：');
-            if (atob('YWRtaW4xMjM=') === password) {
+            if (atob('YWRtaW4xMjM=') === password) { // admin123
                 openAdminDashboard();
             } else {
                 alert('密碼錯誤！你以為你是管理員嗎？😎');
             }
         });
 
-        let clickCount = 0;
-        document.getElementById('user-info').addEventListener('click', () => {
-            clickCount++;
-            if (clickCount === 5) {
-                document.getElementById('admin-btn').style.display = 'block';
-                clickCount = 0;
-                alert('管理員權限已解鎖！點擊右下角齒輪進入。');
-            }
-        });
+        // 初始化渲染
+        renderCards();
+        renderTopicNav();
+        renderLogs();
+        applyLanguage(currentLang);
     </script>
 </body>
 </html>
