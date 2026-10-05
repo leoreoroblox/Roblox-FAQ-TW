@@ -1237,35 +1237,7 @@ async function renderCards() {
         const item = document.createElement('div');
         item.className = 'comment-item';
         const timeStr = new Date(comment.created_at).toLocaleString();
-async function renderComments(cardId) {
-    const list = document.getElementById(`comment-list-${cardId}`);
-    if (!list) return;
-    list.innerHTML = '<p style="color: #9ca3af; font-size: 12px;">載入留言中...</p>';
 
-    const { data, error } = await supabaseClient
-        .from('comments')
-        .select('*')
-        .eq('card_id', cardId)
-        .order('created_at', { ascending: true });
-
-    if (error) { 
-        list.innerHTML = '<p style="color: #ff5555; font-size: 12px;">留言載入失敗。</p>'; 
-        return; 
-    }
-
-    list.innerHTML = '';
-    data.forEach((comment) => {
-        const item = document.createElement('div');
-        item.className = 'comment-item';
-        const timeStr = new Date(comment.created_at).toLocaleString();
-        item.innerHTML = `
-            <span class="comment-user">UID: ${comment.uid} | ${timeStr}</span>
-            <div class="comment-text">${comment.content}</div>
-            <span class="delete-comment" onclick="deleteComment(${comment.id}, ${cardId})">🗑️ 刪除</span>
-        `;
-        list.appendChild(item);
-    });
-}
 
 async function addComment(cardId) {
     const input = document.getElementById(`comment-input-${cardId}`);
@@ -1285,7 +1257,8 @@ async function addComment(cardId) {
     renderComments(cardId);
     showToast('✅ 留言成功！感謝你的參與。', 'success');
 
-        async function deleteComment(commentId, cardId) {
+        async function deleteComment(commentId, 
+                                    cardId) {
     if (!confirm('確定要刪除這條留言嗎？')) return;
 
     // 從 Supabase 刪除
