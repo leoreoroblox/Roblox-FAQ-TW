@@ -1503,26 +1503,28 @@ loadUserProfile();
         }
 
         // 用戶管理
-        function renderUserTable() {
-            const tbody = document.getElementById('user-table-body');
-            tbody.innerHTML = '';
-            usersData.forEach(user => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${user.uid}</td>
-                    <td>${user.name}</td>
-                    <td><span style="color: ${user.role === 'ADSSVIP' ? '#ff00cc' : '#00ffcc'};">${user.role}</span></td>
-                    <td>${user.status}</td>
-                    <td>
-                        <button class="clickable" onclick="warnUser(${user.uid})" style="background: #ffaa00; border: none; color: #000; padding: 5px 10px; border-radius: 3px; cursor: pointer;">⚠️ 警告</button>
-                        <button class="clickable" onclick="muteUser(${user.uid})" style="background: #00aaff; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🔇 禁言</button>
-                        <button class="clickable" onclick="banUserModal(${user.uid})" style="background: #ff5555; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🚫 封禁</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
+        async function renderUserTable() {
+    const { data, error } = await supabaseClient.from('users').select('*');
+    if (error) { showToast('❌ 載入用戶失敗', 'error'); return; }
+    
+    const tbody = document.getElementById('user-table-body');
+    tbody.innerHTML = '';
+    data.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${user.uid}</td>
+            <td>${user.username}</td>
+            <td><span style="color: ${user.vip_level === 'ADSSVIP' ? '#ff00cc' : '#00ffcc'};">${user.vip_level || '普通'}</span></td>
+            <td>🟢 在線</td>
+            <td>
+                <button class="clickable" onclick="warnUser(${user.uid})" style="background: #ffaa00; border: none; color: #000; padding: 5px 10px; border-radius: 3px; cursor: pointer;">⚠️ 警告</button>
+                <button class="clickable" onclick="muteUser(${user.uid})" style="background: #00aaff; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🔇 禁言</button>
+                <button class="clickable" onclick="banUserModal(${user.uid})" style="background: #ff5555; border: none; color: #fff; padding: 5px 10px; border-radius: 3px; cursor: pointer;">🚫 封禁</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
         function searchUser() {
             const query = document.getElementById('search-uid').value.trim();
             if (!query) return;
