@@ -1828,21 +1828,34 @@ async function unbanUser(uid) {
             }
         }
 
-        function addNewCard() {
-            const title = document.getElementById('new-title').value.trim();
-            const topic = document.getElementById('new-topic').value;
-            const content = document.getElementById('new-content').value.trim();
-            if (!title || !content) { showToast('⚠️ 請填寫標題和內容！', 'warning'); return; }
-            cardsData.push({ title, topic, content });
-            localStorage.setItem('robloxCards', JSON.stringify(cardsData));
-            document.getElementById('new-title').value = '';
-            document.getElementById('new-content').value = '';
-            renderCards();
-            renderTopicNav();
-            renderManageCards();
-            renderAdminStats();
-            showToast('📝 問答卡片已成功發布！', 'success');
-        }
+       async function addNewCard() {
+    const title = document.getElementById('new-title').value.trim();
+    const topic = document.getElementById('new-topic').value;
+    const content = document.getElementById('new-content').value.trim();
+    
+    if (!title || !content) { showToast('⚠️ 請填寫標題和內容！', 'warning'); return; }
+
+    // 寫入 Supabase 資料庫
+    const { error } = await supabaseClient
+        .from('cards')
+        .insert([{ title, topic, content }]);
+
+    if (error) {
+        showToast('❌ 卡片發布失敗，請稍後再試。', 'error');
+        return;
+    }
+
+    document.getElementById('new-title').value = '';
+    document.getElementById('new-content').value = '';
+    
+    // 重新載入卡片列表
+    renderCards();
+    renderTopicNav();
+    renderManageCards();
+    renderAdminStats();
+    
+    showToast('📝 問答卡片已成功發布至雲端！', 'success');
+}
 
         // ================= 10. 網頁主要互動 =================
         document.getElementById('menu-btn').addEventListener('click', () => {
