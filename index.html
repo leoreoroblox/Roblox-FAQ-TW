@@ -1614,33 +1614,54 @@ async function banUserModal(uid) {
         }
 
         // 公告管理
-        function sendAnnouncement() {
-            const text = document.getElementById('announce-text').value.trim();
-            if (!text) { showToast('⚠️ 請輸入公告內容！', 'warning'); return; }
-            document.getElementById('announcement-text').innerText = text;
-            document.getElementById('announcement-bar').style.display = 'block';
-            announcements.push({ text: text, time: new Date().toLocaleString() });
-            saveAnnouncements();
-            renderAnnounceHistory();
-            document.getElementById('announce-text').value = '';
-            showToast('📢 公告已發布！全站使用者將在頂部看到。', 'success');
-        }
+        async function sendAnnouncement() {
+    const text = document.getElementById('announce-text').value.trim();
+    if (!text) { showToast('⚠️ 請輸入公告內容！', 'warning'); return; }
 
-        function clearAnnouncement() {
-            document.getElementById('announcement-bar').style.display = 'none';
-            showToast('🗑️ 公告已清除。', 'info');
-        }
+    // 將公告寫入 Supabase 資料庫
+    const { error } = await supabaseClient
+        .from('announcements')
+        .insert([{ content: text }]);
 
-        function renderAnnounceHistory() {
-            const list = document.getElementById('announce-history');
-            list.innerHTML = '';
-            announcements.slice().reverse().forEach(a => {
-                const div = document.createElement('div');
-                div.style.cssText = 'background: #1f2937; padding: 10px; border-radius: 5px; margin-bottom: 8px; font-size: 14px;';
-                div.innerHTML = `<span style="color: #9ca3af;">[${a.time}]</span> ${a.text}`;
-                list.appendChild(div);
-            });
-        }
+    if (error) {
+        showToast('❌ 公告發布失敗，請稍後再試。', 'error');
+        return;
+    }
+
+    // 更新前台的跑馬燈
+    document.getElementById('announcement-text').innerText = text;
+    document.getElementById('announcement-bar').style.display = 'block';
+    document.getElementById('announce-text').value = '';
+    
+    showToast('📢 公告已成功發布至雲端！', 'success');
+    renderAnnounceHistory(); // 重新載入歷史記錄
+}
+
+function clearAnnouncement() {
+    document.getElementById('announcement-bar').style.display = 'none';
+    showToast('🗑️ 公告已清除。', 'info');
+}
+
+async function renderAnnounceHistory() {
+    // 從 Supabase 抓取所有公告記錄
+    const { data, error } = await supabaseClient
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) { return; }
+
+    const list = document.getElementById('announce-history');
+    list.innerHTML = '';
+    data.forEach(a => {
+        const div = document.createElement('div');
+        div.style.cssText = 'background: #1f2937; padding: 10px; border-radius: 5px; margin-bottom: 8px; font-size: 14px;';
+        // 將時間格式化為本地時間
+        const timeStr = new Date(a.created_at).toLocaleString();
+        div.innerHTML = `<span style="color: #9ca3af;">[${timeStr}]</span> ${a.content}`;
+        list.appendChild(div);
+    });
+}
 
         // VIP 管理
         function renderVIPSelect() {
