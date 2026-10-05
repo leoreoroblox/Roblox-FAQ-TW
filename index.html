@@ -1154,46 +1154,66 @@ loadUserProfile();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function renderCards() {
-            const container = document.getElementById('cards-container');
-            container.innerHTML = '';
-            cardsData.forEach((card, index) => {
-                let cardClass = 'card-misc';
-                let tagClass = 'tag-misc';
-                if (card.topic.includes('基礎')) { cardClass = 'card-basic'; tagClass = 'tag-basic'; }
-                else if (card.topic.includes('安全')) { cardClass = 'card-security'; tagClass = 'tag-security'; }
-                else if (card.topic.includes('Robux')) { cardClass = 'card-robux'; tagClass = 'tag-robux'; }
-                else if (card.topic.includes('開發')) { cardClass = 'card-dev'; tagClass = 'tag-dev'; }
-                else if (card.topic.includes('平台')) { cardClass = 'card-platform'; tagClass = 'tag-platform'; }
-                else if (card.topic.includes('社群')) { cardClass = 'card-community'; tagClass = 'tag-community'; }
-                else if (card.topic.includes('最新')) { cardClass = 'card-latest'; tagClass = 'tag-latest'; }
+async function renderCards() {
+    const container = document.getElementById('cards-container');
+    container.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 载入卡片中...</p>';
+    
+    // 从 Supabase 取得卡片数据
+    const { data, error } = await supabaseClient
+        .from('cards')
+        .select('*')
+        .order('id', { ascending: true });
 
-                const cardDiv = document.createElement('div');
-                cardDiv.className = `card ${cardClass}`;
-                cardDiv.id = `card-${index}`;
-                cardDiv.innerHTML = `
-                    <span class="tag ${tagClass}">${card.topic}</span>
-                    <h3>❓ ${card.title}</h3>
-                    <p>${card.content}</p>
-                    <div class="card-actions">
-                        <span onclick="toggleComment(${index})">💬 留言區</span>
-                        <span onclick="likeCard(${index})">👍 讚</span>
-                        <span onclick="dislikeCard(${index})">👎 爛</span>
-                        <span style="margin-left: auto; font-size: 12px; color: #4b5563;">UID: 1001</span>
-                    </div>
-                    <div class="comment-section" id="comment-section-${index}">
-                        <div class="comment-input-box">
-                            <input type="text" id="comment-input-${index}" placeholder="留下你的評論...">
-                            <button onclick="addComment(${index})">送出</button>
-                        </div>
-                        <div id="comment-list-${index}"></div>
-                    </div>
-                `;
-                container.appendChild(cardDiv);
-                renderComments(index);
-            });
-            document.getElementById('stat-posts').innerText = cardsData.length;
-        }
+    if (error) {
+        container.innerHTML = '<p style="text-align: center; color: #ff5555;">❌ 载入卡片失败，请稍后再试。</p>';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #9ca3af;">目前没有卡片，请至后台新增！</p>';
+        document.getElementById('stat-posts').innerText = 0;
+        return;
+    }
+
+    container.innerHTML = '';
+    data.forEach((card) => {
+        let cardClass = 'card-misc';
+        let tagClass = 'tag-misc';
+        if (card.topic.includes('基础')) { cardClass = 'card-basic'; tagClass = 'tag-basic'; }
+        else if (card.topic.includes('安全')) { cardClass = 'card-security'; tagClass = 'tag-security'; }
+        else if (card.topic.includes('Robux')) { cardClass = 'card-robux'; tagClass = 'tag-robux'; }
+        else if (card.topic.includes('开发')) { cardClass = 'card-dev'; tagClass = 'tag-dev'; }
+        else if (card.topic.includes('平台')) { cardClass = 'card-platform'; tagClass = 'tag-platform'; }
+        else if (card.topic.includes('社群')) { cardClass = 'card-community'; tagClass = 'tag-community'; }
+        else if (card.topic.includes('最新')) { cardClass = 'card-latest'; tagClass = 'tag-latest'; }
+
+        const cardDiv = document.createElement('div');
+        cardDiv.className = `card ${cardClass}`;
+        cardDiv.id = `card-${card.id}`;
+        cardDiv.innerHTML = `
+            <span class="tag ${tagClass}">${card.topic}</span>
+            <h3>❓ ${card.title}</h3>
+            <p>${card.content}</p>
+            <div class="card-actions">
+                <span onclick="toggleComment(${card.id})">💬 留言区</span>
+                <span onclick="likeCard(${card.id})">👍 赞</span>
+                <span onclick="dislikeCard(${card.id})">👎 烂</span>
+                <span style="margin-left: auto; font-size: 12px; color: #4b5563;">UID: 1001</span>
+            </div>
+            <div class="comment-section" id="comment-section-${card.id}">
+                <div class="comment-input-box">
+                    <input type="text" id="comment-input-${card.id}" placeholder="留下你的评论...">
+                    <button onclick="addComment(${card.id})">送出</button>
+                </div>
+                <div id="comment-list-${card.id}"></div>
+            </div>
+        `;
+        container.appendChild(cardDiv);
+        renderComments(card.id);
+    });
+    
+    document.getElementById('stat-posts').innerText = data.length;
+}
 
         function renderComments(cardIndex) {
             const list = document.getElementById(`comment-list-${cardIndex}`);
