@@ -1563,21 +1563,31 @@ loadUserProfile();
             showToast(`🔇 已禁言 UID ${uid}！`, 'warning');
         }
 
-        function banUserModal(uid) {
-            const reason = prompt(`請輸入封禁 UID ${uid} 的原因：`, '違反社群規範');
-            if (reason === null) return;
-            const adminName = prompt(`請輸入管理員名稱（留空則顯示系統管理員）：`, '系統管理員');
-            if (adminName === null) return;
-            
-            const hideAdmin = confirm('是否隱藏管理員名稱？');
-            const displayAdmin = hideAdmin || adminName.trim() === '' ? '系統管理員' : adminName;
-            
-            bannedUsers.push({ uid: uid, name: usersData.find(u => u.uid == uid)?.name || 'Unknown', reason: reason, type: '永久', admin: displayAdmin });
-            saveBanned();
-            showToast(`🚫 已封禁 UID ${uid}，原因：${reason}`, 'error');
-            renderUserTable();
-            renderAdminStats();
-        }
+async function banUserModal(uid) {
+    const reason = prompt(`請輸入封禁 UID ${uid} 的原因：`, '違反社群規範');
+    if (reason === null) return;
+    const adminName = prompt(`請輸入管理員名稱（留空則顯示系統管理員）：`, '系統管理員');
+    if (adminName === null) return;
+    
+    const hideAdmin = confirm('是否隱藏管理員名稱？');
+    const displayAdmin = hideAdmin || adminName.trim() === '' ? '系統管理員' : adminName;
+
+    // 更新 Supabase 資料庫，將該用戶標記為已封禁
+    const { error } = await supabaseClient
+        .from('users')
+        .update({ is_banned: true })
+        .eq('uid', uid);
+
+    if (error) {
+        showToast('❌ 封禁失敗，請稍後再試。', 'error');
+        return;
+    }
+
+    showToast(`🚫 已成功封禁 UID ${uid}，原因：${reason}`, 'error');
+    renderUserTable();   // 重新整理用戶列表
+    renderAdminStats();  // 重新整理數據
+    renderBannedList();  // 重新整理封禁名單
+}
 
         // 留言管理
         function renderAdminComments() {
