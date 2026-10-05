@@ -1284,21 +1284,6 @@ async function addComment(cardId) {
     input.value = '';
     renderComments(cardId);
     showToast('✅ 留言成功！感謝你的參與。', 'success');
-}
-            const input = document.getElementById(`comment-input-${index}`);
-            const text = input.value.trim();
-            if (!text) return;
-            if (!commentsData[index]) commentsData[index] = [];
-            commentsData[index].push({
-                uid: 1001,
-                text: text,
-                time: new Date().toLocaleString()
-            });
-            saveComments();
-            input.value = '';
-            renderComments(index);
-            showToast('✅ 留言成功！感謝你的參與。', 'success');
-        }
 
         async function deleteComment(commentId, cardId) {
     if (!confirm('確定要刪除這條留言嗎？')) return;
