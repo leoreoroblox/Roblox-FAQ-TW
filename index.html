@@ -760,9 +760,22 @@
 
     <!-- ================= 核心 JavaScript ================= -->
     <script>
-        const SUPABASE_URL = 'https://sybsxbcldanndptpfypq.supabase.co';
+const SUPABASE_URL = 'https://sybsxbcldanndptpfypq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_zOfEiax08ifCaBrTglb1Ow_JQm1Ed77';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 測試資料庫連線
+async function testDatabaseConnection() {
+    const { data, error } = await supabaseClient.from('users').select('*');
+    if (error) {
+        console.error('連線失敗:', error);
+        showToast('❌ 資料庫連線失敗，請檢查金鑰！', 'error');
+    } else {
+        console.log('連線成功！抓到資料:', data);
+        showToast('✅ 資料庫連線成功！抓到 ' + data.length + ' 筆資料。', 'success');
+    }
+}
+testDatabaseConnection();
         // ================= 1. 多語言資料庫 =================
         const translations = {
             zh: {
