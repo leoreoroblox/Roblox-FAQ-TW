@@ -765,17 +765,32 @@ const SUPABASE_ANON_KEY = 'sb_publishable_zOfEiax08ifCaBrTglb1Ow_JQm1Ed77';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // 測試資料庫連線
-async function testDatabaseConnection() {
+// 測試資料庫連線，並將資料套用到個人中心
+async function loadUserProfile() {
     const { data, error } = await supabaseClient.from('users').select('*');
     if (error) {
         console.error('連線失敗:', error);
         showToast('❌ 資料庫連線失敗，請檢查金鑰！', 'error');
-    } else {
-        console.log('連線成功！抓到資料:', data);
-        showToast('✅ 資料庫連線成功！抓到 ' + data.length + ' 筆資料。', 'success');
+        return;
+    }
+    
+    // 如果資料庫裡有資料，就把第一筆資料（就是 leo）套用到個人中心頁面
+    if (data && data.length > 0) {
+        const user = data[0];
+        document.querySelector('.profile-header h3').innerText = user.username;
+        document.querySelector('.profile-header p').innerText = 'UID: ' + user.uid;
+        document.getElementById('profile-exclusive-id').innerText = user.exclusive_id || '未獲取';
+        
+        // 更新 VIP 徽章
+        const vipBadge = document.querySelector('.profile-header .vip-badge');
+        if (user.vip_level) {
+            vipBadge.className = 'vip-badge vip-' + user.vip_level;
+            vipBadge.innerText = user.vip_level;
+        }
+        showToast('✅ 成功載入 ' + user.username + ' 的個人資料！', 'success');
     }
 }
-testDatabaseConnection();
+loadUserProfile();
         // ================= 1. 多語言資料庫 =================
         const translations = {
             zh: {
