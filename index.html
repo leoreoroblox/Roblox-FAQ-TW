@@ -760,6 +760,9 @@
 
     <!-- ================= 核心 JavaScript ================= -->
     <script>
+        const SUPABASE_URL = 'https://sybsxbcldanndptpfypq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_zOfEiax08ifCaBrTglb1Ow_JQm1Ed77';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // ================= 1. 多語言資料庫 =================
         const translations = {
             zh: {
