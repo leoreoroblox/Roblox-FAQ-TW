@@ -1670,27 +1670,34 @@ async function renderAnnounceHistory() {
             // 這裡可以做成下拉選單，但為了靈活，我們讓管理員直接輸入 UID
         }
 
-        function grantVIP() {
-            const uid = document.getElementById('vip-uid').value.trim();
-            const level = document.getElementById('vip-level').value;
-            const exclusiveId = document.getElementById('vip-exclusive-id').value.trim();
-            
-            if (!uid) { showToast('⚠️ 請輸入用戶 UID！', 'warning'); return; }
-            
-            const user = usersData.find(u => u.uid == uid);
-            if (!user) { showToast('❌ 找不到該用戶！', 'error'); return; }
-            
-            user.vip = level;
-            user.role = level === 'ADSSVIP' ? 'ADSSVIP' : user.role;
-            if (exclusiveId) user.exclusiveId = exclusiveId;
-            saveUsers();
-            
-            showToast(`🎁 已成功為 UID ${uid} 發放 ${level} 特權！`, 'success');
-            renderUserTable();
-            document.getElementById('vip-uid').value = '';
-            document.getElementById('vip-exclusive-id').value = '';
-        }
+      async function grantVIP() {
+    const uid = document.getElementById('vip-uid').value.trim();
+    const level = document.getElementById('vip-level').value;
+    const exclusiveId = document.getElementById('vip-exclusive-id').value.trim();
+    
+    if (!uid) { showToast('⚠️ 請輸入用戶 UID！', 'warning'); return; }
+    
+    // 準備要更新的資料
+    const updateData = { vip_level: level };
+    if (exclusiveId) updateData.exclusive_id = exclusiveId;
+    
+    // 更新 Supabase 資料庫
+    const { error } = await supabaseClient
+        .from('users')
+        .update(updateData)
+        .eq('uid', uid);
 
+    if (error) {
+        showToast('❌ 發放失敗，請確認 UID 是否正確。', 'error');
+        return;
+    }
+
+    showToast(`🎁 已成功為 UID ${uid} 發放 ${level} 特權！`, 'success');
+    renderUserTable(); // 重新整理用戶列表
+    renderAdminStats(); // 重新整理數據
+    document.getElementById('vip-uid').value = '';
+    document.getElementById('vip-exclusive-id').value = '';
+}
         // 封禁名單
 async function renderBannedList() {
     const { data, error } = await supabaseClient
