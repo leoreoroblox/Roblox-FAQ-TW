@@ -1799,22 +1799,37 @@ async function unbanUser(uid) {
         }
 
         // 管理問答
-        function renderManageCards() {
-            const list = document.getElementById('manage-cards-list');
-            list.innerHTML = '';
-            cardsData.forEach((card, index) => {
-                const div = document.createElement('div');
-                div.style.cssText = 'background: #1f2937; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;';
-                div.innerHTML = `
-                    <div>
-                        <strong style="color: #00ffcc;">${card.title}</strong>
-                        <div style="font-size: 12px; color: #9ca3af;">${card.topic}</div>
-                    </div>
-                    <button class="clickable" onclick="deleteCard(${index})" style="background: #ff5555; color: white; border: none; padding: 5px 10px; border-radius: 5px;">刪除</button>
-                `;
-                list.appendChild(div);
-            });
-        }
+        async function renderManageCards() {
+    const list = document.getElementById('manage-cards-list');
+    list.innerHTML = '<p style="color: #9ca3af;">📥 載入卡片中...</p>';
+
+    // 從 Supabase 讀取卡片
+    const { data, error } = await supabaseClient
+        .from('cards')
+        .select('*')
+        .order('id', { ascending: true });
+
+    if (error) { list.innerHTML = '<p style="color: #ff5555;">讀取失敗。</p>'; return; }
+
+    if (!data || data.length === 0) {
+        list.innerHTML = '<p style="color: #9ca3af;">目前資料庫中沒有卡片。</p>';
+        return;
+    }
+
+    list.innerHTML = '';
+    data.forEach((card) => {
+        const div = document.createElement('div');
+        div.style.cssText = 'background: #1f2937; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;';
+        div.innerHTML = `
+            <div>
+                <strong style="color: #00ffcc;">${card.title}</strong>
+                <div style="font-size: 12px; color: #9ca3af;">${card.topic}</div>
+            </div>
+            <button class="clickable" onclick="deleteCard(${card.id})" style="background: #ff5555; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">刪除</button>
+        `;
+        list.appendChild(div);
+    });
+}
 
 async function deleteCard(cardId) {
     if (!confirm('確定要刪除這張卡片嗎？')) return;
