@@ -1237,20 +1237,44 @@ async function renderCards() {
         const item = document.createElement('div');
         item.className = 'comment-item';
         const timeStr = new Date(comment.created_at).toLocaleString();
-     async function addComment(cardId) {
+async function renderComments(cardId) {
+    const list = document.getElementById(`comment-list-${cardId}`);
+    if (!list) return;
+    list.innerHTML = '<p style="color: #9ca3af; font-size: 12px;">載入留言中...</p>';
+
+    const { data, error } = await supabaseClient
+        .from('comments')
+        .select('*')
+        .eq('card_id', cardId)
+        .order('created_at', { ascending: true });
+
+    if (error) { 
+        list.innerHTML = '<p style="color: #ff5555; font-size: 12px;">留言載入失敗。</p>'; 
+        return; 
+    }
+
+    list.innerHTML = '';
+    data.forEach((comment) => {
+        const item = document.createElement('div');
+        item.className = 'comment-item';
+        const timeStr = new Date(comment.created_at).toLocaleString();
+        item.innerHTML = `
+            <span class="comment-user">UID: ${comment.uid} | ${timeStr}</span>
+            <div class="comment-text">${comment.content}</div>
+            <span class="delete-comment" onclick="deleteComment(${comment.id}, ${cardId})">🗑️ 刪除</span>
+        `;
+        list.appendChild(item);
+    });
+}
+
+async function addComment(cardId) {
     const input = document.getElementById(`comment-input-${cardId}`);
     const text = input.value.trim();
     if (!text) return;
 
-    // 寫入 Supabase 資料庫
     const { error } = await supabaseClient
         .from('comments')
-        .insert([{ 
-            card_id: cardId, 
-            uid: 1001, 
-            username: 'leo', 
-            content: text 
-        }]);
+        .insert([{ card_id: cardId, uid: 1001, username: 'leo', content: text }]);
 
     if (error) { 
         showToast('❌ 留言失敗，請稍後再試。', 'error'); 
@@ -1260,7 +1284,7 @@ async function renderCards() {
     input.value = '';
     renderComments(cardId);
     showToast('✅ 留言成功！感謝你的參與。', 'success');
-}        function addComment(index) {
+}
             const input = document.getElementById(`comment-input-${index}`);
             const text = input.value.trim();
             if (!text) return;
