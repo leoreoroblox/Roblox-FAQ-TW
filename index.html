@@ -1525,24 +1525,36 @@ loadUserProfile();
         tbody.appendChild(tr);
     });
 }
-        function searchUser() {
-            const query = document.getElementById('search-uid').value.trim();
-            if (!query) return;
-            const user = usersData.find(u => u.uid == query || u.name.includes(query));
-            const resultDiv = document.getElementById('user-search-result');
-            if (user) {
-                resultDiv.innerHTML = `
-                    <div class="stat-card" style="text-align: left; margin-bottom: 15px;">
-                        <p>🔍 找到用戶：<strong>${user.name}</strong> (UID: ${user.uid})</p>
-                        <p>狀態：${user.status} | 角色：${user.role} | VIP：${user.vip || '無'}</p>
-                        <p>專屬 ID：${user.exclusiveId || '未獲取'}</p>
-                    </div>
-                `;
-            } else {
-                resultDiv.innerHTML = '<p style="color: #ff5555;">找不到該用戶。</p>';
-            }
-        }
+        async function searchUser() {
+    const query = document.getElementById('search-uid').value.trim();
+    if (!query) return;
+    const resultDiv = document.getElementById('user-search-result');
+    
+    // 从资料库搜寻：比对 UID 或 用户名
+    const { data, error } = await supabaseClient
+        .from('users')
+        .select('*')
+        .or(`uid.eq.${query},username.ilike.%${query}%`);
 
+    if (error) {
+        resultDiv.innerHTML = '<p style="color: #ff5555;">搜寻失败，请稍后再试。</p>';
+        return;
+    }
+
+    if (data && data.length > 0) {
+        const user = data[0];
+        resultDiv.innerHTML = `
+            <div class="stat-card" style="text-align: left; margin-bottom: 15px;">
+                <p>🔍 找到用户：<strong>${user.username}</strong> (UID: ${user.uid})</p>
+                <p>VIP 等级：<span style="color: ${user.vip_level === 'ADSSVIP' ? '#ff00cc' : '#00ffcc'};">${user.vip_level || '普通'}</span></p>
+                <p>专属 ID：${user.exclusive_id || '未获取'}</p>
+                <p>当前状态：${user.is_banned ? '🚫 已封禁' : '🟢 正常'}</p>
+            </div>
+        `;
+    } else {
+        resultDiv.innerHTML = '<p style="color: #ff5555;">找不到该用户。</p>';
+    }
+}
         function warnUser(uid) {
             showToast(`⚠️ 已對 UID ${uid} 發出警告！`, 'warning');
         }
