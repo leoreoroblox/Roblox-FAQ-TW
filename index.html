@@ -1816,17 +1816,26 @@ async function unbanUser(uid) {
             });
         }
 
-        function deleteCard(index) {
-            if (confirm('確定要刪除這張卡片嗎？')) {
-                cardsData.splice(index, 1);
-                localStorage.setItem('robloxCards', JSON.stringify(cardsData));
-                renderCards();
-                renderTopicNav();
-                renderManageCards();
-                renderAdminStats();
-                showToast('🗑️ 卡片已刪除', 'warning');
-            }
-        }
+async function deleteCard(cardId) {
+    if (!confirm('確定要刪除這張卡片嗎？')) return;
+
+    // 從 Supabase 資料庫刪除
+    const { error } = await supabaseClient
+        .from('cards')
+        .delete()
+        .eq('id', cardId);
+
+    if (error) {
+        showToast('❌ 刪除失敗，請稍後再試。', 'error');
+        return;
+    }
+
+    showToast('🗑️ 卡片已從雲端刪除', 'warning');
+    renderCards();
+    renderTopicNav();
+    renderManageCards();
+    renderAdminStats();
+}
 
        async function addNewCard() {
     const title = document.getElementById('new-title').value.trim();
