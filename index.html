@@ -485,9 +485,13 @@
             <h3 style="color: #fff;">leoreoroblox</h3>
             <p style="color: var(--text-sub);">UID: 1001</p>
             <span class="vip-badge vip-ADSSVIP">ADSSVIP 管理員</span>
-        </div>
-
-        <div class="profile-section">
+       <!-- 每日簽到卡片 -->
+<div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
+    <h3 style="color: var(--accent);">📅 每日簽到</h3>
+    <p style="color: #9ca3af; font-size: 14px;">每天簽到領取積分，積分可在未來兌換獎勵！</p>
+    <div style="font-size: 24px; color: var(--warning); margin: 15px 0;">💎 積分：<span id="user-points">0</span></div>
+    <button id="checkin-btn" class="hero-btn clickable" onclick="dailyCheckIn()" style="padding: 10px 30px; font-size: 16px;">立即簽到</button>
+</div>        <div class="profile-section">
             <div class="profile-section-title" data-i18n="profile_section_account">帳號管理</div>
             <div class="profile-row clickable" onclick="showToast('📧 此功能開發中，敬請期待！', 'warning')">
                 <div class="left"><span>📧</span> <span data-i18n="profile_email">綁定電子郵件</span></div>
@@ -789,8 +793,60 @@ async function loadUserProfile() {
         }
         showToast('✅ 成功載入 ' + user.username + ' 的個人資料！', 'success');
     }
+// 檢查今天是否已經簽到
+async function checkDailyCheckin() {
+    const btn = document.getElementById('checkin-btn');
+    const pointsSpan = document.getElementById('user-points');
+    if (!btn) return;
+
+    const { data, error } = await supabaseClient.from('users').select('*').eq('uid', 1001).single();
+    if (error || !data) return;
+
+    pointsSpan.innerText = data.points || 0;
+    
+    if (data.last_checkin) {
+        const last = new Date(data.last_checkin).toDateString();
+        const today = new Date().toDateString();
+        if (last === today) {
+            btn.innerText = '✅ 今日已簽到';
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            return;
+        }
+    }
+    btn.innerText = '立即簽到';
+    btn.disabled = false;
+    btn.style.opacity = '1';
 }
-loadUserProfile();
+
+// 執行簽到
+async function dailyCheckIn() {
+    const uid = 1001; 
+    const { data, error } = await supabaseClient.from('users').select('*').eq('uid', uid).single();
+    if (error || !data) { showToast('❌ 讀取用戶資料失敗', 'error'); return; }
+
+    let bonus = 10;
+    if (data.vip_level === 'VIP') bonus = 15;
+    else if (data.vip_level === 'PVIP') bonus = 20;
+    else if (data.vip_level === 'SVIP') bonus = 30;
+    else if (data.vip_level === 'VVVIP') bonus = 50;
+    else if (data.vip_level === 'ADSSVIP') bonus = 100;
+
+    const newPoints = (data.points || 0) + bonus;
+    const now = new Date().toISOString();
+
+    const { error: updateError } = await supabaseClient
+        .from('users')
+        .update({ points: newPoints, last_checkin: now })
+        .eq('uid', uid);
+
+    if (updateError) { showToast('❌ 簽到失敗，請稍後再試。', 'error'); return; }
+
+    showToast(`✅ 簽到成功！獲得 ${bonus} 積分！`, 'success');
+    document.getElementById('user-points').innerText = newPoints;
+    checkDailyCheckin();
+}
+    checkDailyCheckin();
         // ================= 1. 多語言資料庫 =================
         const translations = {
             zh: {
