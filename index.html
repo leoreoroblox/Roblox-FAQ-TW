@@ -793,9 +793,10 @@ async function loadUserProfile() {
         }
         showToast('✅ 成功載入 ' + user.username + ' 的個人資料！', 'success');
     }
-// 檢查今天是否已經簽到
+}    // 檢查今天是否已經簽到
+
 async function checkDailyCheckin() {
-    const btn = document.getElementById('checkin-btn');
+    const bt = document.getElementById('checkin-btn');
     const pointsSpan = document.getElementById('user-points');
     if (!btn) return;
 
