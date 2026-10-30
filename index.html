@@ -2256,5 +2256,21 @@ async function deleteCard(cardId) {
         }
     });
 </script>
+<script>
+    // 自動把網站上的「論壇」按鈕，連接到 GitHub Discussions
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            // 尋找選單中寫著「論壇」的按鈕
+            if (item.innerText.includes('論壇') || item.innerText.includes('Forum')) {
+                // 把點擊動作改成「在新分頁打開 GitHub Discussions」
+                item.onclick = function(e) {
+                    e.preventDefault(); // 阻止原本的黑屏動作
+                    window.open('https://github.com/leoreoroblox/Roblox-FAQ-TW/discussions', '_blank');
+                };
+            }
+        });
+    });
+</script>
 </body>
 </html>
