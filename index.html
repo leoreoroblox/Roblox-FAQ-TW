@@ -2272,5 +2272,46 @@ async function deleteCard(cardId) {
         });
     });
 </script>
+<script>
+    // ================= 修復後台卡死與按鈕被擠出螢幕的問題 =================
+    // 1. 修改打開後台的函式
+    window.openAdminDashboard = function() {
+        document.getElementById('admin-dashboard').style.display = 'flex';
+        document.getElementById('side-menu').style.left = '-300px'; // 順便關閉側邊選單
+        document.getElementById('menu-btn').style.display = 'none'; // 隱藏漢堡選單，避免跟後台打架
+        switchAdminPage('dashboard');
+        renderAdminStats();
+        renderManageCards();
+        renderAdminComments();
+        renderBannedList();
+        renderAnnounceHistory();
+        renderUserTable();
+        renderVIPSelect();
+        showToast('👑 管理員已登入後台', 'success');
+    };
+
+    // 2. 修改關閉後台的函式
+    window.closeAdminDashboard = function() {
+        document.getElementById('admin-dashboard').style.display = 'none';
+        document.getElementById('menu-btn').style.display = 'block'; // 恢復漢堡選單
+    };
+
+    // 3. 強制讓後台頂部的按鈕不要被擠出螢幕
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminHeader = document.querySelector('.admin-header');
+        if (adminHeader) {
+            // 讓標題不要佔用太多空間，把按鈕擠出去
+            adminHeader.style.gap = '10px';
+            const title = adminHeader.querySelector('h2');
+            if (title) {
+                title.style.flex = '1';
+                title.style.fontSize = '14px'; // 手機版縮小標題字體
+                title.style.whiteSpace = 'nowrap';
+                title.style.overflow = 'hidden';
+                title.style.textOverflow = 'ellipsis';
+            }
+        }
+    });
+</script>
 </body>
 </html>
