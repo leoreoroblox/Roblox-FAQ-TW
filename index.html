@@ -2586,5 +2586,36 @@ async function deleteCard(cardId) {
 
     }, 1000); // 延遲 1 秒執行，確保所有前面的程式碼都載入完畢
 </script>
+<script>
+    // ================= 終極修復：讓儀表板顯示真實的雲端數據 =================
+    window.renderAdminStats = async function() {
+        try {
+            // 從 Supabase 抓取各項目的真實數量
+            const { count: cardCount } = await supabaseClient.from('cards').select('*', { count: 'exact', head: true });
+            const { count: commentCount } = await supabaseClient.from('comments').select('*', { count: 'exact', head: true });
+            const { count: userCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+            const { count: banCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('is_banned', true);
+
+            // 更新畫面上的數字
+            document.getElementById('stat-posts').innerText = cardCount || 0;
+            document.getElementById('stat-comments').innerText = commentCount || 0;
+            document.getElementById('stat-users').innerText = userCount || 0;
+            document.getElementById('stat-online').innerText = userCount || 1; // 在線人數目前用總會員數暫代
+            document.getElementById('stat-bans').innerText = banCount || 0;
+            
+        } catch (error) {
+            console.error('讀取統計數據失敗:', error);
+        }
+    };
+
+    // 網頁載入完畢後，重新抓取一次真實數據
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            if (typeof window.renderAdminStats === 'function') {
+                window.renderAdminStats();
+            }
+        }, 1500);
+    });
+</script>
 </body>
 </html>
