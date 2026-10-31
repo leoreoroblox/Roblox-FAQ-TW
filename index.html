@@ -2507,5 +2507,84 @@ async function deleteCard(cardId) {
         }
     }, true);
 </script>
+<script>
+    // ================= 終極防彈修復：解決兩個全螢幕元素打架的問題 =================
+    setTimeout(() => {
+        const loginPage = document.getElementById('login-page');
+        const adminDash = document.getElementById('admin-dashboard');
+        
+        // 1. 把這兩個元素移到網頁最外層，防止被其他容器卡住
+        if (loginPage) document.body.appendChild(loginPage);
+        if (adminDash) document.body.appendChild(adminDash);
+
+        // 2. 覆蓋顯示登入畫面的函式（重點：先強制隱藏後台！）
+        window.showLoginPage = function() {
+            if (adminDash) adminDash.style.display = 'none'; // 把擋住的大布收起來！
+            if (loginPage) {
+                loginPage.style.display = 'flex';
+                loginPage.style.cssText = "display: flex !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #f0f4f9 !important; z-index: 2147483647 !important; justify-content: center !important; align-items: center !important; flex-direction: column !important;";
+                
+                // 重置輸入框狀態
+                const pwdInput = document.getElementById('admin-password-input');
+                const errMsg = document.getElementById('login-error-msg');
+                const loginBtn = document.querySelector('.login-btn');
+                if(pwdInput) { pwdInput.value = ''; pwdInput.disabled = false; }
+                if(errMsg) errMsg.style.display = 'none';
+                if(loginBtn) loginBtn.disabled = false;
+            }
+        };
+
+        // 3. 覆蓋顯示後台的函式（重點：先強制隱藏登入畫面！）
+        window.openAdminDashboard = function() {
+            if (loginPage) loginPage.style.display = 'none'; // 收起登入畫面
+            if (adminDash) {
+                adminDash.style.display = 'flex';
+                adminDash.style.cssText = "display: flex !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #0b0f19 !important; z-index: 2147483647 !important; flex-direction: column !important;";
+                
+                // 隱藏側邊選單
+                const sideMenu = document.getElementById('side-menu');
+                const menuBtn = document.getElementById('menu-btn');
+                if(sideMenu) sideMenu.style.left = '-300px';
+                if(menuBtn) menuBtn.style.display = 'none';
+
+                if (typeof switchAdminPage === 'function') switchAdminPage('dashboard');
+                if (typeof renderAdminStats === 'function') renderAdminStats();
+                if (typeof renderManageCards === 'function') renderManageCards();
+                if (typeof renderAdminComments === 'function') renderAdminComments();
+                if (typeof renderBannedList === 'function') renderBannedList();
+                if (typeof renderAnnounceHistory === 'function') renderAnnounceHistory();
+                if (typeof renderUserTable === 'function') renderUserTable();
+                if (typeof renderVIPSelect === 'function') renderVIPSelect();
+                if (typeof showToast === 'function') showToast('👑 管理員已登入後台', 'success');
+            }
+        };
+
+        // 4. 覆蓋關閉與退出函式
+        window.closeAdminDashboard = function() {
+            if (adminDash) adminDash.style.display = 'none';
+            const menuBtn = document.getElementById('menu-btn');
+            if(menuBtn) menuBtn.style.display = 'block';
+        };
+
+        window.logoutAdmin = function() {
+            if (adminDash) adminDash.style.display = 'none';
+            if (loginPage) loginPage.style.display = 'none';
+            const menuBtn = document.getElementById('menu-btn');
+            if(menuBtn) menuBtn.style.display = 'block';
+            if (typeof showToast === 'function') showToast('👋 已退出管理員後台，下次進入需重新登入。', 'info');
+        };
+
+        // 5. 終極點擊攔截（確保百分之百觸發）
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('#admin-menu-item');
+            if (target) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.showLoginPage();
+            }
+        }, true);
+
+    }, 1000); // 延遲 1 秒執行，確保所有前面的程式碼都載入完畢
+</script>
 </body>
 </html>
