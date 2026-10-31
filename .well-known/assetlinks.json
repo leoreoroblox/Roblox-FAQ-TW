@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.leoreoroblox.twa",
+        "sha256_cert_fingerprints": ["7B:6B:EB:24:C2:32:34:0F:5A:90:A4:88:0E:B2:DF:6E:AF:E1:F6:87:74:67:93:98:29:E1:1B:29:26:B3:83:CF"]
+      }
+    }]
