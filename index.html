@@ -4701,5 +4701,88 @@ async function deleteCard(cardId) {
         });
     });
 </script>
+<script>
+    // ================= 終極權限鎖定：覆蓋原本的 renderCards =================
+    window.renderCards = async function() {
+        const container = document.getElementById('cards-container');
+        if (!container) return;
+        
+        // 1. 第一步：先檢查有沒有登入！
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+            // 如果沒有登入，直接顯示超大的鎖頭，不載入任何卡片！
+            container.innerHTML = `
+                <div style="text-align: center; padding: 50px 20px; background: rgba(17, 24, 39, 0.8); border: 1px dashed #ffaa00; border-radius: 15px; margin-top: 20px;">
+                    <h2 style="color: #ffaa00; font-size: 28px;">🔒 請先登入以查看知識庫</h2>
+                    <p style="color: #9ca3af; margin-top: 10px;">Leo Studio 的知識庫目前僅限會員瀏覽。</p>
+                    <p style="color: #9ca3af;">請點擊左上角選單，使用 Google 登入或遊客快速登入。</p>
+                </div>
+            `;
+            return; // 直接中斷，不往下執行！
+        }
+
+        // 2. 如果有登入，才繼續載入卡片
+        container.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 載入卡片中...</p>';
+        
+        const { data, error } = await supabaseClient
+            .from('cards')
+            .select('*')
+            .order('id', { ascending: true });
+
+        if (error) {
+            container.innerHTML = '<p style="text-align: center; color: #ff5555;">❌ 載入卡片失敗。</p>';
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #9ca3af;">目前沒有卡片。</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+        data.forEach((card) => {
+            let cardClass = 'card-misc';
+            let tagClass = 'tag-misc';
+            if (card.topic.includes('基礎')) { cardClass = 'card-basic'; tagClass = 'tag-basic'; }
+            else if (card.topic.includes('安全')) { cardClass = 'card-security'; tagClass = 'tag-security'; }
+            else if (card.topic.includes('Robux')) { cardClass = 'card-robux'; tagClass = 'tag-robux'; }
+            else if (card.topic.includes('開發')) { cardClass = 'card-dev'; tagClass = 'tag-dev'; }
+            else if (card.topic.includes('平台')) { cardClass = 'card-platform'; tagClass = 'tag-platform'; }
+            else if (card.topic.includes('社群')) { cardClass = 'card-community'; tagClass = 'tag-community'; }
+            else if (card.topic.includes('最新')) { cardClass = 'card-latest'; tagClass = 'tag-latest'; }
+
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `card ${cardClass}`;
+            cardDiv.id = `card-${card.id}`;
+            cardDiv.innerHTML = `
+                <span class="tag ${tagClass}">${card.topic}</span>
+                <h3>❓ ${card.title}</h3>
+                <p>${card.content}</p>
+                <div class="card-actions">
+                    <span onclick="toggleComment(${card.id})">💬 留言區</span>
+                    <span onclick="likeCard(${card.id})">👍 讚</span>
+                    <span onclick="likeCard(${card.id})">👎 爛</span>
+                </div>
+                <div class="comment-section" id="comment-section-${card.id}">
+                    <div class="comment-input-box">
+                        <input type="text" id="comment-input-${card.id}" placeholder="留下你的評論...">
+                        <button onclick="addComment(${card.id})">送出</button>
+                    </div>
+                    <div id="comment-list-${card.id}"></div>
+                </div>
+            `;
+            container.appendChild(cardDiv);
+            renderComments(card.id);
+        });
+    };
+
+    // 網頁載入後，立刻觸發一次檢查並重新渲染
+    setTimeout(() => {
+        if (typeof window.renderCards === 'function') {
+            window.renderCards();
+        }
+    }, 500);
+</script>
 </body>
 </html>
