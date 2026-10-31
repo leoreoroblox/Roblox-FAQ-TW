@@ -29,17 +29,35 @@ jobs:
             const axios = require('axios');
             const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-            // 👇 這裡填寫你想監控的遊戲 Place ID，可以無限增加！
+            // 👇 這是你剛剛截圖裡的 20 個遊戲 ID！
             const gameIds = [
-              '6516141723', // DOORS
-              '920587237'   // Adopt Me (你可以自己換成其他遊戲)
+              '6516141723',        // DOORS (原本的)
+              '920587237',         // Adopt Me (原本的)
+              '70411440483149',    // 海上100天
+              '94278659624110',    // 後座集會
+              '129631837832236',   // 一場漫長的飛行
+              '12334109280',       // 《內臟和黑火藥》
+              '7041939546',        // 目錄化身創作者
+              '114234929420007',   // 布洛克斯攻擊
+              '116495829188952',   // 死亡鐵軌
+              '113506071094099',   // 銳利的
+              '79546208627805',    // 森林中的99個夜晚
+              '107778070777162',   // 偷一顆蛋
+              '17516596118',       // 超級射擊
+              '12411473842',       // 壓力
+              '4639625707',        // War Tycoon
+              '14438406081',       // Wanted
+              '99409088950210',    // 在百萬隻猴子中存活
+              '86479448397834',    // 烘焙或死亡
+              '18934709778',       // 漫長路徑
+              '111543903102439',   // +1石頭跳躍
+              '6872265039',        // BedWars
+              '122446657157717'    // 狙擊手競技場
             ];
 
             async function checkUpdates() {
               for (const placeId of gameIds) {
                 try {
-                  console.log('正在檢查遊戲 ID: ' + placeId);
-                  
                   // 1. 取得遊戲的 Universe ID
                   const uniRes = await axios.get('https://apis.roblox.com/universes/v1/places/' + placeId + '/universe');
                   const universeId = uniRes.data.universeId;
@@ -60,7 +78,6 @@ jobs:
                     .limit(1);
 
                   if (existing && existing.length > 0 && existing[0].updated_date === gameUpdated) {
-                    console.log('[' + game.name + '] 沒有更新，跳過。');
                     continue; // 沒更新就換下一個遊戲
                   }
 
@@ -76,6 +93,9 @@ jobs:
                   if (error) { console.error('[' + game.name + '] 寫入失敗:', error); } 
                   else { console.log('✅ [' + game.name + '] 發現更新！已成功記錄。'); }
                   
+                  // 💡 小魔法：每次查詢中間休息 1 秒，避免被 Roblox 官方當成惡意攻擊封鎖
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+
                 } catch (err) {
                   console.error('檢查遊戲 ' + placeId + ' 時發生錯誤:', err.message);
                 }
