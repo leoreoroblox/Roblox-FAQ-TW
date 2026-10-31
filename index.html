@@ -3041,5 +3041,132 @@ async function deleteCard(cardId) {
         };
     });
 </script>
+<script>
+    // ================= 擴充：更新日誌管理與隱藏功能 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 在「新增更新日誌」的下方，加一個「現有日誌管理」的區塊
+        const changelogPage = document.getElementById('admin-page-changelog');
+        if (changelogPage) {
+            const listContainer = document.createElement('div');
+            listContainer.style.marginTop = '40px';
+            listContainer.innerHTML = `
+                <h3 style="color: var(--accent); border-top: 1px solid var(--border-color); padding-top: 20px;">📋 現有日誌管理</h3>
+                <div id="admin-changelog-list"></div>
+            `;
+            changelogPage.appendChild(listContainer);
+        }
+
+        // 2. 渲染後台日誌列表的函式
+        window.renderAdminChangelogList = async function() {
+            const list = document.getElementById('admin-changelog-list');
+            if (!list) return;
+            list.innerHTML = '<p style="color: #9ca3af;">📥 載入中...</p>';
+
+            const { data, error } = await supabaseClient.from('changelogs').select('*').order('created_at', { ascending: false });
+            if (error) { list.innerHTML = '<p style="color: #ff5555;">載入失敗。</p>'; return; }
+
+            if (!data || data.length === 0) {
+                list.innerHTML = '<p style="color: #9ca3af;">目前沒有日誌。</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            data.forEach(log => {
+                const div = document.createElement('div');
+                div.style.cssText = 'background: #1f2937; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;';
+                
+                const statusText = log.is_hidden ? '<span style="color: #ff5555;">(已隱藏)</span>' : '<span style="color: #00ffcc;">(顯示中)</span>';
+                
+                div.innerHTML = `
+                    <div>
+                        <strong style="color: #fff;">${log.version} - ${log.title}</strong> ${statusText}
+                        <div style="font-size: 12px; color: #9ca3af;">📅 ${log.date} | 類型: ${log.type}</div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="clickable" onclick="toggleLogVisibility(${log.id}, ${log.is_hidden})" style="background: ${log.is_hidden ? '#00ffcc' : '#ffaa00'}; color: #000; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                            ${log.is_hidden ? '👁️ 顯示' : '🙈 隱藏'}
+                        </button>
+                        <button class="clickable" onclick="deleteChangelog(${log.id})" style="background: #ff5555; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">🗑️ 刪除</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        };
+
+        // 3. 隱藏/顯示切換函式
+        window.toggleLogVisibility = async function(id, currentHidden) {
+            const { error } = await supabaseClient.from('changelogs').update({ is_hidden: !currentHidden }).eq('id', id);
+            if (error) { showToast('❌ 操作失敗', 'error'); return; }
+            showToast(currentHidden ? '👁️ 日誌已公開' : '🙈 日誌已隱藏', 'success');
+            window.renderAdminChangelogList();
+            window.renderLogs(); // 同步更新前台
+        };
+
+        // 4. 刪除日誌函式
+        window.deleteChangelog = async function(id) {
+            if (!confirm('確定要永久刪除這篇更新日誌嗎？')) return;
+            const { error } = await supabaseClient.from('changelogs').delete().eq('id', id);
+            if (error) { showToast('❌ 刪除失敗', 'error'); return; }
+            showToast('🗑️ 日誌已刪除', 'warning');
+            window.renderAdminChangelogList();
+            window.renderLogs(); // 同步更新前台
+        };
+
+        // 5. 覆蓋原本的切換頁面函式，讓進入日誌管理時自動載入列表
+        const originalSwitchAdminPage = window.switchAdminPage;
+        window.switchAdminPage = function(page) {
+            if (originalSwitchAdminPage) originalSwitchAdminPage(page);
+            if (page === 'changelog') {
+                window.renderAdminChangelogList();
+            }
+        };
+
+        // 6. 覆蓋前台的渲染函式，過濾掉「已隱藏」的日誌
+        window.renderLogs = async function(filter = 'all') {
+            const list = document.getElementById('log-list');
+            if (!list) return;
+            list.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 載入更新日誌中...</p>';
+
+            // 只抓取 is_hidden = false (或是 null) 的資料
+            const { data, error } = await supabaseClient
+                .from('changelogs')
+                .select('*')
+                .eq('is_hidden', false)
+                .order('created_at', { ascending: false });
+
+            if (error) { list.innerHTML = '<p style="color: #ff5555;">載入失敗。</p>'; return; }
+
+            let logsToShow = data || [];
+            if (filter !== 'all') {
+                logsToShow = logsToShow.filter(log => log.type === filter);
+            }
+
+            if (logsToShow.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #9ca3af;">目前沒有公開的更新日誌喔！</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            logsToShow.forEach(log => {
+                const item = document.createElement('div');
+                item.className = 'log-item';
+                let tagText = '';
+                if (log.type === 'major') tagText = '🚀 大型更新';
+                else if (log.type === 'feature') tagText = '✨ 新功能';
+                else if (log.type === 'minor') tagText = '🔧 小型更新';
+                else if (log.type === 'bug') tagText = '🐛 Bug修復';
+                
+                const contentHtml = (log.content || []).map(c => `<li>✅ ${c}</li>`).join('');
+
+                item.innerHTML = `
+                    <div class="log-version">${log.version} - ${log.title} <span class="log-tag tag-${log.type}">${tagText}</span></div>
+                    <div class="log-date">📅 ${log.date}</div>
+                    <div class="log-content"><ul>${contentHtml}</ul></div>
+                `;
+                list.appendChild(item);
+            });
+        };
+    });
+</script>
 </body>
 </html>
