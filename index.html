@@ -4810,5 +4810,25 @@ async function deleteCard(cardId) {
         }
     });
 </script>
+<script>
+    // ================= 終極修復：確保 Logo 點擊一定能打開選單 =================
+    document.addEventListener('click', function(e) {
+        // 檢查點擊的目標是不是我們的 Logo 按鈕 (包含點到裡面的圖片)
+        if (e.target.closest('#menu-btn')) {
+            e.preventDefault();
+            e.stopPropagation(); // 阻止所有其他干擾
+            
+            const menu = document.getElementById('side-menu');
+            if (menu) {
+                // 如果目前選單在左邊（打開狀態），就收回；反之就打開
+                if (menu.style.left === '0px' || menu.style.left === '0') {
+                    menu.style.left = '-320px';
+                } else {
+                    menu.style.left = '0px';
+                }
+            }
+        }
+    }, true); // 使用 capture 階段，比任何原本的程式碼都早執行
+</script>
 </body>
 </html>
