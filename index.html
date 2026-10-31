@@ -4830,5 +4830,99 @@ async function deleteCard(cardId) {
         }
     }, true); // 使用 capture 階段，比任何原本的程式碼都早執行
 </script>
+<!-- ================= 獨立遊戲更新頁面 ================= -->
+<div id="game-updates-page" class="page-section container" style="display: none;">
+    <h2 style="color: var(--accent); text-align: center;">🎮 遊戲更新監控中心</h2>
+    <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;">由 Leo Studio 機器人自動為您抓取最新遊戲動態</p>
+    
+    <div id="game-updates-list">
+        <p style="text-align: center; color: #9ca3af;">📥 載入遊戲資訊中...</p>
+    </div>
+</div>
+
+<script>
+    // ================= 遊戲更新頁面連動邏輯 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. 在側邊選單加入「遊戲更新」按鈕 (插在公告中心下面)
+        const sideMenu = document.getElementById('side-menu');
+        if (sideMenu) {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'menu-item clickable';
+            menuItem.innerText = '🎮 遊戲更新';
+            menuItem.onclick = () => showPage('game-updates');
+            
+            const announceItem = Array.from(sideMenu.querySelectorAll('.menu-item')).find(el => el.innerText.includes('公告中心'));
+            if (announceItem) {
+                announceItem.parentNode.insertBefore(menuItem, announceItem.nextSibling);
+            } else {
+                sideMenu.insertBefore(menuItem, sideMenu.querySelector('.menu-item'));
+            }
+        }
+
+        // 2. 渲染遊戲更新列表的函式
+        window.renderGameUpdates = async function() {
+            const list = document.getElementById('game-updates-list');
+            if (!list) return;
+            list.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 載入中...</p>';
+
+            // 抓取最新的遊戲更新資料
+            const { data, error } = await supabaseClient
+                .from('game_updates')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20); // 顯示最近 20 筆
+
+            if (error) { list.innerHTML = '<p style="color: #ff5555; text-align: center;">載入失敗。</p>'; return; }
+            if (!data || data.length === 0) { list.innerHTML = '<p style="color: #9ca3af; text-align: center;">目前沒有監控資料。</p>'; return; }
+
+            list.innerHTML = '';
+            data.forEach(game => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.borderLeft = '4px solid var(--accent)';
+                
+                const updateTime = new Date(game.updated_date).toLocaleString();
+                
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="color: var(--accent); margin-bottom: 5px;">🎮 ${game.game_name}</h3>
+                            <p style="font-size: 14px; color: var(--text-sub);">👤 創作者：${game.creator_name}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="tag tag-basic" style="background: rgba(0,255,204,0.1); color: #00ffcc; border: 1px solid #00ffcc; padding: 2px 8px; border-radius: 4px; font-size: 12px;">🟢 線上：${game.playing.toLocaleString()} 人</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); font-size: 14px; color: #d1d5db;">
+                        <span style="color: #ffaa00;">🔄 最後更新時間：</span> ${updateTime}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        };
+
+        // 3. 覆蓋 showPage 函式，讓它能切換到新頁面
+        const originalShowPage = window.showPage;
+        window.showPage = function(pageName, topic = '') {
+            if (originalShowPage) originalShowPage(pageName, topic);
+
+            if (pageName === 'game-updates') {
+                document.querySelectorAll('.page-section').forEach(page => {
+                    page.classList.remove('active');
+                    page.style.display = 'none';
+                });
+                const target = document.getElementById('game-updates-page');
+                if (target) {
+                    target.style.display = 'block';
+                    setTimeout(() => target.classList.add('active'), 10);
+                }
+                window.renderGameUpdates(); // 載入資料
+                document.getElementById('side-menu').style.left = '-320px';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+    });
+</script>
 </body>
 </html>
