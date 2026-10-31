@@ -3492,6 +3492,173 @@ async function deleteCard(cardId) {
         setTimeout(window.checkGlobalMaintenance, 1200);
     });
 </script>
+    <script>
+    // ================= 終極進化：時間換算與維護類型 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. 升級後台的「系統設置」介面
+        const settingsPage = document.getElementById('admin-page-settings');
+        if (settingsPage) {
+            const opGroup = document.getElementById('op-message-input').parentElement;
+            opGroup.innerHTML = `
+                <label>維護類型</label>
+                <select id="op-maintenance-type" class="clickable" style="width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px; margin-bottom: 10px;">
+                    <option value="臨時維護">🛑 臨時維護</option>
+                    <option value="大型維修">🚧 大型維修</option>
+                    <option value="定時維護">⏰ 定時維護</option>
+                    <option value="新功能加入">✨ 新功能加入</option>
+                </select>
+
+                <label>快速選擇公告內容 (可自訂)</label>
+                <select id="op-preset-select" class="clickable" style="width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px; margin-bottom: 10px;" onchange="applyOpPreset(this.value)">
+                    <option value="">-- 請選擇預設文字 --</option>
+                    <option value="系統臨時維護中，預計不久後恢復，請稍後再試。">系統臨時維護</option>
+                    <option value="伺服器正在進行大型升級，暫停服務，造成不便敬請見諒。">伺服器大型升級</option>
+                    <option value="我們正在加入超酷的新功能，網站將盡快恢復！">新功能加入中</option>
+                </select>
+
+                <label>維護訊息 (可手動修改)</label>
+                <input type="text" id="op-message-input" placeholder="例如：網站維護中，請稍後再試。" style="margin-bottom: 10px;">
+
+                <label>預計維護時長</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div style="flex: 1;">
+                        <input type="number" id="op-duration-h" value="0" min="0" placeholder="時" style="width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px;">
+                        <span style="font-size: 12px; color: #9ca3af;">小時</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <input type="number" id="op-duration-m" value="10" min="0" placeholder="分" style="width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px;">
+                        <span style="font-size: 12px; color: #9ca3af;">分鐘</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <input type="number" id="op-duration-s" value="0" min="0" placeholder="秒" style="width: 100%; padding: 10px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 5px;">
+                        <span style="font-size: 12px; color: #9ca3af;">秒數</span>
+                    </div>
+                </div>
+
+                <button class="btn-submit clickable" style="background: #ff5555; margin-top: 10px;" onclick="triggerOP()">🛑 啟動全站維護</button>
+            `;
+        }
+
+        // 2. 套用預設文字
+        window.applyOpPreset = function(val) {
+            if (val) document.getElementById('op-message-input').value = val;
+        };
+
+        // 3. 覆蓋 triggerOP：處理時間進位與類型寫入
+        window.triggerOP = async function() {
+            const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。';
+            const type = document.getElementById('op-maintenance-type').value;
+            
+            let h = parseInt(document.getElementById('op-duration-h').value) || 0;
+            let m = parseInt(document.getElementById('op-duration-m').value) || 0;
+            let s = parseInt(document.getElementById('op-duration-s').value) || 0;
+
+            // 自動進位邏輯
+            if (s >= 60) { m += Math.floor(s / 60); s = s % 60; }
+            if (m >= 60) { h += Math.floor(m / 60); m = m % 60; }
+
+            // 計算總秒數與結束時間
+            const totalSeconds = (h * 3600) + (m * 60) + s;
+            const endTime = new Date(Date.now() + totalSeconds * 1000).toISOString();
+
+            const { error } = await supabaseClient.from('site_settings').update({ 
+                maintenance_mode: true, 
+                maintenance_message: msg,
+                maintenance_type: type,
+                end_time: endTime
+            }).eq('id', 1);
+
+            if (error) { showToast('❌ 啟動維護失敗', 'error'); return; }
+
+            showGlobalOverlay(msg, endTime, type);
+            showToast('🛑 已對全球發布維護公告！', 'error');
+            document.getElementById('admin-dashboard').style.display = 'none';
+        };
+
+        // 4. 覆蓋 showGlobalOverlay：根據類型顯示不同標題與倒數
+        window.showGlobalOverlay = function(message, endTimeStr, mType = '臨時維護') {
+            if (document.getElementById('global-op-overlay')) return;
+            
+            const lang = localStorage.getItem('siteLang') || 'zh';
+            const isEn = lang === 'en';
+            
+            // 根據類型決定標題
+            let textTitle = isEn ? '🛑 Under Maintenance' : '🛑 網站維護中';
+            if (mType === '大型維修') textTitle = isEn ? '🚧 Major Upgrade' : '🚧 大型系統升級';
+            if (mType === '定時維護') textTitle = isEn ? '⏰ Scheduled Maintenance' : '⏰ 定時例行維護';
+            if (mType === '新功能加入') textTitle = isEn ? '✨ Adding New Features' : '✨ 新功能火熱加入中';
+
+            const textFooter = isEn ? 'The Leo Studio team is working hard to update. Please check back later!' : 'Leo Studio 團隊正在努力更新，請稍後再回來！';
+            const textCountdown = isEn ? 'Estimated time remaining: ' : '預計剩餘時間：';
+
+            const overlay = document.createElement('div');
+            overlay.id = 'global-op-overlay';
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0b0f19; z-index: 99999999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; font-family: sans-serif; padding: 20px; box-sizing: border-box;';
+            
+            overlay.innerHTML = `
+                <h1 style="color: #ff5555; font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,85,85,0.5);">${textTitle}</h1>
+                <p style="font-size: 20px; color: #9ca3af; max-width: 600px; line-height: 1.6;">${message}</p>
+                <p id="op-timer-display" style="font-size: 24px; color: var(--accent); font-family: monospace; margin-top: 20px;"></p>
+                <p style="margin-top: 20px; font-size: 14px; color: #4b5563;">${textFooter}</p>
+                <div id="secret-unlock" style="position: absolute; bottom: 0; left: 0; width: 100px; height: 100px; cursor: default; -webkit-tap-highlight-color: transparent; touch-action: none;"></div>
+            `;
+            document.body.appendChild(overlay);
+
+            // 倒數計時邏輯
+            if (endTimeStr) {
+                const endTime = new Date(endTimeStr).getTime();
+                const timerEl = document.getElementById('op-timer-display');
+
+                const timerInterval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const distance = endTime - now;
+
+                    if (distance < 0) {
+                        clearInterval(timerInterval);
+                        timerEl.innerHTML = isEn ? 'Time is up! Waiting for Admin...' : '時間到！等待管理員解除...';
+                        return;
+                    }
+
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                    let timeString = '';
+                    if (hours > 0) timeString += `${hours}小時 `;
+                    if (minutes > 0 || hours > 0) timeString += `${minutes}分 `;
+                    timeString += `${seconds < 10 ? '0' : ''}${seconds}秒`;
+
+                    timerEl.innerHTML = `${textCountdown} ${timeString}`;
+                }, 1000);
+            }
+
+            // 長按 3 秒解鎖
+            const unlockArea = document.getElementById('secret-unlock');
+            let pressTimer;
+            const startPress = (e) => { e.preventDefault(); pressTimer = setTimeout(() => { document.getElementById('admin-menu-item').style.display = 'block'; showToast('👑 管理員通道已解鎖，請前往後台關閉維護。', 'success'); overlay.remove(); }, 3000); };
+            const cancelPress = (e) => { e.preventDefault(); if (pressTimer) clearTimeout(pressTimer); };
+            unlockArea.addEventListener('mousedown', startPress);
+            unlockArea.addEventListener('mouseup', cancelPress);
+            unlockArea.addEventListener('mouseleave', cancelPress);
+            unlockArea.addEventListener('touchstart', startPress, { passive: false });
+            unlockArea.addEventListener('touchend', cancelPress);
+            unlockArea.addEventListener('touchcancel', cancelPress);
+        };
+
+        // 5. 覆蓋檢查維護狀態
+        window.checkGlobalMaintenance = async function() {
+            const { data, error } = await supabaseClient.from('site_settings').select('*').eq('id', 1).single();
+            if (error || !data) return;
+
+            if (data.maintenance_mode) {
+                showGlobalOverlay(data.maintenance_message, data.end_time, data.maintenance_type);
+            }
+        };
+
+        setTimeout(window.checkGlobalMaintenance, 1200);
+    });
+</script>
     </script>
 </body>
 </html>
