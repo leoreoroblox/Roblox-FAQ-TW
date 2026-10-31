@@ -4590,5 +4590,56 @@ async function deleteCard(cardId) {
         });
     };
 </script>
+<script>
+    // ================= 全新 VIP 發放系統 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        // 覆蓋發放 VIP 的函式
+        window.grantVIP = async function() {
+            const uidInput = document.getElementById('vip-uid');
+            const levelSelect = document.getElementById('vip-level');
+            const exclusiveInput = document.getElementById('vip-exclusive-id');
+            
+            if (!uidInput || !levelSelect) return;
+
+            const uid = uidInput.value.trim();
+            const level = levelSelect.value;
+            const exclusiveId = exclusiveInput ? exclusiveInput.value.trim() : '';
+
+            if (!uid) {
+                showToast('⚠️ 請輸入玩家 UID！', 'warning');
+                return;
+            }
+
+            // 準備要更新的資料
+            const updateData = { vip_level: level };
+            if (exclusiveId) updateData.exclusive_id = exclusiveId;
+
+            // 寫入 Supabase 資料庫 (比對 UID 來更新)
+            const { data, error } = await supabaseClient
+                .from('users')
+                .update(updateData)
+                .eq('uid', uid)
+                .select();
+
+            if (error) {
+                showToast('❌ 發放失敗，請稍後再試。', 'error');
+                console.error(error);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                showToast(`🎁 已成功為 ${data[0].username} (UID: ${uid}) 發放 ${level} 特權！`, 'success');
+                // 清空輸入框
+                uidInput.value = '';
+                if (exclusiveInput) exclusiveInput.value = '';
+                
+                // 重新整理後台的用戶列表
+                if (typeof renderUserTable === 'function') renderUserTable();
+            } else {
+                showToast(`❌ 找不到 UID 為 ${uid} 的玩家！`, 'error');
+            }
+        };
+    });
+</script>
 </body>
 </html>
