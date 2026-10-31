@@ -4356,5 +4356,12 @@ async function deleteCard(cardId) {
         });
     }
 </script>
+<!-- ================= 修復 Logo 與選單穿模問題 ================= -->
+<style>
+    /* 強制把側邊選單的頂部留白加大，避開 80px 的 Logo */
+    #side-menu {
+        padding-top: 120px !important; 
+    }
+</style>
 </body>
 </html>
