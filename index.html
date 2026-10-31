@@ -5018,5 +5018,95 @@ async function deleteCard(cardId) {
         }, true); // 使用 capture 階段，絕對攔截
     });
 </script>
+<script>
+    // ================= 终极救援：恢复页面与游戏更新功能 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. 恢复所有基本页面切换逻辑
+        window.showPage = function(pageName, topic = '') {
+            document.getElementById('side-menu').style.left = '-320px';
+            document.querySelectorAll('.page-section').forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            });
+
+            let targetPage;
+            if (pageName === 'home') targetPage = document.getElementById('home-page');
+            else if (pageName === 'qa') targetPage = document.getElementById('qa-page');
+            else if (pageName === 'game-updates') targetPage = document.getElementById('game-updates-page');
+            else if (pageName === 'intro') targetPage = document.getElementById('intro-page');
+            else if (pageName === 'changelog') targetPage = document.getElementById('changelog-page');
+            else if (pageName === 'profile') targetPage = document.getElementById('profile-page');
+
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                setTimeout(() => targetPage.classList.add('active'), 10);
+                if (pageName === 'game-updates') {
+                    window.renderGameUpdates();
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // 2. 恢复菜单按钮点击
+        document.getElementById('menu-btn').onclick = function() {
+            const menu = document.getElementById('side-menu');
+            menu.style.left = menu.style.left === '0px' ? '-320px' : '0px';
+        };
+
+        // 3. 渲染游戏更新数据的函数
+        window.renderGameUpdates = async function() {
+            const list = document.getElementById('game-updates-list');
+            if (!list) return;
+            list.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 载入中...</p>';
+
+            const { data, error } = await supabaseClient.from('game_updates').select('*').order('created_at', { ascending: false }).limit(20);
+
+            if (error) { list.innerHTML = '<p style="color: #ff5555; text-align: center;">载入失败。</p>'; return; }
+            if (!data || data.length === 0) { list.innerHTML = '<p style="color: #9ca3af; text-align: center;">目前没有监控资料。</p>'; return; }
+
+            list.innerHTML = '';
+            data.forEach(game => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.borderLeft = '4px solid var(--accent)';
+                const updateTime = new Date(game.updated_date).toLocaleString();
+                
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="color: var(--accent); margin-bottom: 5px;">🎮 ${game.game_name}</h3>
+                            <p style="font-size: 14px; color: var(--text-sub);">👤 创作者：${game.creator_name}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="tag tag-basic" style="background: rgba(0,255,204,0.1); color: #00ffcc; border: 1px solid #00ffcc; padding: 2px 8px; border-radius: 4px; font-size: 12px;">🟢 线上：${game.playing.toLocaleString()} 人</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); font-size: 14px; color: #d1d5db;">
+                        <span style="color: #ffaa00;">🔄 最后更新时间：</span> ${updateTime}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        };
+
+        // 4. 隐藏/移除那个奇怪的绿条（如果存在的话）
+        const weirdBar = Array.from(document.querySelectorAll('*')).find(el => el.innerText === '不小心按到推荐');
+        if (weirdBar) weirdBar.style.display = 'none';
+
+        // 5. 重新绑定侧边栏的「游戏更新」按钮（确保能点）
+        const sideMenu = document.getElementById('side-menu');
+        const gameMenuBtn = Array.from(sideMenu.querySelectorAll('.menu-item')).find(el => el.innerText.includes('游戏更新') || el.innerText.includes('遊戲更新'));
+        if (gameMenuBtn) {
+            gameMenuBtn.onclick = (e) => {
+                e.preventDefault();
+                showPage('game-updates');
+            };
+        }
+
+        // 强制重新显示首页，防止黑屏
+        showPage('home');
+    });
+</script>
 </body>
 </html>
