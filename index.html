@@ -5161,5 +5161,38 @@ async function deleteCard(cardId) {
         display: none !important;
     }
 </style>
+<!-- ================= 終極公告中心修復 ================= -->
+<script>
+document.addEventListener('click', function(e) {
+    // 攔截所有點擊「公告中心」的動作
+    const target = e.target.closest('.menu-item');
+    if (target && target.innerText.includes('公告中心')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // 1. 關閉側邊選單
+        const sideMenu = document.getElementById('side-menu');
+        if (sideMenu) sideMenu.style.left = '-320px';
+
+        // 2. 隱藏所有頁面
+        document.querySelectorAll('.page-section').forEach(page => {
+            page.classList.remove('active');
+            page.style.display = 'none';
+        });
+
+        // 3. 強制顯示公告中心
+        const announcePage = document.getElementById('announcements-page');
+        if (announcePage) {
+            announcePage.style.display = 'block';
+            announcePage.classList.add('active');
+            
+            // 4. 呼叫渲染函式 (如果存在的話)
+            if (typeof window.renderUserAnnouncements === 'function') {
+                window.renderUserAnnouncements();
+            }
+        }
+    }
+}, true); // true 代表使用捕獲階段，絕對比任何其他點擊事件更早執行
+</script>
 </body>
 </html>
