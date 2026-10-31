@@ -3659,5 +3659,45 @@ async function deleteCard(cardId) {
         setTimeout(window.checkGlobalMaintenance, 1200);
     });
     </script>
+<script>
+    // ================= 終極救援：在後台加上「停止維護」按鈕 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        const settingsPage = document.getElementById('admin-page-settings');
+        if (settingsPage) {
+            const opGroup = document.getElementById('op-message-input').parentElement;
+            
+            // 檢查是不是已經有停止按鈕了，避免重複加
+            if (!document.getElementById('stop-op-btn')) {
+                // 找到原本的「啟動全站維護」按鈕
+                const startBtn = Array.from(opGroup.querySelectorAll('button')).find(b => b.innerText.includes('啟動全站維護'));
+                
+                if (startBtn) {
+                    // 在啟動按鈕的旁邊，塞入一個「解除維護」按鈕
+                    const stopBtn = document.createElement('button');
+                    stopBtn.id = 'stop-op-btn';
+                    stopBtn.className = 'btn-submit clickable';
+                    stopBtn.style.cssText = 'background: #00ffcc; color: #000; margin-top: 10px; margin-left: 10px;';
+                    stopBtn.innerText = '✅ 解除全站維護';
+                    stopBtn.onclick = function() {
+                        if (typeof window.stopOP === 'function') {
+                            window.stopOP();
+                        } else {
+                            showToast('⚠️ 找不到解除函式', 'warning');
+                        }
+                    };
+                    
+                    // 把兩個按鈕包在一個容器裡，排在一起比較好看
+                    const btnWrapper = document.createElement('div');
+                    btnWrapper.style.display = 'flex';
+                    btnWrapper.style.gap = '10px';
+                    
+                    startBtn.parentNode.insertBefore(btnWrapper, startBtn);
+                    btnWrapper.appendChild(startBtn);
+                    btnWrapper.appendChild(stopBtn);
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>
