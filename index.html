@@ -3261,50 +3261,85 @@ async function deleteCard(cardId) {
         }
     }
 
-    // 2. 顯示全站遮罩 (支援中英雙語 & 長按解鎖)
-    function showGlobalOverlay(message) {
+    // 2. 顯示全站遮罩 (支援中英雙語 & 遮罩內切換語言 & 長按解鎖)
+    function showGlobalOverlay(message, endTimeStr, mType = '臨時維護') {
         if (document.getElementById('global-op-overlay')) return;
         
-        // 抓取目前的語言設定
         const lang = localStorage.getItem('siteLang') || 'zh';
         const isEn = lang === 'en';
+        
+        let textTitle = isEn ? '🛑 Under Maintenance' : '🛑 網站維護中';
+        if (mType === '大型維修') textTitle = isEn ? '🚧 Major Upgrade' : '🚧 大型系統升級';
+        if (mType === '定時維護') textTitle = isEn ? '⏰ Scheduled Maintenance' : '⏰ 定時例行維護';
+        if (mType === '新功能加入') textTitle = isEn ? '✨ Adding New Features' : '✨ 新功能火熱加入中';
 
-        // 介面文字翻譯
-        const textTitle = isEn ? '🛑 Under Maintenance' : '🛑 網站維護中';
         const textFooter = isEn ? 'The Leo Studio team is working hard to update. Please check back later!' : 'Leo Studio 團隊正在努力更新，請稍後再回來！';
+        const textCountdown = isEn ? 'Estimated time remaining: ' : '預計剩餘時間：';
 
         const overlay = document.createElement('div');
         overlay.id = 'global-op-overlay';
         overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0b0f19; z-index: 99999999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; font-family: sans-serif; padding: 20px; box-sizing: border-box;';
         
         overlay.innerHTML = `
+            <!-- 右上角語言切換按鈕 -->
+            <div style="position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 16px; color: #9ca3af; border: 1px solid #4b5563; padding: 8px 15px; border-radius: 20px; background: rgba(0,0,0,0.5);" onclick="toggleOverlayLang()">
+                🌐 ${isEn ? '中文' : 'English'}
+            </div>
+
             <h1 style="color: #ff5555; font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,85,85,0.5);">${textTitle}</h1>
             <p style="font-size: 20px; color: #9ca3af; max-width: 600px; line-height: 1.6;">${message}</p>
-            <p style="margin-top: 40px; font-size: 14px; color: #4b5563;">${textFooter}</p>
+            <p id="op-timer-display" style="font-size: 24px; color: var(--accent); font-family: monospace; margin-top: 20px;"></p>
+            <p style="margin-top: 20px; font-size: 14px; color: #4b5563;">${textFooter}</p>
+            
             <!-- 隱形解鎖區 -->
             <div id="secret-unlock" style="position: absolute; bottom: 0; left: 0; width: 100px; height: 100px; cursor: default; -webkit-tap-highlight-color: transparent; touch-action: none;"></div>
         `;
         document.body.appendChild(overlay);
 
-        // 長按 3 秒解鎖邏輯
+        // 遮罩內的語言切換函式
+        window.toggleOverlayLang = function() {
+            const currentLang = localStorage.getItem('siteLang') || 'zh';
+            const newLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('siteLang', newLang);
+            
+            // 移除舊遮罩並重新繪製
+            overlay.remove();
+            window.checkGlobalMaintenance();
+        };
+
+        // 倒數計時邏輯 (保留不變)
+        if (endTimeStr) {
+            const endTime = new Date(endTimeStr).getTime();
+            const timerEl = document.getElementById('op-timer-display');
+
+            const timerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    timerEl.innerHTML = isEn ? 'Time is up! Waiting for Admin...' : '時間到！等待管理員解除...';
+                    return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                let timeString = '';
+                if (hours > 0) timeString += `${hours}${isEn ? 'h ' : '小時 '}`;
+                if (minutes > 0 || hours > 0) timeString += `${minutes}${isEn ? 'm ' : '分 '}`;
+                timeString += `${seconds < 10 ? '0' : ''}${seconds}${isEn ? 's' : '秒'}`;
+
+                timerEl.innerHTML = `${textCountdown} ${timeString}`;
+            }, 1000);
+        }
+
+        // 長按 3 秒解鎖 (保留不變)
         const unlockArea = document.getElementById('secret-unlock');
         let pressTimer;
-
-        const startPress = (e) => {
-            e.preventDefault();
-            pressTimer = setTimeout(() => {
-                document.getElementById('admin-menu-item').style.display = 'block';
-                showToast('👑 管理員通道已解鎖，請前往後台關閉維護。', 'success');
-                overlay.remove();
-            }, 3000); // 3000毫秒 = 3秒
-        };
-
-        const cancelPress = (e) => {
-            e.preventDefault();
-            if (pressTimer) clearTimeout(pressTimer);
-        };
-
-        // 支援電腦滑鼠與手機觸控
+        const startPress = (e) => { e.preventDefault(); pressTimer = setTimeout(() => { document.getElementById('admin-menu-item').style.display = 'block'; showToast('👑 管理員通道已解鎖，請前往後台關閉維護。', 'success'); overlay.remove(); }, 3000); };
+        const cancelPress = (e) => { e.preventDefault(); if (pressTimer) clearTimeout(pressTimer); };
         unlockArea.addEventListener('mousedown', startPress);
         unlockArea.addEventListener('mouseup', cancelPress);
         unlockArea.addEventListener('mouseleave', cancelPress);
