@@ -2481,6 +2481,14 @@ async function deleteCard(cardId) {
         document.getElementById('admin-dashboard').style.display = 'none';
         document.getElementById('menu-btn').style.display = 'block';
     };
+        // 終極攔截器：只要你點擊選單，不管它在哪裡，都強制攔截並執行登入畫面！
+    document.addEventListener('click', function(e) {
+        if (e.target && (e.target.id === 'admin-menu-item' || e.target.closest('#admin-menu-item'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            showLoginPage();
+        }
+    }, true);
 
     // 覆盖退出登录函数
     window.logoutAdmin = function() {
