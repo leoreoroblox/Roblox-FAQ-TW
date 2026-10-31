@@ -3261,7 +3261,7 @@ async function deleteCard(cardId) {
         }
     }
 
-    // 2. 顯示全站遮罩 (支援中英雙語)
+    // 2. 顯示全站遮罩 (支援中英雙語 & 長按解鎖)
     function showGlobalOverlay(message) {
         if (document.getElementById('global-op-overlay')) return;
         
@@ -3281,23 +3281,37 @@ async function deleteCard(cardId) {
             <h1 style="color: #ff5555; font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,85,85,0.5);">${textTitle}</h1>
             <p style="font-size: 20px; color: #9ca3af; max-width: 600px; line-height: 1.6;">${message}</p>
             <p style="margin-top: 40px; font-size: 14px; color: #4b5563;">${textFooter}</p>
-            <div id="secret-unlock" style="position: absolute; bottom: 0; left: 0; width: 100px; height: 100px; cursor: default;"></div>
+            <!-- 隱形解鎖區 -->
+            <div id="secret-unlock" style="position: absolute; bottom: 0; left: 0; width: 100px; height: 100px; cursor: default; -webkit-tap-highlight-color: transparent; touch-action: none;"></div>
         `;
         document.body.appendChild(overlay);
 
-        // 隱密解除按鈕 (連點左下角 5 下)
-        let clicks = 0;
-        document.getElementById('secret-unlock').onclick = () => {
-            clicks++;
-            if (clicks >= 5) {
+        // 長按 3 秒解鎖邏輯
+        const unlockArea = document.getElementById('secret-unlock');
+        let pressTimer;
+
+        const startPress = (e) => {
+            e.preventDefault();
+            pressTimer = setTimeout(() => {
                 document.getElementById('admin-menu-item').style.display = 'block';
                 showToast('👑 管理員通道已解鎖，請前往後台關閉維護。', 'success');
                 overlay.remove();
-                clicks = 0;
-            }
+            }, 3000); // 3000毫秒 = 3秒
         };
-    }
 
+        const cancelPress = (e) => {
+            e.preventDefault();
+            if (pressTimer) clearTimeout(pressTimer);
+        };
+
+        // 支援電腦滑鼠與手機觸控
+        unlockArea.addEventListener('mousedown', startPress);
+        unlockArea.addEventListener('mouseup', cancelPress);
+        unlockArea.addEventListener('mouseleave', cancelPress);
+        unlockArea.addEventListener('touchstart', startPress, { passive: false });
+        unlockArea.addEventListener('touchend', cancelPress);
+        unlockArea.addEventListener('touchcancel', cancelPress);
+    }
     // 3. 覆蓋後台的 OP 啟動按鈕
     window.triggerOP = async function() {
         const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。 (Under maintenance, please try again later.)';
