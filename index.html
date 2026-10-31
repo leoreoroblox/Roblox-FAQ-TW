@@ -4316,5 +4316,24 @@ async function deleteCard(cardId) {
         }, 1500);
     });
 </script>
+<!-- ================= 網站 Logo 顯示 ================= -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 前台左上角替換為 Logo 圖片
+        const menuBtn = document.getElementById('menu-btn');
+        if (menuBtn) {
+            menuBtn.innerHTML = '<img src="logo.png" alt="Leo Studio" style="height: 40px; width: auto; vertical-align: middle;">';
+            menuBtn.style.padding = '5px';
+            menuBtn.style.background = 'transparent';
+            menuBtn.style.border = 'none';
+        }
+
+        // 2. 後台左上角標題加上 Logo
+        const adminTitle = document.querySelector('.admin-header h2');
+        if (adminTitle) {
+            adminTitle.innerHTML = `<img src="logo.png" alt="Logo" style="height: 30px; vertical-align: middle; margin-right: 10px;"> ${adminTitle.innerText}`;
+        }
+    });
+</script>
 </body>
 </html>
