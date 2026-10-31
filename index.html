@@ -3832,5 +3832,27 @@ async function deleteCard(cardId) {
         setInterval(window.checkGlobalMaintenance, 30000);
     });
 </script>
+<script>
+    // ================= 終極完善：解除維護時，順便清除預警排程 =================
+    window.stopOP = async function() {
+        const { error } = await supabaseClient.from('site_settings').update({ 
+            maintenance_mode: false,
+            scheduled_maintenance_at: null, // 清除定時炸彈！
+            end_time: null
+        }).eq('id', 1);
+        
+        if (error) { showToast('❌ 解除失敗', 'error'); return; }
+        
+        // 移除遮罩
+        const overlay = document.getElementById('global-op-overlay');
+        if (overlay) overlay.remove();
+        
+        // 移除頂部的倒數橫幅
+        const banner = document.getElementById('pre-warning-banner');
+        if (banner) banner.remove();
+        
+        showToast('✅ 全站維護已解除，預警排程也已取消！', 'success');
+    };
+</script>
 </body>
 </html>
