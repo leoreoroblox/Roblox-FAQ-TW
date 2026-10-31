@@ -4232,5 +4232,83 @@ async function deleteCard(cardId) {
         }, 2000);
     });
 </script>
+<script>
+    // ================= 終極多語言補丁：修復半中半英 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. 根據目前語言，修正側邊選單的文字
+        function fixMenuLanguage() {
+            const lang = localStorage.getItem('siteLang') || 'zh';
+            const isEn = lang === 'en';
+
+            // 前台側邊選單
+            const menuItems = document.querySelectorAll('#side-menu .menu-item');
+            menuItems.forEach(item => {
+                if (item.innerText.includes('公告中心')) item.innerText = isEn ? '📢 Announcements' : '📢 公告中心';
+            });
+
+            // 後台側邊選單
+            const adminSidebar = document.querySelector('.admin-sidebar');
+            if (adminSidebar) {
+                const adminItems = adminSidebar.querySelectorAll('div');
+                adminItems.forEach(item => {
+                    const text = item.innerText;
+                    if (text.includes('儀表板')) item.innerText = isEn ? '📊 Dashboard' : '📊 儀表板';
+                    if (text.includes('用戶管理')) item.innerText = isEn ? '👥 User Management' : '👥 用戶管理';
+                    if (text.includes('留言管理')) item.innerText = isEn ? '💬 Comment Management' : '💬 留言管理';
+                    if (text.includes('公告管理')) item.innerText = isEn ? '📢 Announcements' : '📢 公告管理';
+                    if (text.includes('新增問答')) item.innerText = isEn ? '➕ Add Q&A' : '➕ 新增問答';
+                    if (text.includes('管理問答')) item.innerText = isEn ? '📝 Manage Q&A' : '📝 管理問答';
+                    if (text.includes('VIP 管理')) item.innerText = isEn ? '👑 VIP Management' : '👑 VIP 管理';
+                    if (text.includes('封禁名單')) item.innerText = isEn ? '🚫 Banned List' : '🚫 封禁名單';
+                    if (text.includes('系統設置')) item.innerText = isEn ? '⚙️ System Settings' : '⚙️ 系統設置';
+                    if (text.includes('更新日誌管理')) item.innerText = isEn ? '📜 Changelog Management' : '📜 更新日誌管理';
+                });
+            }
+        }
+
+        // 2. 修正狀態列的英文與卡住問題
+        const originalCheckStatus = window.checkSiteStatusIndicator;
+        window.checkSiteStatusIndicator = async function() {
+            const dot = document.querySelector('#site-status-indicator .status-dot');
+            const text = document.querySelector('#site-status-indicator .status-text');
+            if (!dot || !text) return;
+            
+            const lang = localStorage.getItem('siteLang') || 'zh';
+            const isEn = lang === 'en';
+
+            const { data, error } = await supabaseClient.from('site_settings').select('maintenance_mode, scheduled_maintenance_at').eq('id', 1).single();
+            if (error || !data) {
+                text.innerText = isEn ? 'Unknown' : '狀態未知';
+                return;
+            }
+
+            if (data.maintenance_mode) {
+                dot.style.background = '#ff5555'; dot.style.boxShadow = '0 0 10px #ff5555';
+                text.innerText = isEn ? 'Maintenance' : '維護中'; text.style.color = '#ff5555';
+            } else if (data.scheduled_maintenance_at) {
+                dot.style.background = '#ffaa00'; dot.style.boxShadow = '0 0 10px #ffaa00';
+                text.innerText = isEn ? 'Pre-warning' : '預警倒數中'; text.style.color = '#ffaa00';
+            } else {
+                dot.style.background = '#00ffcc'; dot.style.boxShadow = '0 0 10px #00ffcc';
+                text.innerText = isEn ? 'Normal' : '正常運行'; text.style.color = '#00ffcc';
+            }
+        };
+
+        // 3. 每次切換語言時，順便觸發修正
+        const originalChangeLang = window.changeLanguage;
+        window.changeLanguage = function(lang) {
+            if (originalChangeLang) originalChangeLang(lang);
+            setTimeout(fixMenuLanguage, 100);
+            setTimeout(window.checkSiteStatusIndicator, 100);
+        };
+
+        // 4. 網頁載入時先執行一次
+        setTimeout(() => {
+            fixMenuLanguage();
+            if (typeof window.checkSiteStatusIndicator === 'function') window.checkSiteStatusIndicator();
+        }, 1500);
+    });
+</script>
 </body>
 </html>
