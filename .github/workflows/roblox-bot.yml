@@ -1,0 +1,76 @@
+name: Roblox 遊戲更新監控機器人
+
+on:
+  schedule:
+    # 每小時的第 0 分鐘執行一次 (你可以改成 '0 */6 * * *' 變成每 6 小時一次)
+    - cron: '0 * * * *'
+  workflow_dispatch: # 允許你在 GitHub 網頁上手動點擊執行測試
+
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 簽出程式碼
+        uses: actions/checkout@v3
+
+      - name: 設定 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 安裝依賴並執行機器人
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          npm install @supabase/supabase-js axios
+          node -e "
+            const { createClient } = require('@supabase/supabase-js');
+            const axios = require('axios');
+            const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+            async function checkUpdate() {
+              try {
+                const placeId = '6516141723'; // DOORS 的 ID
+                
+                // 1. 取得遊戲的 Universe ID
+                const uniRes = await axios.get('https://apis.roblox.com/universes/v1/places/' + placeId + '/universe');
+                const universeId = uniRes.data.universeId;
+                
+                // 2. 抓取遊戲資訊 (名稱、最後更新時間、線上人數)
+                const gameRes = await axios.get('https://games.roblox.com/v1/games?universeIds=' + universeId);
+                const game = gameRes.data.data[0];
+                if (!game) return;
+
+                const updatedDate = new Date(game.updated);
+                const todayStr = updatedDate.toISOString().split('T')[0]; // 取得 YYYY-MM-DD
+
+                // 3. 檢查資料庫裡是不是已經有今天的更新紀錄了 (避免重複發文)
+                const { data: logs } = await supabase.from('changelogs').select('*').eq('date', todayStr);
+                if (logs && logs.length > 0) {
+                  console.log('今天已經記錄過了，跳過。');
+                  return;
+                }
+
+                // 4. 寫入 Supabase 的更新日誌表
+                const { error } = await supabase.from('changelogs').insert([{
+                  version: 'v' + todayStr.replace(/-/g, ''),
+                  date: todayStr,
+                  type: 'major',
+                  title: game.name + ' 官方遊戲更新通知',
+                  content: [
+                    '遊戲名稱：' + game.name,
+                    '創作者：' + game.creator.name,
+                    '最後更新時間：' + updatedDate.toLocaleString(),
+                    '目前線上人數：' + game.playing
+                  ]
+                }]);
+
+                if (error) { console.error('寫入失敗:', error); } 
+                else { console.log('✅ 成功發布遊戲更新通知！'); }
+              } catch (err) {
+                console.error('發生錯誤:', err.message);
+              }
+            }
+            checkUpdate();
+          "
