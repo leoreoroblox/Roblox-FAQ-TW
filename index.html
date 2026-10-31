@@ -2432,5 +2432,72 @@ async function deleteCard(cardId) {
         showToast('👋 已退出管理員後台，下次進入需重新登入。', 'info');
     };
 </script>
+<script>
+    // 立即将登录页和后台移到 body 的最外层，解决被遮挡问题
+    const lp = document.getElementById('login-page');
+    const ad = document.getElementById('admin-dashboard');
+    if (lp) document.body.appendChild(lp);
+    if (ad) document.body.appendChild(ad);
+
+    // 覆盖原本的登录显示函数，强制置顶
+    window.showLoginPage = function() {
+        const loginPage = document.getElementById('login-page');
+        if (loginPage) {
+            loginPage.style.display = 'flex';
+            loginPage.style.cssText = "display: flex !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #f0f4f9 !important; z-index: 2147483647 !important; justify-content: center !important; align-items: center !important; flex-direction: column !important;";
+            
+            document.getElementById('admin-password-input').value = '';
+            document.getElementById('login-error-msg').style.display = 'none';
+            document.getElementById('admin-password-input').disabled = false;
+            document.querySelector('.login-btn').disabled = false;
+        }
+    };
+
+    // 覆盖后台显示函数
+    window.openAdminDashboard = function() {
+        const adminDash = document.getElementById('admin-dashboard');
+        if (adminDash) {
+            adminDash.style.display = 'flex';
+            adminDash.style.cssText = "display: flex !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #0b0f19 !important; z-index: 2147483647 !important; flex-direction: column !important;";
+            
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('side-menu').style.left = '-300px';
+            document.getElementById('menu-btn').style.display = 'none';
+
+            switchAdminPage('dashboard');
+            renderAdminStats();
+            renderManageCards();
+            renderAdminComments();
+            renderBannedList();
+            renderAnnounceHistory();
+            renderUserTable();
+            renderVIPSelect();
+            showToast('👑 管理員已登入後台', 'success');
+        }
+    };
+
+    // 覆盖关闭后台函数
+    window.closeAdminDashboard = function() {
+        document.getElementById('admin-dashboard').style.display = 'none';
+        document.getElementById('menu-btn').style.display = 'block';
+    };
+
+    // 覆盖退出登录函数
+    window.logoutAdmin = function() {
+        document.getElementById('admin-dashboard').style.display = 'none';
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('menu-btn').style.display = 'block';
+        showToast('👋 已退出管理員後台，下次進入需重新登入。', 'info');
+    };
+
+    // 强制给按钮绑定点击事件（绕过可能的覆盖问题）
+    document.addEventListener('click', function(e) {
+        if (e.target && (e.target.id === 'admin-menu-item' || e.target.closest('#admin-menu-item'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            showLoginPage();
+        }
+    }, true);
+</script>
 </body>
 </html>
