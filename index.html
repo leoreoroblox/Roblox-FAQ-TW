@@ -4319,13 +4319,19 @@ async function deleteCard(cardId) {
 <!-- ================= 網站 Logo 顯示 ================= -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. 前台左上角替換為 Logo 圖片
+              // 1. 前台左上角替換為 Logo 圖片
         const menuBtn = document.getElementById('menu-btn');
         if (menuBtn) {
-            menuBtn.innerHTML = '<img src="logo.png" alt="Leo Studio" style="height: 40px; width: auto; vertical-align: middle;">';
-            menuBtn.style.padding = '5px';
-            menuBtn.style.background = 'transparent';
-            menuBtn.style.border = 'none';
+            menuBtn.innerHTML = '<img src="logo.png" alt="Leo Studio" style="height: 100%; width: 100%; object-fit: contain; border-radius: 8px;">';
+            menuBtn.style.width = '80px';   // 放大寬度
+            menuBtn.style.height = '80px';  // 放大高度
+            menuBtn.style.padding = '0';    // 移除內邊距
+            menuBtn.style.background = '#000'; // 配合圖片的黑底
+            menuBtn.style.border = '1px solid #00ffcc'; // 加上青色邊框看起來更科技
+            menuBtn.style.borderRadius = '12px'; // 圓角
+            menuBtn.style.top = '20px';
+            menuBtn.style.left = '20px';
+            menuBtn.style.overflow = 'hidden';
         }
 
         // 2. 後台左上角標題加上 Logo
