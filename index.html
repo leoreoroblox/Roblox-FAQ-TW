@@ -4784,5 +4784,31 @@ async function deleteCard(cardId) {
         }
     }, 500);
 </script>
+<script>
+    // ================= 終極修復：讓 Logo 隨時隨地都能點開選單 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuBtn = document.getElementById('menu-btn');
+        const sideMenu = document.getElementById('side-menu');
+        
+        if (menuBtn && sideMenu) {
+            // 強制顯示 Logo，防止被之前的程式碼隱藏
+            menuBtn.style.display = 'block';
+            
+            // 把點擊事件直接覆蓋成最強版
+            menuBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // 阻止其他干擾
+                
+                // 判斷選單目前在哪裡，如果在左邊就收回，如果在外面就滑出
+                const currentLeft = sideMenu.style.left;
+                if (currentLeft === '0px' || currentLeft === '0') {
+                    sideMenu.style.left = '-320px';
+                } else {
+                    sideMenu.style.left = '0px';
+                }
+            };
+        }
+    });
+</script>
 </body>
 </html>
