@@ -4342,5 +4342,19 @@ async function deleteCard(cardId) {
         }
     });
 </script>
+<!-- ================= PWA 註冊小管家 ================= -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('PWA Service Worker 註冊成功！', registration.scope);
+                })
+                .catch(err => {
+                    console.log('PWA Service Worker 註冊失敗：', err);
+                });
+        });
+    }
+</script>
 </body>
 </html>
