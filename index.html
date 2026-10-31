@@ -4015,5 +4015,67 @@ async function deleteCard(cardId) {
         setTimeout(window.loadFrontendAnnouncement, 1500);
     });
 </script>
+<script>
+    // ================= 後台專屬：網站狀態指示燈 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminHeader = document.querySelector('.admin-header');
+        if (adminHeader) {
+            // 1. 在後台頂部標題旁邊，插入一個狀態顯示區塊
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'site-status-indicator';
+            statusDiv.style.cssText = 'display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: bold; margin-left: 20px; margin-right: auto; padding: 5px 12px; border-radius: 20px; background: #1f2937; border: 1px solid #374151;';
+            statusDiv.innerHTML = `<span class="status-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #9ca3af; display: inline-block;"></span> <span class="status-text" style="color: #9ca3af;">檢查狀態中...</span>`;
+            
+            // 找到後台標題元素，把指示燈插在它後面
+            const title = adminHeader.querySelector('h2');
+            if (title) {
+                title.parentNode.insertBefore(statusDiv, title.nextSibling);
+            } else {
+                adminHeader.insertBefore(statusDiv, adminHeader.firstChild);
+            }
+        }
+
+        // 2. 定義檢查網站狀態的函式
+        window.checkSiteStatusIndicator = async function() {
+            const dot = document.querySelector('#site-status-indicator .status-dot');
+            const text = document.querySelector('#site-status-indicator .status-text');
+            if (!dot || !text) return;
+
+            const { data, error } = await supabaseClient.from('site_settings').select('maintenance_mode, scheduled_maintenance_at').eq('id', 1).single();
+            if (error || !data) {
+                text.innerText = '狀態未知';
+                return;
+            }
+
+            if (data.maintenance_mode) {
+                // 維護中
+                dot.style.background = '#ff5555';
+                dot.style.boxShadow = '0 0 10px #ff5555';
+                text.innerText = '維護中';
+                text.style.color = '#ff5555';
+            } else if (data.scheduled_maintenance_at) {
+                // 即將維護
+                dot.style.background = '#ffaa00';
+                dot.style.boxShadow = '0 0 10px #ffaa00';
+                text.innerText = '預警倒數中';
+                text.style.color = '#ffaa00';
+            } else {
+                // 正常運行
+                dot.style.background = '#00ffcc';
+                dot.style.boxShadow = '0 0 10px #00ffcc';
+                text.innerText = '正常運行';
+                text.style.color = '#00ffcc';
+            }
+        };
+
+        // 3. 覆蓋原本打開後台的函式，讓每次進後台都先檢查一次狀態
+        const originalOpenAdmin = window.openAdminDashboard;
+        window.openAdminDashboard = function() {
+            if (originalOpenAdmin) originalOpenAdmin();
+            // 延遲 0.5 秒等畫面出來後，執行狀態檢查
+            setTimeout(window.checkSiteStatusIndicator, 500);
+        };
+    });
+</script>
 </body>
 </html>
