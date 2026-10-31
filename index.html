@@ -2714,5 +2714,53 @@ async function deleteCard(cardId) {
     if (!win) window.location.href = DISCOURSE_URL;
   }, true);
 })();
+<script>
+    // ================= Copilot 提供的終極數字修復法 =================
+    async function refreshAdminStats() {
+        const statPosts = document.getElementById('stat-posts');
+        if (!statPosts) return;
+
+        try {
+            // 讀取 cards 表的總筆數
+            const { count, error } = await supabaseClient
+                .from('cards')
+                .select('*', { count: 'exact', head: true });
+
+            if (error) throw error;
+
+            const total = Number(count || 0);
+
+            // 強制覆蓋舊假資料
+            statPosts.textContent = String(total);
+            statPosts.dataset.value = String(total);
+
+            // 順便也把會員數、留言數更新一下（如果你想的話）
+            const { count: userCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+            if (document.getElementById('stat-users')) document.getElementById('stat-users').textContent = String(userCount || 0);
+
+            console.log('成功更新真實數據！cards total count:', total);
+        } catch (err) {
+            console.error('讀取總筆數失敗:', err);
+            statPosts.textContent = '0'; 
+        }
+    }
+
+    // 使用 MutationObserver 監聽後台是否被打開
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminDashboard = document.getElementById('admin-dashboard');
+        if (!adminDashboard) return;
+
+        const observer = new MutationObserver(() => {
+            if (getComputedStyle(adminDashboard).display !== 'none') {
+                refreshAdminStats();
+            }
+        });
+
+        observer.observe(adminDashboard, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+    });
+</script>
 </body>
 </html>
