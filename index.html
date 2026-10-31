@@ -3168,5 +3168,85 @@ async function deleteCard(cardId) {
         };
     });
 </script>
+<script>
+    // ================= 真正的全站維護系統 =================
+    
+    // 1. 檢查全站狀態
+    async function checkGlobalMaintenance() {
+        const { data, error } = await supabaseClient.from('site_settings').select('*').eq('id', 1).single();
+        if (error || !data) return;
+
+        if (data.maintenance_mode) {
+            showGlobalOverlay(data.maintenance_message);
+        }
+    }
+
+    // 2. 顯示全站遮罩
+    function showGlobalOverlay(message) {
+        if (document.getElementById('global-op-overlay')) return;
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'global-op-overlay';
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0b0f19; z-index: 99999999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; font-family: sans-serif;';
+        overlay.innerHTML = `
+            <h1 style="color: #ff5555; font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,85,85,0.5);">🛑 網站維護中</h1>
+            <p style="font-size: 20px; color: #9ca3af; max-width: 600px; line-height: 1.6;">${message}</p>
+            <p style="margin-top: 40px; font-size: 14px; color: #4b5563;">Leo Studio 團隊正在努力更新，請稍後再回來！</p>
+            <div id="secret-unlock" style="position: absolute; bottom: 0; left: 0; width: 100px; height: 100px; cursor: default;"></div>
+        `;
+        document.body.appendChild(overlay);
+
+        // 隱密解除按鈕 (連點左下角 5 下)
+        let clicks = 0;
+        document.getElementById('secret-unlock').onclick = () => {
+            clicks++;
+            if (clicks >= 5) {
+                document.getElementById('admin-menu-item').style.display = 'block';
+                showToast('👑 管理員通道已解鎖，請前往後台關閉維護。', 'success');
+                overlay.remove();
+                clicks = 0;
+            }
+        };
+    }
+
+    // 3. 覆蓋後台的 OP 啟動按鈕
+    window.triggerOP = async function() {
+        const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。';
+        
+        // 寫入資料庫
+        const { error } = await supabaseClient.from('site_settings').update({ 
+            maintenance_mode: true, 
+            maintenance_message: msg 
+        }).eq('id', 1);
+
+        if (error) { showToast('❌ 啟動維護失敗', 'error'); return; }
+
+        // 顯示遮罩並提示
+        showGlobalOverlay(msg);
+        showToast('🛑 已對全球發布維護公告！', 'error');
+        
+        // 隱藏目前的後台
+        document.getElementById('admin-dashboard').style.display = 'none';
+    };
+
+    // 4. 解除維護的函式
+    window.stopOP = async function() {
+        const { error } = await supabaseClient.from('site_settings').update({ 
+            maintenance_mode: false 
+        }).eq('id', 1);
+        
+        if (error) { showToast('❌ 解除失敗', 'error'); return; }
+        
+        const overlay = document.getElementById('global-op-overlay');
+        if (overlay) overlay.remove();
+        
+        showToast('✅ 全站維護已解除，網站恢復正常。', 'success');
+    };
+
+    // 在網頁載入時檢查
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(checkGlobalMaintenance, 1000);
+    });
+</script>
 </body>
 </html>
