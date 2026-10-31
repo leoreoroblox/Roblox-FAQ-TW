@@ -3249,7 +3249,7 @@ async function deleteCard(cardId) {
     });
 </script>
 <script>
-    // ================= 真正的全站維護系統 =================
+    // ================= 真正的全站維護系統 (雙語版) =================
     
     // 1. 檢查全站狀態
     async function checkGlobalMaintenance() {
@@ -3261,17 +3261,26 @@ async function deleteCard(cardId) {
         }
     }
 
-    // 2. 顯示全站遮罩
+    // 2. 顯示全站遮罩 (支援中英雙語)
     function showGlobalOverlay(message) {
         if (document.getElementById('global-op-overlay')) return;
         
+        // 抓取目前的語言設定
+        const lang = localStorage.getItem('siteLang') || 'zh';
+        const isEn = lang === 'en';
+
+        // 介面文字翻譯
+        const textTitle = isEn ? '🛑 Under Maintenance' : '🛑 網站維護中';
+        const textFooter = isEn ? 'The Leo Studio team is working hard to update. Please check back later!' : 'Leo Studio 團隊正在努力更新，請稍後再回來！';
+
         const overlay = document.createElement('div');
         overlay.id = 'global-op-overlay';
-        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0b0f19; z-index: 99999999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; font-family: sans-serif;';
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0b0f19; z-index: 99999999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; font-family: sans-serif; padding: 20px; box-sizing: border-box;';
+        
         overlay.innerHTML = `
-            <h1 style="color: #ff5555; font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,85,85,0.5);">🛑 網站維護中</h1>
+            <h1 style="color: #ff5555; font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255,85,85,0.5);">${textTitle}</h1>
             <p style="font-size: 20px; color: #9ca3af; max-width: 600px; line-height: 1.6;">${message}</p>
-            <p style="margin-top: 40px; font-size: 14px; color: #4b5563;">Leo Studio 團隊正在努力更新，請稍後再回來！</p>
+            <p style="margin-top: 40px; font-size: 14px; color: #4b5563;">${textFooter}</p>
             <div id="secret-unlock" style="position: absolute; bottom: 0; left: 0; width: 100px; height: 100px; cursor: default;"></div>
         `;
         document.body.appendChild(overlay);
@@ -3291,7 +3300,7 @@ async function deleteCard(cardId) {
 
     // 3. 覆蓋後台的 OP 啟動按鈕
     window.triggerOP = async function() {
-        const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。';
+        const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。 (Under maintenance, please try again later.)';
         
         // 寫入資料庫
         const { error } = await supabaseClient.from('site_settings').update({ 
@@ -3327,6 +3336,7 @@ async function deleteCard(cardId) {
     document.addEventListener('DOMContentLoaded', () => {
         setTimeout(checkGlobalMaintenance, 1000);
     });
+</script>
 </script>
 </body>
 </html>
