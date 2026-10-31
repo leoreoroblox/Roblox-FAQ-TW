@@ -5108,5 +5108,51 @@ async function deleteCard(cardId) {
         showPage('home');
     });
 </script>
+<!-- ================= 终极修复：强制居中与清理残留元素 ================= -->
+<style>
+    /* 强制让首页变成 Flex 居中布局 */
+    #home-page {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+    }
+    /* 强制让首页的内容区块（标题、副标题、按钮、卡片）居中 */
+    .hero-content {
+        margin: 0 auto !important;
+        text-align: center !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    /* 确保下方的快速链接格子也是居中的 */
+    .quick-links {
+        margin: 0 auto !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 寻找并隐藏那个奇怪的「不要放棄會被逮捕」绿条
+        const allElements = document.querySelectorAll('div, span, p, h1, h2, h3');
+        allElements.forEach(el => {
+            if (el.innerText === '不要放棄會被逮捕') {
+                el.style.display = 'none';
+                // 如果它有一个绿色的父元素，也一起隐藏
+                if (el.parentElement && el.parentElement.style.backgroundColor.includes('0, 255, 204')) {
+                    el.parentElement.style.display = 'none';
+                }
+            }
+        });
+
+        // 2. 强制让页面重置一次渲染，确保居中生效
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 100);
+    });
+</script>
 </body>
 </html>
