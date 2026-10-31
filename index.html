@@ -2658,5 +2658,41 @@ async function deleteCard(cardId) {
         };
     });
 </script>
+<script>
+    // ================= 最終極防彈修復（攔截所有干擾） =================
+    
+    // 1. 暴力攔截所有「論壇」的點擊，強制跳轉到你的 Discourse 論壇
+    document.addEventListener('click', function(e) {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem && menuItem.innerText.includes('論壇')) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open('https://leo-studio-rbxhub.discourse.group/', '_blank');
+        }
+    }, true); // 使用捕獲階段，確保比任何原本的程式碼都早執行
+
+    // 2. 暴力監聽「管理員登入」點擊，在後台打開後，強制用雲端數字覆蓋畫面
+    document.addEventListener('click', function(e) {
+        const adminBtn = e.target.closest('#admin-menu-item');
+        if (adminBtn) {
+            // 延遲 1 秒，等後台畫面完全渲染出來後，我們再偷偷把數字改掉
+            setTimeout(async () => {
+                try {
+                    const { count: cCount } = await supabaseClient.from('cards').select('*', { count: 'exact', head: true });
+                    const { count: uCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+                    const { count: mCount } = await supabaseClient.from('comments').select('*', { count: 'exact', head: true });
+                    const { count: bCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('is_banned', true);
+                    
+                    if (document.getElementById('stat-posts')) document.getElementById('stat-posts').innerText = cCount || 0;
+                    if (document.getElementById('stat-users')) document.getElementById('stat-users').innerText = uCount || 0;
+                    if (document.getElementById('stat-comments')) document.getElementById('stat-comments').innerText = mCount || 0;
+                    if (document.getElementById('stat-bans')) document.getElementById('stat-bans').innerText = bCount || 0;
+                } catch (err) {
+                    console.log('強制更新數字失敗:', err);
+                }
+            }, 1000);
+        }
+    }, true);
+</script>
 </body>
 </html>
