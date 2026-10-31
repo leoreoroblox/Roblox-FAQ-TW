@@ -2313,5 +2313,40 @@ async function deleteCard(cardId) {
         }
     });
 </script>
+<script>
+    // ================= 終極修復：管理員登入按鈕與畫面顯示 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 重新綁定「管理員登入」按鈕的點擊事件，防止被其他元素阻擋
+        const adminMenuBtn = document.getElementById('admin-menu-item');
+        if (adminMenuBtn) {
+            // 使用 addEventListener 覆蓋原本的 onclick
+            adminMenuBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // 阻止事件冒泡，避免點擊被吃掉
+                showLoginPage();
+            };
+        }
+
+        // 2. 強制修復登入畫面的 CSS，把它拉到最上層並置中
+        const loginPage = document.getElementById('login-page');
+        if (loginPage) {
+            loginPage.style.cssText = `
+                display: none; /* 預設隱藏 */
+                position: fixed !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                width: 100vw !important; 
+                height: 100vh !important; 
+                background: #f0f4f9 !important; 
+                z-index: 9999999 !important; 
+                justify-content: center !important; 
+                align-items: center !important; 
+                flex-direction: column !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            `;
+        }
+    });
+</script>
 </body>
 </html>
