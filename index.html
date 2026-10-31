@@ -4400,5 +4400,53 @@ async function deleteCard(cardId) {
         });
     });
 </script>
+<script>
+    // ================= 實裝登入按鈕與狀態顯示 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        const sideMenu = document.getElementById('side-menu');
+        if (!sideMenu) return;
+
+        // 1. 建立「玩家登入/登出」的選單按鈕
+        const userLoginBtn = document.createElement('div');
+        userLoginBtn.id = 'user-login-btn';
+        userLoginBtn.className = 'menu-item clickable';
+        userLoginBtn.style.color = '#00aaff'; // 用藍色區分管理員的紅色
+        userLoginBtn.style.marginTop = '10px';
+        userLoginBtn.innerText = '🔑 玩家登入 (Google)';
+        
+        // 將按鈕插在「管理員登入」的上面
+        const adminBtn = document.getElementById('admin-menu-item');
+        if (adminBtn) {
+            adminBtn.parentNode.insertBefore(userLoginBtn, adminBtn);
+        } else {
+            sideMenu.appendChild(userLoginBtn);
+        }
+
+        // 2. 點擊按鈕的邏輯 (判斷是登入還是登出)
+        userLoginBtn.onclick = () => {
+            const isLoggedIn = localStorage.getItem('player_logged_in') === 'true';
+            if (isLoggedIn) {
+                window.signOutUser();
+            } else {
+                window.signInWithGoogle();
+            }
+        };
+
+        // 3. 監聽狀態並更新按鈕文字
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session && session.user) {
+                // 登入成功
+                localStorage.setItem('player_logged_in', 'true');
+                userLoginBtn.innerText = `👤 ${session.user.email.split('@')[0]} (點擊登出)`;
+                userLoginBtn.style.color = '#00ffcc'; // 登入後變成綠色
+            } else {
+                // 登出
+                localStorage.removeItem('player_logged_in');
+                userLoginBtn.innerText = '🔑 玩家登入 (Google)';
+                userLoginBtn.style.color = '#00aaff'; // 未登入是藍色
+            }
+        });
+    });
+</script>
 </body>
 </html>
