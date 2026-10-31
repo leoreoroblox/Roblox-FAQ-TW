@@ -2884,5 +2884,162 @@ async function deleteCard(cardId) {
         transform: scale(1.05) !important;
     }
 </style>
+<!-- ================= 終極擴充：雲端更新日誌系統 ================= -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 在後台側邊選單加入「更新日誌管理」按鈕
+        const sidebar = document.querySelector('.admin-sidebar');
+        if (sidebar) {
+            const btn = document.createElement('div');
+            btn.className = 'clickable';
+            btn.setAttribute('onclick', "switchAdminPage('changelog')");
+            btn.innerText = '📜 更新日誌管理';
+            // 插在「系統設置」的前面
+            const settingsBtn = Array.from(sidebar.children).find(el => el.innerText.includes('系統設置'));
+            if (settingsBtn) sidebar.insertBefore(btn, settingsBtn);
+            else sidebar.appendChild(btn);
+        }
+
+        // 2. 在後台主內容區加入表單介面
+        const adminContent = document.querySelector('.admin-content');
+        if (adminContent) {
+            const pageDiv = document.createElement('div');
+            pageDiv.id = 'admin-page-changelog';
+            pageDiv.style.display = 'none';
+            pageDiv.innerHTML = `
+                <h3 style="color: var(--accent); margin-top: 0;">📜 新增更新日誌</h3>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>版本號 (例如：v0.4.0)</label>
+                        <input type="text" id="log-version" placeholder="v0.4.0">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>日期 (例如：2026-11-01)</label>
+                        <input type="text" id="log-date" placeholder="2026-11-01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>更新類型</label>
+                    <select id="log-type">
+                        <option value="major">🚀 大型更新</option>
+                        <option value="feature">✨ 新功能</option>
+                        <option value="minor">🔧 小型更新</option>
+                        <option value="bug">🐛 Bug修復</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>標題 (例如：UI 介面大翻新)</label>
+                    <input type="text" id="log-title" placeholder="請輸入標題...">
+                </div>
+                <div class="form-group">
+                    <label>更新內容 (一行一項，系統會自動轉成打勾清單)</label>
+                    <textarea id="log-content" rows="5" placeholder="例如：&#10;新增毛玻璃特效&#10;修復手機排版&#10;優化載入速度"></textarea>
+                </div>
+                <button class="btn-submit clickable" onclick="publishChangelog()">發布更新日誌</button>
+            `;
+            adminContent.appendChild(pageDiv);
+        }
+
+        // 3. 覆蓋後台的切換函式，讓新頁面可以被正確顯示
+        window.switchAdminPage = function(page) {
+            document.querySelectorAll('.admin-content > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.admin-sidebar div').forEach(el => el.classList.remove('active'));
+            
+            const targetPage = document.getElementById(`admin-page-${page}`);
+            if (targetPage) targetPage.style.display = 'block';
+            
+            document.querySelectorAll('.admin-sidebar div').forEach(el => {
+                if (el.getAttribute('onclick') && el.getAttribute('onclick').includes(page)) el.classList.add('active');
+            });
+
+            // 觸發對應的渲染
+            if (page === 'users') renderUserTable();
+            if (page === 'comments') renderAdminComments();
+            if (page === 'manage-cards') renderManageCards();
+            if (page === 'banned') renderBannedList();
+            if (page === 'announce') renderAnnounceHistory();
+            if (page === 'vip') renderVIPSelect();
+        };
+
+        // 4. 發布更新日誌的函式
+        window.publishChangelog = async function() {
+            const version = document.getElementById('log-version').value.trim();
+            const date = document.getElementById('log-date').value.trim();
+            const type = document.getElementById('log-type').value;
+            const title = document.getElementById('log-title').value.trim();
+            const contentRaw = document.getElementById('log-content').value;
+            
+            if (!version || !date || !title || !contentRaw) { showToast('⚠️ 請填寫所有欄位！', 'warning'); return; }
+            
+            // 將多行文字切成陣列，並過濾掉空白行
+            const contentArray = contentRaw.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+            // 寫入 Supabase
+            const { error } = await supabaseClient.from('changelogs').insert([{
+                version, date, type, title, content: contentArray
+            }]);
+
+            if (error) { showToast('❌ 發布失敗，請稍後再試。', 'error'); console.error(error); return; }
+            
+            showToast('✅ 更新日誌已發布至雲端！', 'success');
+            
+            // 清空表單
+            document.getElementById('log-version').value = '';
+            document.getElementById('log-date').value = '';
+            document.getElementById('log-title').value = '';
+            document.getElementById('log-content').value = '';
+            
+            // 重新整理前台日誌
+            if (typeof renderLogs === 'function') renderLogs();
+        };
+
+        // 5. 覆蓋前台的渲染函式，讓它從資料庫抓取
+        window.renderLogs = async function(filter = 'all') {
+            const list = document.getElementById('log-list');
+            if (!list) return;
+            list.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 載入更新日誌中...</p>';
+
+            const { data, error } = await supabaseClient.from('changelogs').select('*').order('created_at', { ascending: false });
+            if (error) { list.innerHTML = '<p style="color: #ff5555;">載入失敗。</p>'; return; }
+
+            let logsToShow = data || [];
+            if (filter !== 'all') {
+                logsToShow = logsToShow.filter(log => log.type === filter);
+            }
+
+            if (logsToShow.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #9ca3af;">目前沒有更新日誌喔！</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            logsToShow.forEach(log => {
+                const item = document.createElement('div');
+                item.className = 'log-item';
+                let tagText = '';
+                if (log.type === 'major') tagText = '🚀 大型更新';
+                else if (log.type === 'feature') tagText = '✨ 新功能';
+                else if (log.type === 'minor') tagText = '🔧 小型更新';
+                else if (log.type === 'bug') tagText = '🐛 Bug修復';
+                
+                const contentHtml = (log.content || []).map(c => `<li>✅ ${c}</li>`).join('');
+
+                item.innerHTML = `
+                    <div class="log-version">${log.version} - ${log.title} <span class="log-tag tag-${log.type}">${tagText}</span></div>
+                    <div class="log-date">📅 ${log.date}</div>
+                    <div class="log-content"><ul>${contentHtml}</ul></div>
+                `;
+                list.appendChild(item);
+            });
+        };
+
+        // 覆蓋前台的篩選按鈕
+        window.filterLog = function(type, btn) {
+            document.querySelectorAll('.log-filter button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            window.renderLogs(type);
+        };
+    });
+</script>
 </body>
 </html>
