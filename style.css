@@ -247,3 +247,108 @@
             .login-card { padding: 20px; margin: 20px; }
         }
     </style>
+<style>
+    /* 1. 讓背景有高級的暗色漸層與科技網格 */
+    body {
+        background-color: #050810 !important;
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(0, 255, 204, 0.08), transparent 25%),
+            radial-gradient(circle at 85% 30%, rgba(0, 85, 255, 0.08), transparent 25%),
+            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px) !important;
+        background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px !important;
+        background-attachment: fixed !important;
+    }
+
+    /* 2. 卡片毛玻璃升級 */
+    .card, .quick-card, .stat-card, .settings-card, .profile-section, .forum-post, .admin-header, .admin-sidebar, .admin-content {
+        background: rgba(17, 24, 39, 0.4) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(0, 255, 204, 0.15) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    /* 3. 卡片滑鼠懸停特效 */
+    .card:hover, .quick-card:hover, .stat-card:hover, .forum-post:hover {
+        transform: translateY(-5px) scale(1.01) !important;
+        border-color: rgba(0, 255, 204, 0.5) !important;
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.2), inset 0 0 10px rgba(0, 255, 204, 0.05) !important;
+    }
+
+    /* 4. 側邊選單與導覽列透明化 */
+    #side-menu, .admin-sidebar {
+        background: rgba(11, 15, 25, 0.7) !important;
+        backdrop-filter: blur(15px) !important;
+    }
+
+    /* 5. 讓按鈕有微光呼吸燈效果 */
+    .hero-btn, .btn-submit, .login-btn {
+        position: relative !important;
+        overflow: hidden !important;
+        transition: all 0.3s !important;
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.3) !important;
+    }
+    .hero-btn:hover, .btn-submit:hover, .login-btn:hover {
+        box-shadow: 0 0 25px rgba(0, 255, 204, 0.6) !important;
+        transform: scale(1.02) !important;
+    }
+</style>
+<style>
+    /* 1. 側邊選單項目升級：滑鼠移過去會有科幻光條 */
+    .menu-item {
+        position: relative !important;
+        padding: 10px 15px !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease !important;
+        border-left: 3px solid transparent !important;
+    }
+    .menu-item:hover {
+        background: rgba(0, 255, 204, 0.1) !important;
+        color: var(--accent) !important;
+        border-left-color: var(--accent) !important;
+        transform: translateX(8px) !important; /* 往右滑動 */
+        text-shadow: 0 0 10px rgba(0, 255, 204, 0.5) !important;
+    }
+
+    /* 2. 大按鈕（開始探索）升級：加入 3D 邊框與呼吸燈 */
+    .hero-btn {
+        position: relative !important;
+        border: 1px solid rgba(0, 255, 204, 0.5) !important;
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+        animation: pulse-glow 2s infinite alternate !important;
+    }
+    
+    /* 定義呼吸燈動畫 */
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 10px rgba(0, 255, 204, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1); }
+        100% { box-shadow: 0 0 25px rgba(0, 255, 204, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.4); }
+    }
+
+    /* 3. 首頁卡片標題升級：滑鼠移過去時文字發光 */
+    .quick-card:hover .title {
+        text-shadow: 0 0 12px rgba(0, 255, 204, 0.8) !important;
+    }
+
+    /* 4. 搜尋框升級：聚焦時有更強的光圈 */
+    #search-input:focus {
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.4) !important;
+        border-color: #00ffcc !important;
+    }
+
+    /* 5. 漢堡選單按鈕升級 */
+    #menu-btn {
+        transition: all 0.3s ease !important;
+    }
+    #menu-btn:hover {
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.6) !important;
+        transform: scale(1.05) !important;
+    }
+</style>
+<style>
+    /* 強制把側邊選單的頂部留白加大，避開 80px 的 Logo */
+    #side-menu {
+        padding-top: 120px !important; 
+    }
+</style>
