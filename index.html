@@ -2348,5 +2348,89 @@ async function deleteCard(cardId) {
         }
     });
 </script>
+<script>
+    // ================= 終極修復：登入與後台顯示 Bug =================
+    
+    // 1. 把登入頁面和後台「拔」出來，直接放在 body 的最外層，防止被其他元素干擾
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginPage = document.getElementById('login-page');
+        const adminDash = document.getElementById('admin-dashboard');
+        if (loginPage) document.body.appendChild(loginPage);
+        if (adminDash) document.body.appendChild(adminDash);
+    });
+
+    // 2. 覆蓋原本的顯示登入頁面函式
+    window.showLoginPage = function() {
+        const loginPage = document.getElementById('login-page');
+        if (loginPage) {
+            loginPage.style.display = 'flex';
+            loginPage.style.cssText = "display: flex !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #f0f4f9 !important; z-index: 9999999 !important; justify-content: center !important; align-items: center !important; flex-direction: column !important;";
+            
+            document.getElementById('admin-password-input').value = '';
+            document.getElementById('login-error-msg').style.display = 'none';
+            
+            // 檢查防撞密碼狀態
+            let loginAttempts = JSON.parse(localStorage.getItem('robloxLoginAttempts')) || { count: 0, lockUntil: 0, banned: false };
+            if (loginAttempts.banned) {
+                document.getElementById('login-error-msg').innerText = '您已被封禁，請聯繫管理員解封。';
+                document.getElementById('login-error-msg').style.display = 'block';
+                document.getElementById('admin-password-input').disabled = true;
+                document.querySelector('.login-btn').disabled = true;
+                return;
+            }
+            if (loginAttempts.lockUntil > Date.now()) {
+                const remaining = Math.ceil((loginAttempts.lockUntil - Date.now()) / 1000 / 60);
+                document.getElementById('login-error-msg').innerText = `嘗試次數過多，請等待 ${remaining} 分鐘後再試。`;
+                document.getElementById('login-error-msg').style.display = 'block';
+                document.getElementById('admin-password-input').disabled = true;
+                document.querySelector('.login-btn').disabled = true;
+                return;
+            }
+            document.getElementById('admin-password-input').disabled = false;
+            document.querySelector('.login-btn').disabled = false;
+        }
+    };
+
+    // 3. 覆蓋原本的後台開啟函式
+    window.openAdminDashboard = function() {
+        const adminDash = document.getElementById('admin-dashboard');
+        if (adminDash) {
+            adminDash.style.display = 'flex';
+            adminDash.style.cssText = "display: flex !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background: #0b0f19 !important; z-index: 9999999 !important; flex-direction: column !important;";
+            
+            // 隱藏登入畫面
+            document.getElementById('login-page').style.display = 'none';
+            
+            // 隱藏側邊選單
+            document.getElementById('side-menu').style.left = '-300px';
+            document.getElementById('menu-btn').style.display = 'none';
+
+            // 重新整理後台資料
+            switchAdminPage('dashboard');
+            renderAdminStats();
+            renderManageCards();
+            renderAdminComments();
+            renderBannedList();
+            renderAnnounceHistory();
+            renderUserTable();
+            renderVIPSelect();
+            showToast('👑 管理員已登入後台', 'success');
+        }
+    };
+
+    // 4. 覆蓋原本的關閉後台函式
+    window.closeAdminDashboard = function() {
+        document.getElementById('admin-dashboard').style.display = 'none';
+        document.getElementById('menu-btn').style.display = 'block'; // 恢復漢堡選單
+    };
+
+    // 5. 覆蓋原本的退出登入函式
+    window.logoutAdmin = function() {
+        document.getElementById('admin-dashboard').style.display = 'none';
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('menu-btn').style.display = 'block';
+        showToast('👋 已退出管理員後台，下次進入需重新登入。', 'info');
+    };
+</script>
 </body>
 </html>
