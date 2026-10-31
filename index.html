@@ -4641,5 +4641,65 @@ async function deleteCard(cardId) {
         };
     });
 </script>
+<script>
+    // ================= 登入權限控制與遊客登入 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        const sideMenu = document.getElementById('side-menu');
+        
+        // 1. 在側邊選單加入「遊客快速登入」按鈕
+        if (sideMenu && !document.getElementById('guest-login-btn')) {
+            const guestBtn = document.createElement('div');
+            guestBtn.id = 'guest-login-btn';
+            guestBtn.className = 'menu-item clickable';
+            guestBtn.style.color = '#ffaa00'; // 橘色代表遊客
+            guestBtn.style.marginTop = '10px';
+            guestBtn.innerText = '🚪 遊客快速登入';
+            guestBtn.onclick = async () => {
+                const { data, error } = await supabaseClient.auth.signInAnonymously();
+                if (error) {
+                    showToast('❌ 遊客登入失敗，請稍後再試。', 'error');
+                } else {
+                    showToast('🚪 遊客登入成功！部分高級功能受限。', 'success');
+                    setTimeout(() => window.location.reload(), 1000); // 重新整理以套用權限
+                }
+            };
+            
+            const adminBtn = document.getElementById('admin-menu-item');
+            if (adminBtn) {
+                adminBtn.parentNode.insertBefore(guestBtn, adminBtn);
+            } else {
+                sideMenu.appendChild(guestBtn);
+            }
+        }
+
+        // 2. 實作「未登入者無法查看卡片內容」的權限控制
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            const cardsContainer = document.getElementById('cards-container');
+            const qaSearchInput = document.getElementById('search-input');
+            
+            if (!cardsContainer) return;
+
+            if (!session) {
+                // 如果沒有登入，就顯示一個超大遮罩，不給看卡片
+                cardsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px 20px; background: rgba(17, 24, 39, 0.8); border: 1px dashed #ffaa00; border-radius: 15px;">
+                        <h2 style="color: #ffaa00; font-size: 28px;">🔒 請先登入以查看知識庫</h2>
+                        <p style="color: #9ca3af; margin-top: 10px;">Leo Studio 的知識庫目前僅限會員瀏覽。</p>
+                        <p style="color: #9ca3af;">請點擊左上角選單，使用 Google 登入或遊客快速登入。</p>
+                    </div>
+                `;
+                if(qaSearchInput) qaSearchInput.style.display = 'none'; // 藏起搜尋框
+                if(document.getElementById('topic-nav')) document.getElementById('topic-nav').style.display = 'none'; // 藏起右側主題
+            } else {
+                // 如果已登入，恢復正常顯示
+                if(qaSearchInput) qaSearchInput.style.display = 'block';
+                if(document.getElementById('topic-nav')) document.getElementById('topic-nav').style.display = 'flex';
+                // 重新觸發卡片渲染（如果原本的渲染函式存在）
+                if (typeof renderCards === 'function') renderCards();
+                if (typeof renderTopicNav === 'function') renderTopicNav();
+            }
+        });
+    });
+</script>
 </body>
 </html>
