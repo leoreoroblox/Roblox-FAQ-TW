@@ -4448,5 +4448,70 @@ async function deleteCard(cardId) {
         });
     });
 </script>
+<script>
+    // ================= 終極玩家系統：自動註冊與載入真實資料 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 監聽登入狀態
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session && session.user) {
+                const user = session.user;
+                const email = user.email;
+                const defaultUsername = email.split('@')[0]; // 用信箱前綴當預設名字
+
+                // 1. 去資料庫找找看，這個 Email 有沒有註冊過
+                let { data: userData, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('email', email)
+                    .single();
+
+                if (error && error.code === 'PGRST116') {
+                    // PGRST116 代表找不到資料，所以我們要幫他建一個新帳號！
+                    const newUid = Math.floor(Math.random() * 9000) + 1000; // 隨機給個 UID
+                    const { data: newUser, error: insertError } = await supabaseClient
+                        .from('users')
+                        .insert([{ 
+                            email: email, 
+                            username: defaultUsername, 
+                            uid: newUid,
+                            auth_id: user.id,
+                            vip_level: '普通'
+                        }])
+                        .select()
+                        .single();
+                        
+                    if (!insertError) userData = newUser;
+                } else if (error) {
+                    console.error('讀取用戶失敗:', error);
+                    return;
+                }
+
+                // 2. 如果成功抓到（或建立）用戶資料，就更新畫面
+                if (userData) {
+                    // 更新個人中心的標題與資訊
+                    const profileHeader = document.querySelector('.profile-header');
+                    if (profileHeader) {
+                        profileHeader.querySelector('h3').innerText = userData.username;
+                        profileHeader.querySelector('p').innerText = 'UID: ' + userData.uid;
+                        
+                        // 更新 VIP 徽章
+                        const vipBadge = profileHeader.querySelector('.vip-badge');
+                        if (vipBadge) {
+                            vipBadge.className = 'vip-badge vip-' + (userData.vip_level || '普通');
+                            vipBadge.innerText = userData.vip_level || '普通';
+                        }
+                    }
+
+                    // 更新簽到積分
+                    const pointsSpan = document.getElementById('user-points');
+                    if (pointsSpan) pointsSpan.innerText = userData.points || 0;
+                    
+                    showToast(`✅ 歡迎回來，${userData.username}！`, 'success');
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
