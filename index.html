@@ -3699,5 +3699,138 @@ async function deleteCard(cardId) {
         }
     });
 </script>
+<script>
+    // ================= 終極預警：提前 10 分鐘公告與自動維護 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. 升級後台介面：加上「提前預警」選項
+        const settingsPage = document.getElementById('admin-page-settings');
+        if (settingsPage) {
+            const opGroup = document.getElementById('op-message-input').parentElement;
+            
+            // 檢查是否已經加過，避免重複
+            if (!document.getElementById('pre-warning-checkbox')) {
+                const warningDiv = document.createElement('div');
+                warningDiv.style.cssText = 'margin-top: 15px; padding: 10px; background: rgba(255, 170, 0, 0.1); border: 1px solid #ffaa00; border-radius: 5px;';
+                warningDiv.innerHTML = `
+                    <label style="color: #ffaa00; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="pre-warning-checkbox" style="width: 20px; height: 20px;">
+                        <span>提前 10 分鐘發布全站預警公告</span>
+                    </label>
+                `;
+                // 插在啟動按鈕的上方
+                const btnWrapper = opGroup.querySelector('button').parentElement;
+                opGroup.insertBefore(warningDiv, btnWrapper);
+            }
+        }
+
+        // 2. 覆蓋原本的啟動維護函式，加入預警邏輯
+        window.triggerOP = async function() {
+            const msg = document.getElementById('op-message-input').value.trim() || '網站維護中，請稍後再試。';
+            const type = document.getElementById('op-maintenance-type').value;
+            const isPreWarning = document.getElementById('pre-warning-checkbox').checked;
+            
+            let h = parseInt(document.getElementById('op-duration-h').value) || 0;
+            let m = parseInt(document.getElementById('op-duration-m').value) || 0;
+            let s = parseInt(document.getElementById('op-duration-s').value) || 0;
+
+            if (s >= 60) { m += Math.floor(s / 60); s = s % 60; }
+            if (m >= 60) { h += Math.floor(m / 60); m = m % 60; }
+
+            const totalSeconds = (h * 3600) + (m * 60) + s;
+            const now = Date.now();
+            const endTime = new Date(now + totalSeconds * 1000).toISOString();
+
+            if (isPreWarning) {
+                // 如果有勾選預警，就設定「10分鐘後」為維護開始時間，並寫入預警排程
+                const scheduledTime = new Date(now + 10 * 60000).toISOString();
+                await supabaseClient.from('site_settings').update({
+                    scheduled_maintenance_at: scheduledTime,
+                    maintenance_message: msg,
+                    maintenance_type: type,
+                    end_time: endTime,
+                    maintenance_mode: false // 先不關閉，等時間到再關
+                }).eq('id', 1);
+                
+                showToast('⚠️ 已發布 10 分鐘預警公告，時間到將自動維護！', 'warning');
+                
+                // 立刻在管理員畫面顯示橫幅
+                startPreWarningCountdown(new Date(scheduledTime).getTime(), msg, type, endTime);
+            } else {
+                // 直接進入維護
+                const { error } = await supabaseClient.from('site_settings').update({ 
+                    maintenance_mode: true, 
+                    maintenance_message: msg,
+                    maintenance_type: type,
+                    end_time: endTime,
+                    scheduled_maintenance_at: null // 清除預警排程
+                }).eq('id', 1);
+
+                if (error) { showToast('❌ 啟動維護失敗', 'error'); return; }
+                showGlobalOverlay(msg, endTime, type);
+                showToast('🛑 已對全球發布維護公告！', 'error');
+                document.getElementById('admin-dashboard').style.display = 'none';
+            }
+        };
+
+        // 3. 建立「預警倒數橫幅」的函式
+        function startPreWarningCountdown(targetTime, msg, type, endTime) {
+            if (document.getElementById('pre-warning-banner')) return;
+
+            const banner = document.createElement('div');
+            banner.id = 'pre-warning-banner';
+            banner.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; background: #ffaa00; color: #000; padding: 15px; text-align: center; font-weight: bold; z-index: 9999999; box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-size: 16px; display: flex; justify-content: center; align-items: center; gap: 10px;';
+            document.body.appendChild(banner);
+
+            const timer = setInterval(() => {
+                const now = Date.now();
+                const distance = targetTime - now;
+
+                if (distance <= 0) {
+                    clearInterval(timer);
+                    banner.remove();
+                    // 時間到，自動開啟全站遮罩
+                    showGlobalOverlay(msg, endTime, type);
+                    // (可選) 這裡可以寫一段自動更新資料庫 maintenance_mode = true 的請求
+                    supabaseClient.from('site_settings').update({ maintenance_mode: true, scheduled_maintenance_at: null }).eq('id', 1).then();
+                    return;
+                }
+
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                banner.innerHTML = `⚠️ 系統公告：網站將在 <span style="font-size: 20px; color: #ff0000;">${minutes} 分 ${seconds < 10 ? '0' : ''}${seconds} 秒</span> 後進入維護模式！請盡快保存您的工作。`;
+            }, 1000);
+        }
+
+        // 4. 覆蓋檢查函式，讓一般訪客也能看到預警
+        window.checkGlobalMaintenance = async function() {
+            const { data, error } = await supabaseClient.from('site_settings').select('*').eq('id', 1).single();
+            if (error || !data) return;
+
+            // 如果已經在維護中
+            if (data.maintenance_mode) {
+                showGlobalOverlay(data.maintenance_message, data.end_time, data.maintenance_type);
+                return;
+            }
+
+            // 如果設定了預警排程
+            if (data.scheduled_maintenance_at) {
+                const scheduledTime = new Date(data.scheduled_maintenance_at).getTime();
+                if (Date.now() < scheduledTime) {
+                    startPreWarningCountdown(scheduledTime, data.maintenance_message, data.maintenance_type, data.end_time);
+                } else {
+                    // 如果時間已經過了，但維護模式還沒開，自動幫他開
+                    showGlobalOverlay(data.maintenance_message, data.end_time, data.maintenance_type);
+                }
+            }
+        };
+
+        // 網頁載入時執行檢查
+        setTimeout(window.checkGlobalMaintenance, 1000);
+        
+        // 每 30 秒檢查一次資料庫（確保如果管理員在別的電腦設定，這台電腦也會跳出預警）
+        setInterval(window.checkGlobalMaintenance, 30000);
+    });
+</script>
 </body>
 </html>
