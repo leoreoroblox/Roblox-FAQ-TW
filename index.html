@@ -3519,13 +3519,19 @@ async function deleteCard(cardId) {
             // 長按 3 秒解鎖
             const unlockArea = document.getElementById('secret-unlock');
             let pressTimer;
-            const startPress = (e) => {
-                e.preventDefault();
-                pressTimer = setTimeout(() => {
-                    document.getElementById('admin-menu-item').style.display = 'block';
-                    showToast('👑 管理員通道已解鎖，請前往後台關閉維護。', 'success');
-                    overlay.remove();
-                }, 3000);
+            const startPress = (e) => { 
+                e.preventDefault(); 
+                pressTimer = setTimeout(() => { 
+                    document.getElementById('admin-menu-item').style.display = 'block'; 
+                    
+                    // 👇 這裡加入手機判斷：如果是手機，就把漢堡選單還給你，不然你會卡死
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('menu-btn').style.display = 'block';
+                    }
+                    
+                    showToast('👑 管理員通道已解鎖，請前往後台關閉維護。', 'success'); 
+                    overlay.remove(); 
+                }, 3000); 
             };
             const cancelPress = (e) => {
                 e.preventDefault();
