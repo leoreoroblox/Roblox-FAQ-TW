@@ -285,7 +285,7 @@
             <!-- 由 JS 動態生成 -->
         </div>
 
-        <div class="menu-item clickable" onclick="showPage('forum')" data-i18n="menu_forum">💬 論壇</div>
+        <div class="menu-item clickable" onclick="window.open('https://leo-studio-rbxhub.discourse.group/', '_blank')" data-i18n="menu_forum">💬 論壇</div>
         <div class="menu-item clickable" onclick="showPage('profile')" data-i18n="menu_profile">👤 個人中心</div>
         <div class="menu-item clickable" onclick="showPage('changelog')" data-i18n="menu_changelog">📜 更新日誌</div>
         <div class="menu-item clickable" onclick="showPage('settings')" data-i18n="menu_settings">⚙️ 設定</div>
@@ -2631,6 +2631,31 @@ async function deleteCard(cardId) {
                 };
             }
         });
+    });
+</script>
+<script>
+    // ================= 最終極：覆蓋後台數據 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        // 保存舊的打開後台函式
+        const oldOpenAdmin = window.openAdminDashboard;
+
+        // 重新定義打開後台的函式
+        window.openAdminDashboard = async function() {
+            if (oldOpenAdmin) oldOpenAdmin(); // 先執行原本的（顯示畫面）
+            
+            // 然後立刻去 Supabase 抓取真實數字，覆蓋掉那個 75
+            try {
+                const { count: cCount } = await supabaseClient.from('cards').select('*', { count: 'exact', head: true });
+                const { count: uCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+                const { count: mCount } = await supabaseClient.from('comments').select('*', { count: 'exact', head: true });
+                
+                if (document.getElementById('stat-posts')) document.getElementById('stat-posts').innerText = cCount || 0;
+                if (document.getElementById('stat-users')) document.getElementById('stat-users').innerText = uCount || 0;
+                if (document.getElementById('stat-comments')) document.getElementById('stat-comments').innerText = mCount || 0;
+            } catch (e) {
+                console.log('讀取數字失敗', e);
+            }
+        };
     });
 </script>
 </body>
