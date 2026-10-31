@@ -4924,5 +4924,99 @@ async function deleteCard(cardId) {
         };
     });
 </script>
+<!-- ================= 終極獨立遊戲更新頁面 ================= -->
+<div id="game-updates-page" class="page-section container" style="display: none;">
+    <h2 style="color: var(--accent); text-align: center;">🎮 遊戲更新監控中心</h2>
+    <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;">由 Leo Studio 機器人自動為您抓取最新遊戲動態</p>
+    
+    <div id="game-updates-list">
+        <p style="text-align: center; color: #9ca3af;">📥 載入遊戲資訊中...</p>
+    </div>
+</div>
+
+<script>
+    // ================= 絕對防彈的遊戲更新邏輯 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 渲染資料的函式
+        window.renderGameUpdates = async function() {
+            const list = document.getElementById('game-updates-list');
+            if (!list) return;
+            list.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 載入中...</p>';
+
+            const { data, error } = await supabaseClient
+                .from('game_updates')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (error) { list.innerHTML = '<p style="color: #ff5555; text-align: center;">載入失敗。</p>'; return; }
+            if (!data || data.length === 0) { list.innerHTML = '<p style="color: #9ca3af; text-align: center;">目前沒有監控資料。</p>'; return; }
+
+            list.innerHTML = '';
+            data.forEach(game => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.borderLeft = '4px solid var(--accent)';
+                const updateTime = new Date(game.updated_date).toLocaleString();
+                
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="color: var(--accent); margin-bottom: 5px;">🎮 ${game.game_name}</h3>
+                            <p style="font-size: 14px; color: var(--text-sub);">👤 創作者：${game.creator_name}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="tag tag-basic" style="background: rgba(0,255,204,0.1); color: #00ffcc; border: 1px solid #00ffcc; padding: 2px 8px; border-radius: 4px; font-size: 12px;">🟢 線上：${game.playing.toLocaleString()} 人</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); font-size: 14px; color: #d1d5db;">
+                        <span style="color: #ffaa00;">🔄 最後更新時間：</span> ${updateTime}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        };
+
+        // 2. 在側邊選單加入按鈕 (如果還沒有的話)
+        const sideMenu = document.getElementById('side-menu');
+        if (sideMenu && !document.getElementById('btn-game-updates')) {
+            const btn = document.createElement('div');
+            btn.id = 'btn-game-updates';
+            btn.className = 'menu-item clickable';
+            btn.innerText = '🎮 遊戲更新';
+            // 插入在「論壇」的上面
+            const forumBtn = Array.from(sideMenu.querySelectorAll('.menu-item')).find(el => el.innerText.includes('論壇'));
+            if (forumBtn) sideMenu.insertBefore(btn, forumBtn);
+            else sideMenu.appendChild(btn);
+        }
+
+        // 3. 用「全域點擊攔截」確保選單一定生效
+        document.addEventListener('click', function(e) {
+            // 如果點擊的是側邊選單的「遊戲更新」
+            if (e.target.closest('#btn-game-updates') || (e.target.closest('.menu-item') && e.target.innerText.includes('遊戲更新'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 隱藏所有頁面
+                document.querySelectorAll('.page-section').forEach(page => {
+                    page.classList.remove('active');
+                    page.style.display = 'none';
+                });
+                
+                // 顯示遊戲更新頁面
+                const target = document.getElementById('game-updates-page');
+                if (target) {
+                    target.style.display = 'block';
+                    setTimeout(() => target.classList.add('active'), 10);
+                }
+                
+                // 關閉側邊選單並載入資料
+                document.getElementById('side-menu').style.left = '-320px';
+                window.renderGameUpdates();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }, true); // 使用 capture 階段，絕對攔截
+    });
+</script>
 </body>
 </html>
