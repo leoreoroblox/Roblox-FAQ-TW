@@ -4077,5 +4077,133 @@ async function deleteCard(cardId) {
         };
     });
 </script>
+<!-- ================= 獨立前台公告中心 ================= -->
+<div id="announcements-page" class="page-section container" style="display: none;">
+    <h2 style="color: var(--accent); text-align: center;">📢 全站公告中心</h2>
+    <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;">掌握 Leo Studio 的最新動態與維護通知</p>
+    
+    <div style="text-align: right; margin-bottom: 15px;">
+        <button class="btn-submit clickable" onclick="showPage('admin')" style="background: #1f2937; color: #fff; border: 1px solid #374151; display: none;" id="goto-admin-announce-btn">⚙️ 前往後台管理</button>
+    </div>
+
+    <div id="user-announcement-list">
+        <p style="text-align: center; color: #9ca3af;">📥 載入公告中...</p>
+    </div>
+</div>
+
+<script>
+    // ================= 公告中心連動邏輯 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. 在側邊選單加入「公告中心」按鈕
+        const sideMenu = document.getElementById('side-menu');
+        if (sideMenu) {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'menu-item clickable';
+            menuItem.innerText = '📢 公告中心';
+            menuItem.onclick = () => showPage('announcements');
+            
+            // 插在「首頁」下面
+            const firstItem = sideMenu.querySelector('.menu-item');
+            if (firstItem) {
+                firstItem.parentNode.insertBefore(menuItem, firstItem.nextSibling);
+            } else {
+                sideMenu.appendChild(menuItem);
+            }
+        }
+
+        // 2. 讓頂部的跑馬燈可以點擊跳轉
+        const announceBar = document.getElementById('announcement-bar');
+        if (announceBar) {
+            announceBar.style.cursor = 'pointer';
+            announceBar.title = '點擊查看所有公告';
+            announceBar.onclick = () => {
+                if (typeof showPage === 'function') {
+                    showPage('announcements');
+                }
+            };
+        }
+
+        // 3. 渲染前台公告列表的函式
+        window.renderUserAnnouncements = async function() {
+            const list = document.getElementById('user-announcement-list');
+            if (!list) return;
+            list.innerHTML = '<p style="text-align: center; color: #9ca3af;">📥 載入中...</p>';
+
+            const { data, error } = await supabaseClient
+                .from('announcements')
+                .select('*')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false });
+
+            if (error) { list.innerHTML = '<p style="color: #ff5555; text-align: center;">載入失敗。</p>'; return; }
+            if (!data || data.length === 0) { list.innerHTML = '<p style="color: #9ca3af; text-align: center;">目前沒有公開的公告。</p>'; return; }
+
+            list.innerHTML = '';
+            data.forEach(a => {
+                const div = document.createElement('div');
+                div.className = 'card'; // 使用網站原本的卡片樣式
+                div.style.borderLeft = '4px solid var(--accent)';
+                
+                const timeStr = new Date(a.created_at).toLocaleString();
+                
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; color: var(--text-sub);">
+                        <span>📢 官方公告</span>
+                        <span>📅 ${timeStr}</span>
+                    </div>
+                    <div style="font-size: 16px; line-height: 1.6; color: #fff;">
+                        ${a.content}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        };
+
+        // 4. 覆蓋原有的 showPage 函式，讓它能切換到新頁面
+        const originalShowPage = window.showPage;
+        window.showPage = function(pageName, topic = '') {
+            // 先執行原本的切換邏輯
+            if (originalShowPage) originalShowPage(pageName, topic);
+
+            // 如果是切換到公告中心
+            if (pageName === 'announcements') {
+                document.querySelectorAll('.page-section').forEach(page => {
+                    page.classList.remove('active');
+                    page.style.display = 'none';
+                });
+                const target = document.getElementById('announcements-page');
+                if (target) {
+                    target.style.display = 'block';
+                    setTimeout(() => target.classList.add('active'), 10);
+                }
+                window.renderUserAnnouncements(); // 載入公告列表
+                document.getElementById('side-menu').style.left = '-320px';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // 5. 檢查是否為管理員，如果是就顯示「前往後台」的按鈕
+        setTimeout(() => {
+            const adminMenuBtn = document.getElementById('admin-menu-item');
+            // 如果管理員選單已經顯示，代表登入過
+            if (adminMenuBtn && adminMenuBtn.style.display === 'block') {
+                const gotoAdminBtn = document.getElementById('goto-admin-announce-btn');
+                if (gotoAdminBtn) {
+                    gotoAdminBtn.style.display = 'inline-block';
+                    // 點擊直接去後台的公告管理頁
+                    gotoAdminBtn.onclick = () => {
+                        if (typeof openAdminDashboard === 'function') {
+                            openAdminDashboard();
+                            setTimeout(() => {
+                                if (typeof switchAdminPage === 'function') switchAdminPage('announce');
+                            }, 100);
+                        }
+                    };
+                }
+            }
+        }, 2000);
+    });
+</script>
 </body>
 </html>
