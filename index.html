@@ -2694,5 +2694,25 @@ async function deleteCard(cardId) {
         }
     }, true);
 </script>
+(() => {
+  const DISCOURSE_URL = 'https://leo-studio-rbxhub.discourse.group/';
+  const forumItem = [...document.querySelectorAll('.menu-item')].find(el =>
+    /論壇|Forum/i.test((el.textContent || '').replace(/\s+/g, ' ').trim())
+  );
+
+  if (!forumItem) return;
+
+  forumItem.onclick = null;
+  forumItem.removeAttribute('onclick');
+
+  forumItem.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    const win = window.open(DISCOURSE_URL, '_blank', 'noopener,noreferrer');
+    if (!win) window.location.href = DISCOURSE_URL;
+  }, true);
+})();
 </body>
 </html>
