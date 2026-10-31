@@ -4363,5 +4363,42 @@ async function deleteCard(cardId) {
         padding-top: 120px !important; 
     }
 </style>
+<script>
+    // ================= 真正的 Google 登入與狀態追蹤 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. 定義登入函式
+        window.signInWithGoogle = async function() {
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    // 登入成功後，會引導玩家回到你目前的網站網址
+                    redirectTo: window.location.origin + window.location.pathname 
+                }
+            });
+            if (error) {
+                showToast('❌ 登入失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 2. 定義登出函式
+        window.signOutUser = async function() {
+            await supabaseClient.auth.signOut();
+            showToast('👋 已成功登出', 'info');
+            setTimeout(() => window.location.reload(), 1000); // 登出後重新整理頁面
+        };
+
+        // 3. 監聽登入狀態，並把使用者資訊顯示在網頁上
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session && session.user) {
+                // 如果有人登入，就把資訊印在 Console 裡（我們下一步再把它顯示在畫面上）
+                console.log('✅ 玩家已登入:', session.user.email);
+                console.log('玩家 ID:', session.user.id);
+            } else {
+                console.log('ℹ️ 目前沒有玩家登入');
+            }
+        });
+    });
+</script>
 </body>
 </html>
