@@ -1,10 +1,10 @@
-name: Roblox 遊戲更新監控機器人
+name: Roblox 自動化遊戲更新監控
 
 on:
   schedule:
-    # 每小時的第 0 分鐘執行一次
-    - cron: '0 * * * *'
-  workflow_dispatch: # 允許手動點擊測試
+    # 每 6 小時執行一次 (避免抓取太頻繁被限制)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # 允許手動測試
 
 jobs:
   check-update:
@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '18'
 
-      - name: 安裝依賴並執行多遊戲監控
+      - name: 自動抓取熱門遊戲並監控
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -29,47 +29,49 @@ jobs:
             const axios = require('axios');
             const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-            // 👇 這是你剛剛截圖裡的 20 個遊戲 ID！
-            const gameIds = [
-              '6516141723',        // DOORS (原本的)
-              '920587237',         // Adopt Me (原本的)
-              '70411440483149',    // 海上100天
-              '94278659624110',    // 後座集會
-              '129631837832236',   // 一場漫長的飛行
-              '12334109280',       // 《內臟和黑火藥》
-              '7041939546',        // 目錄化身創作者
-              '114234929420007',   // 布洛克斯攻擊
-              '116495829188952',   // 死亡鐵軌
-              '113506071094099',   // 銳利的
-              '79546208627805',    // 森林中的99個夜晚
-              '107778070777162',   // 偷一顆蛋
-              '17516596118',       // 超級射擊
-              '12411473842',       // 壓力
-              '4639625707',        // War Tycoon
-              '14438406081',       // Wanted
-              '99409088950210',    // 在百萬隻猴子中存活
-              '86479448397834',    // 烘焙或死亡
-              '18934709778',       // 漫長路徑
-              '111543903102439',   // +1石頭跳躍
-              '6872265039',        // BedWars
-              '122446657157717'    // 狙擊手競技場
-            ];
+            // 休息函式 (模擬排隊，避免被封 IP)
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            async function fetchHotGames() {
+              try {
+                console.log('🔄 正在向 Roblox 抓取熱門遊戲排行榜...');
+                // 抓取 Roblox 官方的「熱門趨勢」排行榜
+                const sortsRes = await axios.get('https://games.roblox.com/v1/games/sorts?model.gameSortsContext=GamesDefaultSortsContext');
+                
+                // 找到「Top Trending (熱門趨勢)」的 Token
+                const trendingSort = sortsRes.data.sorts.find(s => s.sortDisplayName === 'Top Trending') || sortsRes.data.sorts[0];
+                
+                // 抓取該排行榜前 15 名遊戲
+                const listRes = await axios.get('https://games.roblox.com/v1/games/list?model.sortToken=' + trendingSort.token + '&model.maxRows=15');
+                
+                const gameIds = listRes.data.games.map(g => g.universeId.toString());
+                console.log('✅ 成功抓到 ' + gameIds.length + ' 個熱門遊戲！');
+                return gameIds;
+              } catch (error) {
+                console.error('❌ 抓取排行榜失敗:', error.message);
+                return [];
+              }
+            }
 
             async function checkUpdates() {
-              for (const placeId of gameIds) {
+              // 1. 先拿到熱門遊戲名單
+              const gameIds = await fetchHotGames();
+              if (gameIds.length === 0) return;
+
+              // 2. 分批處理 (一次處理一個，中間休息 1.5 秒)
+              for (const universeId of gameIds) {
                 try {
-                  // 1. 取得遊戲的 Universe ID
-                  const uniRes = await axios.get('https://apis.roblox.com/universes/v1/places/' + placeId + '/universe');
-                  const universeId = uniRes.data.universeId;
+                  console.log('正在檢查 Universe ID: ' + universeId);
                   
-                  // 2. 抓取遊戲最新資訊
+                  // 抓取遊戲詳情
                   const gameRes = await axios.get('https://games.roblox.com/v1/games?universeIds=' + universeId);
                   const game = gameRes.data.data[0];
                   if (!game) continue;
 
-                  const gameUpdated = game.updated; // 這是一串 ISO 時間
+                  const gameUpdated = game.updated;
+                  const placeId = game.rootPlaceId.toString(); 
 
-                  // 3. 去資料庫查這個遊戲有沒有紀錄，比對最後更新時間是否一樣
+                  // 檢查資料庫有沒有這個遊戲的紀錄
                   const { data: existing } = await supabase
                     .from('game_updates')
                     .select('updated_date')
@@ -78,26 +80,26 @@ jobs:
                     .limit(1);
 
                   if (existing && existing.length > 0 && existing[0].updated_date === gameUpdated) {
-                    continue; // 沒更新就換下一個遊戲
+                    console.log('[' + game.name + '] 沒更新，跳過。');
+                  } else {
+                    // 寫入新紀錄
+                    const { error } = await supabase.from('game_updates').insert([{
+                      game_id: placeId,
+                      game_name: game.name,
+                      creator_name: game.creator.name,
+                      updated_date: gameUpdated,
+                      playing: game.playing
+                    }]);
+
+                    if (error) { console.error('[' + game.name + '] 寫入失敗:', error); } 
+                    else { console.log('✅ [' + game.name + '] 發現更新！已寫入資料庫。'); }
                   }
-
-                  // 4. 有更新！寫入新的紀錄到資料庫
-                  const { error } = await supabase.from('game_updates').insert([{
-                    game_id: placeId,
-                    game_name: game.name,
-                    creator_name: game.creator.name,
-                    updated_date: gameUpdated,
-                    playing: game.playing
-                  }]);
-
-                  if (error) { console.error('[' + game.name + '] 寫入失敗:', error); } 
-                  else { console.log('✅ [' + game.name + '] 發現更新！已成功記錄。'); }
                   
-                  // 💡 小魔法：每次查詢中間休息 1 秒，避免被 Roblox 官方當成惡意攻擊封鎖
-                  await new Promise(resolve => setTimeout(resolve, 1000));
+                  // ⚠️ 關鍵的分批處理：每次查詢後休息 1500 毫秒 (1.5 秒)
+                  await sleep(1500);
 
                 } catch (err) {
-                  console.error('檢查遊戲 ' + placeId + ' 時發生錯誤:', err.message);
+                  console.error('檢查 Universe ID ' + universeId + ' 時發生錯誤:', err.message);
                 }
               }
             }
