@@ -5154,5 +5154,12 @@ async function deleteCard(cardId) {
         }, 100);
     });
 </script>
+<!-- ================= 修復頁面被首頁擠下去的問題 ================= -->
+<style>
+    /* 當首頁不在 .active 狀態時，強制把它完全隱藏，不佔用空間 */
+    #home-page:not(.active) {
+        display: none !important;
+    }
+</style>
 </body>
 </html>
